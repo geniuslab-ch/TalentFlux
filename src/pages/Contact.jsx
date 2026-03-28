@@ -224,7 +224,7 @@ export default function Contact() {
                 <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
                 <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                 <InputField label="Email professionnel" type="email" placeholder="sophie@acme.com" value={form.email} onChange={set("email")} required />
-                <InputField label="Téléphone" type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")} />
+                <InputField label="Téléphone" type="tel" placeholder="+41 79 592 88 06" value={form.phone} onChange={set("phone")} />
                 {activeTab === "recruiter" && (
                   <>
                     <InputField label="Entreprise" placeholder="Acme Corp SA" value={form.company} onChange={set("company")} required />
