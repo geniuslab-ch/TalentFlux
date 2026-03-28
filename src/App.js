@@ -1,60 +1,14 @@
-import { BrowserRouter, Routes, Route, Link } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TalentFluxIT from './pages/TalentFluxIT';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
 import CGU from './pages/CGU';
 
-function Home() {
-  return (
-    <div style={{
-      background: '#0B0F1A', minHeight: '100vh', display: 'flex',
-      flexDirection: 'column', alignItems: 'center', justifyContent: 'center',
-      fontFamily: "'Sora', sans-serif", color: '#fff', gap: 24,
-    }}>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Sora:wght@700;800&display=swap');`}</style>
-      <h1 style={{ fontSize: '3rem', fontWeight: 800 }}>
-        TALENT<span style={{
-          background: 'linear-gradient(135deg, #2563EB, #0EA5E9, #14B8A6)',
-          WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent'
-        }}>FLUX</span>
-      </h1>
-      <p style={{ color: '#94A3B8' }}>Placement Stratégique — Suisse</p>
-      <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', justifyContent: 'center', marginTop: 20 }}>
-        {[
-          { label: '💻 IT', path: '/it', active: true },
-          { label: '💰 Finance', path: '/finance', active: false },
-          { label: '🏥 Santé', path: '/sante', active: false },
-          { label: '⚙️ Ingénierie', path: '/ingenierie', active: false },
-          { label: '👥 RH', path: '/rh', active: false },
-        ].map(({ label, path, active }) => (
-          active
-            ? <Link key={path} to={path} style={{
-                padding: '12px 28px', borderRadius: 12, fontSize: '0.9rem', fontWeight: 600,
-                background: 'linear-gradient(135deg, #2563EB, #0EA5E9, #14B8A6)',
-                color: '#fff', textDecoration: 'none',
-                boxShadow: '0 0 20px rgba(14,165,233,0.4)',
-              }}>{label}</Link>
-            : <span key={path} style={{
-                padding: '12px 28px', borderRadius: 12, fontSize: '0.9rem', fontWeight: 600,
-                background: 'rgba(255,255,255,0.04)', color: '#334155',
-                border: '1px solid rgba(255,255,255,0.06)', cursor: 'not-allowed',
-              }}>{label} — Bientôt</span>
-        ))}
-      </div>
-      <div style={{ display: 'flex', gap: 24, marginTop: 40 }}>
-        <Link to="/contact" style={{ color: '#0EA5E9', textDecoration: 'none', fontSize: '0.88rem' }}>Contact</Link>
-        <Link to="/privacy" style={{ color: '#475569', textDecoration: 'none', fontSize: '0.88rem' }}>Confidentialité</Link>
-        <Link to="/cgu" style={{ color: '#475569', textDecoration: 'none', fontSize: '0.88rem' }}>CGU</Link>
-      </div>
-    </div>
-  );
-}
-
 export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Home />} />
+        <Route path="/" element={<Navigate to="/it" replace />} />
         <Route path="/it" element={<TalentFluxIT />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
