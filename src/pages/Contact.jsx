@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Phone, Mail, MapPin, Upload, CheckCircle, ArrowLeft, Zap, X, FileText, Clock, AlertCircle } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { supabase } from "../supabase";
 
 const GradientText = ({ children }) => (
@@ -39,6 +39,7 @@ const SelectField = ({ label, value, onChange, options, required }) => (
 );
 
 export default function Contact() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState("recruiter");
   const [submitted, setSubmitted] = useState(false);
@@ -115,9 +116,9 @@ export default function Contact() {
       `}</style>
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 70, background: scrolled ? "rgba(11,15,26,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8" }}>
+        <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8", background: "none", border: "none", cursor: "pointer" }}>
           <ArrowLeft size={18} /><span style={{ fontSize: "0.9rem" }}>Retour</span>
-        </Link>
+        </button>
         <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 

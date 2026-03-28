@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { FileText, AlertCircle, Scale, Briefcase, Globe, ArrowLeft, ChevronDown, ChevronUp } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const GradientText = ({ children }) => (
   <span style={{
@@ -56,6 +56,7 @@ const Article = ({ num, title, children }) => (
 );
 
 export default function CGU() {
+  const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -74,9 +75,9 @@ export default function CGU() {
         borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
         transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
-        <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8" }}>
+        <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "#94A3B8" }}>
           <ArrowLeft size={18} /> <span style={{ fontSize: "0.9rem" }}>Retour</span>
-        </Link>
+        </button>
         <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 
