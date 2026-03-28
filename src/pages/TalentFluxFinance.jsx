@@ -194,7 +194,9 @@ export default function TalentFluxFinance() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", company: "", profile: "", message: "" });
+  const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", company: "", profile: "", message: "", file: null });
+  const [dragOver, setDragOver] = useState(false);
+  const fileRef = useRef(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -203,6 +205,14 @@ export default function TalentFluxFinance() {
   }, []);
 
   const set = (key) => (e) => setForm(f => ({ ...f, [key]: e.target.value }));
+
+  const handleFile = (file) => {
+    if (!file) return;
+    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError("Le fichier ne doit pas dépasser 10 MB."); return; }
+    setError(null);
+    setForm(f => ({ ...f, file }));
+  };
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   const handleSubmit = async () => {
@@ -210,11 +220,20 @@ export default function TalentFluxFinance() {
     if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
+      let pdfFileName = null, pdfFileUrl = null;
+      if (form.file) {
+        const sanitize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const fileName = `${Date.now()}_${sanitize(form.firstName)}_${sanitize(form.lastName)}.pdf`;
+        const { error: uploadError } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fileName}`, form.file, { contentType: "application/pdf" });
+        if (uploadError) throw new Error("Erreur upload PDF : " + uploadError.message);
+        pdfFileName = fileName; pdfFileUrl = `submissions/${fileName}`;
+      }
       const { error: insertError } = await supabase.from("contact_submissions").insert([{
         type: "recruiter", first_name: form.firstName.trim(), last_name: form.lastName.trim(),
         email: form.email.trim().toLowerCase(), phone: form.phone.trim() || null,
         company: form.company.trim() || null, sector: "finance",
-        role: form.profile || null, message: form.message.trim() || null, status: "new",
+        role: form.profile || null, message: form.message.trim() || null,
+        pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
       if (insertError) throw new Error(insertError.message);
       setSubmitted(true);
@@ -626,6 +645,54 @@ export default function TalentFluxFinance() {
                     onFocus={e => { e.target.style.borderColor = "rgba(180,145,60,.6)"; e.target.style.boxShadow = "0 0 0 3px rgba(180,145,60,.08)"; }}
                     onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }}
                   />
+                </div>
+
+                {/* PDF Upload — Annonce de poste */}
+                <div style={{ marginBottom: 24 }}>
+                  <label style={{ display: "block", color: C.subtle, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 8 }}>
+                    Annonce de poste <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                  </label>
+                  {!form.file ? (
+                    <div
+                      onClick={() => fileRef.current?.click()}
+                      onDragOver={e => { e.preventDefault(); setDragOver(true); }}
+                      onDragLeave={() => setDragOver(false)}
+                      onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
+                      style={{
+                        border: dragOver ? `2px dashed ${C.goldLight}` : `2px dashed rgba(180,145,60,0.25)`,
+                        borderRadius: 12, padding: "22px 20px", textAlign: "center",
+                        cursor: "pointer", transition: "all .25s",
+                        background: dragOver ? "rgba(180,145,60,0.05)" : "rgba(11,17,32,0.4)",
+                      }}
+                      onMouseEnter={e => { e.currentTarget.style.borderColor = `rgba(180,145,60,0.5)`; }}
+                      onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = `rgba(180,145,60,0.25)`; }}
+                    >
+                      <Upload size={22} style={{ color: C.subtle, margin: "0 auto 10px" }} />
+                      <p style={{ color: C.muted, fontSize: ".85rem" }}>
+                        <span style={{ color: C.goldLight, fontWeight: 600 }}>Cliquez</span> ou glissez votre annonce PDF
+                      </p>
+                      <p style={{ color: C.subtle, fontSize: ".75rem", marginTop: 4 }}>Job description, fiche de poste, cahier des charges...</p>
+                      <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
+                    </div>
+                  ) : (
+                    <div style={{
+                      display: "flex", alignItems: "center", justifyContent: "space-between",
+                      padding: "13px 16px", borderRadius: 12,
+                      background: "rgba(180,145,60,0.07)", border: `1px solid ${C.borderGold}`,
+                    }}>
+                      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <FileText size={18} style={{ color: C.goldLight }} />
+                        <div>
+                          <p style={{ color: "#CBD5E1", fontWeight: 600, fontSize: ".86rem" }}>{form.file.name}</p>
+                          <p style={{ color: C.subtle, fontSize: ".72rem" }}>{(form.file.size / 1024 / 1024).toFixed(2)} MB</p>
+                        </div>
+                      </div>
+                      <button onClick={() => setForm(f => ({ ...f, file: null }))} style={{
+                        background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.2)",
+                        borderRadius: 8, padding: "5px 7px", cursor: "pointer", color: "#EF4444",
+                      }}><X size={14} /></button>
+                    </div>
+                  )}
                 </div>
 
                 {error && (
