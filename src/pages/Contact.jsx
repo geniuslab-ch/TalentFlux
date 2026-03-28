@@ -245,9 +245,9 @@ export default function Contact() {
           <div style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 28 }}>
             <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "1rem", marginBottom: 20 }}>Nous contacter</h3>
             {[
-              { icon: Mail, label: "Email", value: "hello@talentflux.ch", href: "mailto:hello@talentflux.ch" },
-              { icon: Phone, label: "Téléphone", value: "+41 22 000 00 00", href: "tel:+41220000000" },
-              { icon: MapPin, label: "Adresse", value: "Genève, Suisse", href: null },
+              { icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
+              { icon: Phone, label: "Téléphone", value: "+41 76 592 88 06", href: "tel:+41765928806" },
+              { icon: MapPin, label: "Adresse", value: "Yverdon-les-Bains, Suisse", href: null },
             ].map(({ icon: Icon, label, value, href }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(20,184,166,0.15))", border: "1px solid rgba(14,165,233,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>

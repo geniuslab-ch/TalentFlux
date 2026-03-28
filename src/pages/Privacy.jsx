@@ -107,7 +107,7 @@ export default function Privacy() {
           <p><strong style={{ color: "#CBD5E1" }}>TalentFlux Sàrl</strong><br />
           Placement Stratégique — Suisse<br />
           Site web : talentflux.ch<br />
-          Email : <a href="mailto:privacy@talentflux.ch" style={{ color: "#0EA5E9" }}>privacy@talentflux.ch</a><br /><br />
+          Email : <a href="mailto:info@talentflux.ch" style={{ color: "#0EA5E9" }}>info@talentflux.ch</a><br /><br />
           En tant que responsable du traitement, TalentFlux détermine les finalités et les moyens du traitement de vos données personnelles collectées via ce site.</p>
         </Section>
 
@@ -186,7 +186,7 @@ export default function Privacy() {
             ))}
           </div>
           <p style={{ marginTop: 16 }}>
-            Pour exercer ces droits : <a href="mailto:privacy@talentflux.ch" style={{ color: "#0EA5E9" }}>privacy@talentflux.ch</a><br />
+            Pour exercer ces droits : <a href="mailto:info@talentflux.ch" style={{ color: "#0EA5E9" }}>info@talentflux.ch</a><br />
             En cas de désaccord, vous pouvez adresser une réclamation au <strong style={{ color: "#CBD5E1" }}>Préposé fédéral à la protection des données (PFPDT)</strong> à Berne.
           </p>
         </Section>
@@ -226,7 +226,7 @@ export default function Privacy() {
         }}>
           <p style={{ color: "#94A3B8", fontSize: "0.88rem" }}>
             Des questions sur vos données ? Contactez notre délégué à la protection des données :<br />
-            <a href="mailto:privacy@talentflux.ch" style={{ color: "#0EA5E9", fontWeight: 600 }}>privacy@talentflux.ch</a>
+            <a href="mailto:info@talentflux.ch" style={{ color: "#0EA5E9", fontWeight: 600 }}>info@talentflux.ch</a>
           </p>
         </div>
       </div>

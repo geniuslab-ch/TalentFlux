@@ -186,8 +186,8 @@ export default function CGU() {
           border: "1px solid rgba(14,165,233,0.2)",
         }}>
           <p style={{ color: "#94A3B8", fontSize: "0.88rem" }}>
-            Questions juridiques : <a href="mailto:legal@talentflux.ch" style={{ color: "#0EA5E9", fontWeight: 600 }}>legal@talentflux.ch</a><br />
-            <span style={{ color: "#475569", fontSize: "0.8rem" }}>TalentFlux Sàrl — Placement Stratégique — Suisse — RC CHE-XXX.XXX.XXX</span>
+            Questions juridiques : <a href="mailto:info@talentflux.ch" style={{ color: "#0EA5E9", fontWeight: 600 }}>info@talentflux.ch</a><br />
+            <span style={{ color: "#475569", fontSize: "0.8rem" }}>TalentFlux Sàrl — Placement Stratégique — Suisse — Yverdon-les-Bains, Suisse</span>
           </p>
         </div>
       </div>
