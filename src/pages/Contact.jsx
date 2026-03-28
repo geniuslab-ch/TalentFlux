@@ -71,7 +71,8 @@ export default function Contact() {
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const fileName = `${Date.now()}_${form.firstName}_${form.lastName}.pdf`;
+        const sanitize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const fileName = `${Date.now()}_${sanitize(form.firstName)}_${sanitize(form.lastName)}.pdf`;
         const { error: uploadError } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fileName}`, form.file, { contentType: "application/pdf" });
         if (uploadError) throw new Error("Erreur upload PDF : " + uploadError.message);
         pdfFileName = fileName;
