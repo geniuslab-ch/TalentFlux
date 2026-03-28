@@ -294,12 +294,6 @@ export default function TalentFluxIT() {
   const scrollTo = (id) => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   const hero = heroContent[isCandidate ? "candidate" : "company"];
-  const sectors = [
-    { value: "it", label: "💻 IT & Technologie" }, { value: "finance", label: "💰 Finance" },
-    { value: "sante", label: "🏥 Santé" }, { value: "ingenierie", label: "⚙️ Ingénierie" },
-    { value: "rh", label: "👥 RH & Management" },
-  ];
-
   return (
     <div style={{ background: "#0B0F1A", color: "#F1F5F9", fontFamily: "'DM Sans',sans-serif", overflowX: "hidden" }}>
       <style>{`
@@ -330,13 +324,8 @@ export default function TalentFluxIT() {
         transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 32, height: 32, background: "linear-gradient(135deg,#2563EB,#06B6D4,#14B8A6)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Zap size={17} color="#fff" fill="#fff" />
-          </div>
-          <span style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: "1.05rem", color: "#F1F5F9" }}>
-            TALENT<GradientText>FLUX</GradientText>
-          </span>
-          <span style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".12em", color: "#0EA5E9", background: "rgba(14,165,233,.1)", border: "1px solid rgba(14,165,233,.3)", borderRadius: 4, padding: "2px 7px", marginLeft: 4 }}>IT</span>
+          <img src="/logo.png" alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
+          <span style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".12em", color: "#0EA5E9", background: "rgba(14,165,233,.1)", border: "1px solid rgba(14,165,233,.3)", borderRadius: 4, padding: "2px 7px" }}>IT</span>
         </div>
         <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
           {["Solution","FAQ","Contact"].map(item => (
@@ -588,8 +577,8 @@ export default function TalentFluxIT() {
                     <InputField label="Email" type="email" placeholder="sophie@acme.com" value={form.email} onChange={set("email")} required />
                     <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
                     {activeTab==="recruiter"
-                      ? <><InputField label="Entreprise" placeholder="Acme Corp SA" value={form.company} onChange={set("company")} required /><SelectField label="Secteur" value={form.sector} onChange={set("sector")} options={sectors} /></>
-                      : <><InputField label="Poste actuel" placeholder="Lead Developer" value={form.role} onChange={set("role")} /><SelectField label="Secteur visé" value={form.sector} onChange={set("sector")} options={sectors} /></>
+                      ? <><InputField label="Entreprise" placeholder="Acme Corp SA" value={form.company} onChange={set("company")} required /><InputField label="Rôle recherché" placeholder="Lead Developer React" value={form.role} onChange={set("role")} /></>
+                      : <><InputField label="Poste actuel" placeholder="Lead Developer" value={form.role} onChange={set("role")} /><InputField label="Stack principale" placeholder="React, Node.js, Python..." value={form.company} onChange={set("company")} /></>
                     }
                   </div>
                   <div style={{ marginBottom: 13 }}>
@@ -705,8 +694,8 @@ export default function TalentFluxIT() {
       {/* FOOTER */}
       <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "26px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 13 }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-            <span style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, color: "#F1F5F9" }}>TALENT<GradientText>FLUX</GradientText></span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <img src="/logo.png" alt="TalentFlux" style={{ height: 32, width: "auto", objectFit: "contain" }} />
             <span style={{ color: "#334155", fontSize: ".7rem" }}>· IT · Yverdon-les-Bains, Suisse</span>
           </div>
           <p style={{ color: "#334155", fontSize: ".73rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>

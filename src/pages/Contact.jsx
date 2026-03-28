@@ -118,12 +118,7 @@ export default function Contact() {
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8" }}>
           <ArrowLeft size={18} /><span style={{ fontSize: "0.9rem" }}>Retour</span>
         </Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <div style={{ width: 32, height: 32, borderRadius: 8, background: "linear-gradient(135deg, #2563EB, #06B6D4, #14B8A6)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Zap size={16} color="#fff" fill="#fff" />
-          </div>
-          <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700 }}>TALENT<GradientText>FLUX</GradientText></span>
-        </div>
+        <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 
       <div style={{ padding: "110px 2rem 50px", textAlign: "center", background: "radial-gradient(ellipse at top, rgba(37,99,235,0.1) 0%, transparent 55%)" }}>

@@ -73,9 +73,7 @@ export default function Privacy() {
         <Link to="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8" }}>
           <ArrowLeft size={18} /> <span style={{ fontSize: "0.9rem" }}>Retour</span>
         </Link>
-        <span style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700 }}>
-          TALENT<GradientText>FLUX</GradientText>
-        </span>
+        <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 
       {/* HERO */}
