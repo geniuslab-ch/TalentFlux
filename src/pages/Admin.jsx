@@ -321,7 +321,7 @@ function TabCandidats() {
                   )}
 
                   {/* Lier à un mandat */}
-                  <div style={{ background: "rgba(37,99,235,.06)", border: `1px solid rgba(37,99,235,.15)`, borderRadius: 12, padding: "14px 16px" }}>
+                  <div onClick={e => e.stopPropagation()} style={{ background: "rgba(37,99,235,.06)", border: `1px solid rgba(37,99,235,.15)`, borderRadius: 12, padding: "14px 16px" }}>
                     <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 10 }}>
                       <Link2 size={12} style={{ display: "inline", marginRight: 5 }} />
                       Lier à un mandat
@@ -395,27 +395,37 @@ function TabMandats() {
   const openEdit = (m) => {
     setEditing(m);
     setForm({
-      ...m,
-      budget_min_chf:       m.budget_min_chf       || "",
-      budget_max_chf:       m.budget_max_chf       || "",
-      remote_jours_max:     m.remote_jours_max     || "2",
-      exp_min_annees:       m.exp_min_annees       || "3",
-      exp_ideal_annees:     m.exp_ideal_annees     || "6",
-      score_seuil_min:      m.score_seuil_min      || "70",
-      test_score_min:       m.test_score_min       || "12",
-      description_poste:    m.description_poste    || "",
-      // Arrays : null → [] pour les TagSelectors
-      it_stack_requis:      m.it_stack_requis      || [],
-      it_stack_bonus:       m.it_stack_bonus       || [],
-      it_cloud_requis:      m.it_cloud_requis      || "",
-      it_contrat_accepte:   m.it_contrat_accepte   || [],
+      titre_poste: m.titre_poste || "",
+      secteur: m.secteur || "",
+      statut: m.statut || "Ouvert",
+      budget_min_chf: m.budget_min_chf || "",
+      budget_max_chf: m.budget_max_chf || "",
+      remote_policy: m.remote_policy || "Hybride",
+      remote_jours_max: m.remote_jours_max ?? "2",
+      exp_min_annees: m.exp_min_annees ?? "3",
+      exp_ideal_annees: m.exp_ideal_annees ?? "6",
+      localisation: m.localisation || "Lausanne",
+      langue_1: m.langue_1 || "FR",
+      score_seuil_min: m.score_seuil_min ?? "70",
+      test_score_min: m.test_score_min ?? "12",
+      description_poste: m.description_poste || "",
+      prio_formation: m.prio_formation || "Souhaité",
+      prio_technique: m.prio_technique || "Non-négociable",
+      prio_langues: m.prio_langues || "Souhaité",
+      prio_exp_secteur: m.prio_exp_secteur || "Souhaité",
+      prio_management: m.prio_management || "Atout",
+      prio_salaire_fit: m.prio_salaire_fit || "Non-négociable",
+      it_stack_requis: m.it_stack_requis || [],
+      it_stack_bonus: m.it_stack_bonus || [],
+      it_cloud_requis: m.it_cloud_requis || "",
+      it_contrat_accepte: m.it_contrat_accepte || [],
       fin_specialite_requise: m.fin_specialite_requise || "",
-      fin_normes_requises:  m.fin_normes_requises  || [],
-      fin_erp_requis:       m.fin_erp_requis       || [],
+      fin_normes_requises: m.fin_normes_requises || [],
+      fin_erp_requis: m.fin_erp_requis || [],
       ing_specialite_requise: m.ing_specialite_requise || "",
-      ing_cao_requis:       m.ing_cao_requis       || [],
-      ing_normes_requises:  m.ing_normes_requises  || [],
-      ing_secteur_cible:    m.ing_secteur_cible    || "",
+      ing_cao_requis: m.ing_cao_requis || [],
+      ing_normes_requises: m.ing_normes_requises || [],
+      ing_secteur_cible: m.ing_secteur_cible || "",
     });
     setShowForm(true);
   };
@@ -423,11 +433,23 @@ function TabMandats() {
   const handleSave = async () => {
     if (!form.titre_poste || !form.secteur) return;
     setSaving(true);
-    const payload = { ...form, budget_min_chf: parseInt(form.budget_min_chf)||null, budget_max_chf: parseInt(form.budget_max_chf)||null, remote_jours_max: parseInt(form.remote_jours_max)||0, exp_min_annees: parseInt(form.exp_min_annees)||0, exp_ideal_annees: parseInt(form.exp_ideal_annees)||3, score_seuil_min: parseInt(form.score_seuil_min)||70, test_score_min: parseInt(form.test_score_min)||12 };
+    const { id, created_at, updated_at, reference, ...rest } = form;
+    const payload = {
+      ...rest,
+      budget_min_chf:   parseInt(form.budget_min_chf) || null,
+      budget_max_chf:   parseInt(form.budget_max_chf) || null,
+      remote_jours_max: parseInt(form.remote_jours_max) || 0,
+      exp_min_annees:   parseInt(form.exp_min_annees) || 0,
+      exp_ideal_annees: parseInt(form.exp_ideal_annees) || 3,
+      score_seuil_min:  parseInt(form.score_seuil_min) || 70,
+      test_score_min:   parseInt(form.test_score_min) || 12,
+    };
     if (editing) {
-      await supabase.from("mandats").update(payload).eq("id", editing.id);
+      const { error } = await supabase.from("mandats").update(payload).eq("id", editing.id);
+      if (error) console.error("Update error:", error);
     } else {
-      await supabase.from("mandats").insert(payload);
+      const { error } = await supabase.from("mandats").insert(payload);
+      if (error) console.error("Insert error:", error);
     }
     setSaving(false); setShowForm(false); load();
   };
@@ -607,58 +629,29 @@ function TabEvaluations() {
     setAiError(null);
     setAiResult(null);
 
-    const systemPrompt = `Tu es un consultant senior en recrutement pour TalentFlux, une agence suisse spécialisée dans le matching algorithmique.
-Tu analyses des transcriptions d'entretiens pour en extraire des données structurées.
-
-CONTEXTE DU MANDAT :
-- Secteur : ${editing.mandat_secteur}
-- Poste : ${editing.titre_poste}
-
-MISSION : Analyse la transcription et retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exactement ces clés :
-{
-  "SS_leadership": <entier 0-5>,
-  "SS_communication": <entier 0-5>,
-  "SS_adaptabilite": <entier 0-5>,
-  "SS_rigueur": <entier 0-5>,
-  "SS_autonomie": <entier 0-5>,
-  "SC_formation": <0 ou 1>,
-  "SC_technique": <0 ou 1>,
-  "SC_langues": <0 ou 1>,
-  "SC_exp_secteur": <0 ou 1>,
-  "SC_management": <0 ou 1>,
-  "analyse": "<paragraphe factuel 100 mots max>",
-  "points_forts": ["<point 1>", "<point 2>", "<point 3>"],
-  "points_vigilance": ["<point 1>", "<point 2>"],
-  "recommandation": "<SHORTLIST | SECOND_TOUR | REFUS>",
-  "red_flag": <true ou false>,
-  "red_flag_motif": "<vide si false>"
-}
-
-RÈGLES :
-- SS_ : 0=absent 1=faible 2=moyen 3=bon 4=très bon 5=exceptionnel
-- SC_ : 0=non validé 1=validé
-- Red Flag = true si contradiction, attitude inappropriée, mensonge détecté
-- Si info insuffisante pour un SC_, mets 0
-- Sois factuel, ne déduis pas ce qui n'est pas dit explicitement`;
-
     try {
-      const response = await fetch("https://api.anthropic.com/v1/messages", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          model: "claude-sonnet-4-20250514",
-          max_tokens: 1000,
-          system: systemPrompt,
-          messages: [{ role: "user", content: transcription }],
-        }),
-      });
+      const supabaseUrl = "https://aaknzniigmmrdjlakiry.supabase.co";
+      const supabaseKey = process.env.REACT_APP_SUPABASE_ANON_KEY;
+      const response = await fetch(
+        `${supabaseUrl}/functions/v1/analyze-interview`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${supabaseKey}`,
+          },
+          body: JSON.stringify({
+            transcription,
+            secteur: editing.mandat_secteur,
+            titre_poste: editing.titre_poste,
+          }),
+        }
+      );
 
       const data = await response.json();
-      if (data.error) throw new Error(data.error.message);
+      if (data.error) throw new Error(data.error);
 
-      const text = data.content?.[0]?.text || "";
-      const clean = text.replace(/```json|```/g, "").trim();
-      const parsed = JSON.parse(clean);
+      const parsed = data;
 
       // Auto-remplir les scores
       setScores(s => ({
