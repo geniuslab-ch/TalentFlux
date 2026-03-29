@@ -194,18 +194,27 @@ export default function CandidatureForm({ secteur, theme, labels }) {
     e.preventDefault();
     setError(null);
     if (!form.prenom || !form.nom || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
-    if (!form.cv_file) { setError("Veuillez joindre votre CV en PDF."); return; }
     if (!form.consentement) { setError("Veuillez accepter les conditions de traitement des données."); return; }
     setLoading(true);
 
     try {
-      // Upload CV
-      const sanitize = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
-      const fileName = `${Date.now()}_${sanitize(form.prenom)}_${sanitize(form.nom)}.pdf`;
-      const { error: upErr } = await supabase.storage
-        .from("contact-pdfs")
-        .upload(`cv/${fileName}`, form.cv_file, { contentType: "application/pdf" });
-      if (upErr) throw new Error("Erreur upload CV : " + upErr.message);
+      // Upload CV (optionnel — on continue même si l'upload échoue)
+      let cvFileName = null;
+      let cvUrl = null;
+
+      if (form.cv_file) {
+        const sanitize = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const fileName = `${Date.now()}_${sanitize(form.prenom)}_${sanitize(form.nom)}.pdf`;
+        const { error: upErr } = await supabase.storage
+          .from("contact-pdfs")
+          .upload(`cv/${fileName}`, form.cv_file, { contentType: "application/pdf" });
+        if (upErr) {
+          console.warn("Upload CV échoué (non bloquant):", upErr.message);
+        } else {
+          cvFileName = fileName;
+          cvUrl = `cv/${fileName}`;
+        }
+      }
 
       // Insertion candidat
       const payload = {
@@ -229,8 +238,8 @@ export default function CandidatureForm({ secteur, theme, labels }) {
         motif_changement: form.motif_changement || null,
         succes_professionnel: form.succes || null,
         gestion_desaccord: form.desaccord || null,
-        cv_nom_fichier: fileName,
-        cv_url: `cv/${fileName}`,
+        cv_nom_fichier: cvFileName,
+        cv_url: cvUrl,
         consentement_rgpd: form.consentement,
         consentement_opportunites: form.consentement_opportunites,
         // IT
@@ -257,7 +266,10 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       const { error: insErr } = await supabase
         .from("candidats")
         .upsert(payload, { onConflict: "email" });
-      if (insErr) throw new Error(insErr.message);
+      if (insErr) {
+        console.error("Supabase insert error:", insErr);
+        throw new Error(`Erreur base de données : ${insErr.message} (code: ${insErr.code})`);
+      }
 
       setSubmitted(true);
     } catch (err) {
