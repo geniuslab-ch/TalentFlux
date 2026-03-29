@@ -734,9 +734,7 @@ RÈGLES :
                   Transcription ou notes d'entretien
                 </label>
                 <textarea value={transcription} onChange={e => setTranscription(e.target.value)} rows={5}
-                  placeholder={"Collez ici la transcription de l'entretien ou vos notes...
-
-Ex: Le candidat a mentionné 5 ans d'expérience React, maîtrise TypeScript et Node.js. Autonome sur les projets, bon communicant. A dirigé une équipe de 3 devs. Disponible dans 4 semaines..."}
+                  placeholder="Collez ici la transcription ou vos notes d'entretien... Ex: 7 ans React/TypeScript, maîtrise Node.js et AWS, autonome, bon communicant, disponible 3 semaines."
                   style={{ width: "100%", padding: "10px 13px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid rgba(99,102,241,.3)`, color: C.text, fontSize: ".86rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                   onFocus={e => { e.target.style.borderColor = "rgba(99,102,241,.6)"; }}
                   onBlur={e => { e.target.style.borderColor = "rgba(99,102,241,.3)"; }}
