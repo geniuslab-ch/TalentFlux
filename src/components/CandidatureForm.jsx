@@ -265,10 +265,15 @@ export default function CandidatureForm({ secteur, theme, labels }) {
 
       const { error: insErr } = await supabase
         .from("candidats")
-        .upsert(payload, { onConflict: "email" });
+        .insert(payload);
+
       if (insErr) {
-        console.error("Supabase insert error:", insErr);
-        throw new Error(`Erreur base de données : ${insErr.message} (code: ${insErr.code})`);
+        console.error("Supabase error:", insErr);
+        // Email déjà existant → candidature déjà soumise
+        if (insErr.code === "23505") {
+          throw new Error("Votre candidature est déjà enregistrée avec cet email. Contactez-nous à info@talentflux.ch pour la mettre à jour.");
+        }
+        throw new Error(`Erreur : ${insErr.message} (code: ${insErr.code})`);
       }
 
       setSubmitted(true);
