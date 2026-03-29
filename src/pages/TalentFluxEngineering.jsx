@@ -752,6 +752,19 @@ export default function TalentFluxEngineering() {
                 <p style={{ color: E.subtle, fontSize: ".68rem", textAlign: "center", marginTop: 10, fontFamily: "'DM Mono', monospace" }}>
                   // DONNÉES CHIFFRÉES · SUPABASE · RGPD & LPD
                 </p>
+                <div style={{ textAlign: "center", marginTop: 14, paddingTop: 14, borderTop: `1px solid ${E.border}` }}>
+                  <Link to="/candidature/ingenierie" style={{
+                    color: E.subtle, fontSize: ".78rem", textDecoration: "none",
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    borderBottom: `1px solid rgba(59,130,246,.2)`, paddingBottom: 2,
+                    transition: "color .2s", fontFamily: "'DM Mono', monospace",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.color = E.blueLight}
+                    onMouseLeave={e => e.currentTarget.style.color = E.subtle}
+                  >
+                    Vous êtes ingénieur ? → Déposez votre candidature
+                  </Link>
+                </div>
               </div>
             ) : (
               <div style={{ padding: "52px 28px", textAlign: "center" }}>

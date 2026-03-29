@@ -730,6 +730,19 @@ export default function TalentFluxFinance() {
                 </button>
 
                 <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 12 }}>🔒 Données chiffrées · Stockées sur Supabase CH · RGPD & LPD conformes</p>
+                <div style={{ textAlign: "center", marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
+                  <Link to="/candidature/finance" style={{
+                    color: C.subtle, fontSize: ".8rem", textDecoration: "none",
+                    display: "inline-flex", alignItems: "center", gap: 6,
+                    borderBottom: `1px solid rgba(180,145,60,.2)`, paddingBottom: 2,
+                    transition: "color .2s",
+                  }}
+                    onMouseEnter={e => e.currentTarget.style.color = C.goldLight}
+                    onMouseLeave={e => e.currentTarget.style.color = C.subtle}
+                  >
+                    Vous êtes candidat Finance ? → Déposez votre dossier
+                  </Link>
+                </div>
               </div>
             ) : (
               <div style={{ padding: "52px 32px", textAlign: "center" }}>
