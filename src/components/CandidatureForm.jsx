@@ -223,7 +223,7 @@ export default function CandidatureForm({ secteur, theme, labels }) {
         email: form.email.trim().toLowerCase(),
         telephone: form.telephone.trim() || null,
         secteur,
-        source: "Formulaire web",
+        source: "Manuel",
         salaire_souhaite_chf: parseInt(form.salaire_souhaite_chf) || 0,
         salaire_minimum_chf: parseInt(form.salaire_minimum_chf) || null,
         disponibilite_semaines: parseInt(form.disponibilite_semaines) || 4,
@@ -353,11 +353,29 @@ export default function CandidatureForm({ secteur, theme, labels }) {
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
             <Field label="Années sur votre stack principale" type="number" placeholder="5" value={form.it_annees_stack} onChange={set("it_annees_stack")} required accentColor={ac} />
             <SelectField label="Cloud maîtrisé" value={form.it_cloud} onChange={set("it_cloud")} accentColor={ac}
-              options={[{ value: "", label: "Sélectionnez..." }, ...["AWS", "Google Cloud (GCP)", "Microsoft Azure", "Multi-cloud", "Aucun"].map(v => ({ value: v, label: v }))]} />
+              options={[
+                { value: "", label: "Sélectionnez..." },
+                { value: "AWS", label: "AWS" },
+                { value: "GCP", label: "Google Cloud (GCP)" },
+                { value: "Azure", label: "Microsoft Azure" },
+                { value: "Multi-cloud", label: "Multi-cloud" },
+                { value: "Aucun", label: "Aucun" },
+              ]} />
             <SelectField label="Contrat préféré" value={form.it_contrat} onChange={set("it_contrat")} required accentColor={ac}
-              options={[{ value: "", label: "Sélectionnez..." }, ...["CDI", "Mission / Freelance", "Indépendant"].map(v => ({ value: v, label: v }))]} />
+              options={[
+                { value: "", label: "Sélectionnez..." },
+                { value: "CDI", label: "CDI" },
+                { value: "Mission", label: "Mission / Freelance" },
+                { value: "Indépendant", label: "Indépendant" },
+              ]} />
             <SelectField label="Environnement préféré" value={form.it_env} onChange={set("it_env")} accentColor={ac}
-              options={[{ value: "", label: "Sélectionnez..." }, ...["Produit / Startup", "Conseil / ESN", "Grand groupe", "PME"].map(v => ({ value: v, label: v }))]} />
+              options={[
+                { value: "", label: "Sélectionnez..." },
+                { value: "Produit", label: "Produit / Startup" },
+                { value: "Conseil", label: "Conseil / ESN" },
+                { value: "Grand groupe", label: "Grand groupe" },
+                { value: "Startup", label: "PME / Startup" },
+              ]} />
           </div>
         </Section>
       )}
@@ -365,7 +383,16 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       {secteur === "Finance" && (
         <Section title="Compétences Finance" icon="💰" accentColor={ac}>
           <SelectField label="Spécialité principale" value={form.fin_specialite} onChange={set("fin_specialite")} required accentColor={ac}
-            options={[{ value: "", label: "Sélectionnez..." }, ...["CFO / Direction financière", "Contrôle de gestion", "Audit interne / externe", "Comptabilité / Reporting", "Trésorerie / Risk", "M&A / Finance d'entreprise", "Autre"].map(v => ({ value: v, label: v }))]} />
+            options={[
+              { value: "", label: "Sélectionnez..." },
+              { value: "CFO", label: "CFO / Direction financière" },
+              { value: "Contrôle de gestion", label: "Contrôle de gestion" },
+              { value: "Audit", label: "Audit interne / externe" },
+              { value: "Comptabilité", label: "Comptabilité / Reporting" },
+              { value: "Trésorerie", label: "Trésorerie / Risk" },
+              { value: "M&A", label: "M&A / Finance d'entreprise" },
+              { value: "Autre", label: "Autre" },
+            ]} />
           <CheckboxGroup label="Normes maîtrisées" accentColor={ac}
             options={["IFRS", "Swiss GAAP", "Code des Obligations (OR)", "US GAAP", "Lux GAAP"]}
             values={form.fin_normes} onChange={setArr("fin_normes")} />
@@ -385,7 +412,15 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       {secteur === "Ingénierie" && (
         <Section title="Compétences Ingénierie" icon="⚙️" accentColor={ac}>
           <SelectField label="Spécialité principale" value={form.ing_specialite} onChange={set("ing_specialite")} required accentColor={ac}
-            options={[{ value: "", label: "Sélectionnez..." }, ...["Mécanique / Conception", "Électronique / Embarqué", "Automation / Robotique", "Qualité / Réglementaire", "Direction technique / R&D", "Autre"].map(v => ({ value: v, label: v }))]} />
+            options={[
+              { value: "", label: "Sélectionnez..." },
+              { value: "Mécanique", label: "Mécanique / Conception" },
+              { value: "Électronique", label: "Électronique / Embarqué" },
+              { value: "Automation", label: "Automation / Robotique" },
+              { value: "Qualité", label: "Qualité / Réglementaire" },
+              { value: "Direction R&D", label: "Direction technique / R&D" },
+              { value: "Autre", label: "Autre" },
+            ]} />
           <CheckboxGroup label="Logiciels CAO" accentColor={ac}
             options={["SolidWorks", "CATIA V5/V6", "AutoCAD", "Inventor", "CREO", "NX Siemens", "Aucun"]}
             values={form.ing_cao} onChange={setArr("ing_cao")} />
@@ -395,7 +430,7 @@ export default function CandidatureForm({ secteur, theme, labels }) {
           <CheckboxGroup label="Secteurs d'expérience" accentColor={ac}
             options={["MedTech / Dispositifs médicaux", "Horlogerie / Microtechnique", "Automation / Robotique industrielle", "Aérospatiale / Défense", "Industrie 4.0 / IoT", "Alimentaire / Pharma"]}
             values={form.ing_secteurs} onChange={setArr("ing_secteurs")} />
-          {form.ing_specialite === "Automation / Robotique" && (
+          {form.ing_specialite === "Automation" && (
             <CheckboxGroup label="Langages automate" accentColor={ac}
               options={["Siemens S7 / TIA Portal", "ABB", "Rockwell / Allen-Bradley", "Beckhoff", "Schneider Electric"]}
               values={form.ing_automates} onChange={setArr("ing_automates")} />
