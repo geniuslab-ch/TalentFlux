@@ -283,7 +283,7 @@ function TabCandidats() {
 
               {/* Détail expandé */}
               {selected?.id === c.id && (
-                <div style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.border}` }}>
+                <div onClick={e => e.stopPropagation()} style={{ marginTop: 16, paddingTop: 16, borderTop: `1px solid ${C.border}` }}>
                   <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 16 }}>
                     {[
                       ["Expérience", `${c.annees_experience_total || 0} ans`],
@@ -394,7 +394,29 @@ function TabMandats() {
 
   const openEdit = (m) => {
     setEditing(m);
-    setForm({ ...m, budget_min_chf: m.budget_min_chf||"", budget_max_chf: m.budget_max_chf||"", remote_jours_max: m.remote_jours_max||"2", exp_min_annees: m.exp_min_annees||"3", exp_ideal_annees: m.exp_ideal_annees||"6", score_seuil_min: m.score_seuil_min||"70", test_score_min: m.test_score_min||"12" });
+    setForm({
+      ...m,
+      budget_min_chf:       m.budget_min_chf       || "",
+      budget_max_chf:       m.budget_max_chf       || "",
+      remote_jours_max:     m.remote_jours_max     || "2",
+      exp_min_annees:       m.exp_min_annees       || "3",
+      exp_ideal_annees:     m.exp_ideal_annees     || "6",
+      score_seuil_min:      m.score_seuil_min      || "70",
+      test_score_min:       m.test_score_min       || "12",
+      description_poste:    m.description_poste    || "",
+      // Arrays : null → [] pour les TagSelectors
+      it_stack_requis:      m.it_stack_requis      || [],
+      it_stack_bonus:       m.it_stack_bonus       || [],
+      it_cloud_requis:      m.it_cloud_requis      || "",
+      it_contrat_accepte:   m.it_contrat_accepte   || [],
+      fin_specialite_requise: m.fin_specialite_requise || "",
+      fin_normes_requises:  m.fin_normes_requises  || [],
+      fin_erp_requis:       m.fin_erp_requis       || [],
+      ing_specialite_requise: m.ing_specialite_requise || "",
+      ing_cao_requis:       m.ing_cao_requis       || [],
+      ing_normes_requises:  m.ing_normes_requises  || [],
+      ing_secteur_cible:    m.ing_secteur_cible    || "",
+    });
     setShowForm(true);
   };
 
