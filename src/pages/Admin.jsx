@@ -3,7 +3,7 @@ import { supabase } from "../supabase";
 import {
   Users, Briefcase, Star, Trophy, LogOut, Plus, X,
   ChevronDown, ChevronUp, Search, RefreshCw, AlertTriangle,
-  CheckCircle, Clock, Link2, Eye, Save, Shield, Zap
+  CheckCircle, Clock, Link2, Eye, Save, Shield, Zap, Sparkles, Bot
 } from "lucide-react";
 
 // ── Design tokens ─────────────────────────────────────────
@@ -550,8 +550,16 @@ function TabEvaluations() {
 
   useEffect(() => { load(); }, [load]);
 
+  const [transcription, setTranscription] = useState("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiResult, setAiResult] = useState(null);
+  const [aiError, setAiError] = useState(null);
+
   const openEdit = (ev) => {
     setEditing(ev);
+    setTranscription(ev.transcription_entretien || "");
+    setAiResult(null);
+    setAiError(null);
     setScores({
       statut: ev.statut || "En analyse",
       test_score: ev.test_score ?? "",
@@ -571,9 +579,102 @@ function TabEvaluations() {
     });
   };
 
+  const analyzeWithAI = async () => {
+    if (!transcription.trim()) return;
+    setAiLoading(true);
+    setAiError(null);
+    setAiResult(null);
+
+    const systemPrompt = `Tu es un consultant senior en recrutement pour TalentFlux, une agence suisse spécialisée dans le matching algorithmique.
+Tu analyses des transcriptions d'entretiens pour en extraire des données structurées.
+
+CONTEXTE DU MANDAT :
+- Secteur : ${editing.mandat_secteur}
+- Poste : ${editing.titre_poste}
+
+MISSION : Analyse la transcription et retourne UNIQUEMENT un objet JSON valide, sans texte avant ni après, avec exactement ces clés :
+{
+  "SS_leadership": <entier 0-5>,
+  "SS_communication": <entier 0-5>,
+  "SS_adaptabilite": <entier 0-5>,
+  "SS_rigueur": <entier 0-5>,
+  "SS_autonomie": <entier 0-5>,
+  "SC_formation": <0 ou 1>,
+  "SC_technique": <0 ou 1>,
+  "SC_langues": <0 ou 1>,
+  "SC_exp_secteur": <0 ou 1>,
+  "SC_management": <0 ou 1>,
+  "analyse": "<paragraphe factuel 100 mots max>",
+  "points_forts": ["<point 1>", "<point 2>", "<point 3>"],
+  "points_vigilance": ["<point 1>", "<point 2>"],
+  "recommandation": "<SHORTLIST | SECOND_TOUR | REFUS>",
+  "red_flag": <true ou false>,
+  "red_flag_motif": "<vide si false>"
+}
+
+RÈGLES :
+- SS_ : 0=absent 1=faible 2=moyen 3=bon 4=très bon 5=exceptionnel
+- SC_ : 0=non validé 1=validé
+- Red Flag = true si contradiction, attitude inappropriée, mensonge détecté
+- Si info insuffisante pour un SC_, mets 0
+- Sois factuel, ne déduis pas ce qui n'est pas dit explicitement`;
+
+    try {
+      const response = await fetch("https://api.anthropic.com/v1/messages", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 1000,
+          system: systemPrompt,
+          messages: [{ role: "user", content: transcription }],
+        }),
+      });
+
+      const data = await response.json();
+      if (data.error) throw new Error(data.error.message);
+
+      const text = data.content?.[0]?.text || "";
+      const clean = text.replace(/```json|```/g, "").trim();
+      const parsed = JSON.parse(clean);
+
+      // Auto-remplir les scores
+      setScores(s => ({
+        ...s,
+        ss_leadership:    parsed.SS_leadership    ?? s.ss_leadership,
+        ss_communication: parsed.SS_communication ?? s.ss_communication,
+        ss_adaptabilite:  parsed.SS_adaptabilite  ?? s.ss_adaptabilite,
+        ss_rigueur:       parsed.SS_rigueur        ?? s.ss_rigueur,
+        ss_autonomie:     parsed.SS_autonomie      ?? s.ss_autonomie,
+        sc_formation:     parsed.SC_formation      ?? s.sc_formation,
+        sc_technique:     parsed.SC_technique      ?? s.sc_technique,
+        sc_langues:       parsed.SC_langues        ?? s.sc_langues,
+        sc_exp_secteur:   parsed.SC_exp_secteur    ?? s.sc_exp_secteur,
+        sc_management:    parsed.SC_management     ?? s.sc_management,
+        red_flag:         parsed.red_flag          ?? s.red_flag,
+        red_flag_motif:   parsed.red_flag_motif    || s.red_flag_motif,
+        notes_consultant: parsed.analyse           || s.notes_consultant,
+      }));
+
+      setAiResult(parsed);
+    } catch (err) {
+      setAiError("Erreur IA : " + err.message);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
   const handleSave = async () => {
     setSaving(true);
-    const payload = { ...scores, test_score: scores.test_score === "" ? null : parseInt(scores.test_score) };
+    const payload = {
+      ...scores,
+      test_score: scores.test_score === "" ? null : parseInt(scores.test_score),
+      transcription_entretien: transcription || null,
+      analyse_ia: aiResult?.analyse || scores.notes_consultant || null,
+      points_forts: aiResult?.points_forts || null,
+      points_vigilance: aiResult?.points_vigilance || null,
+      recommandation_ia: aiResult?.recommandation || null,
+    };
     await supabase.from("evaluations").update(payload).eq("id", editing.evaluation_id);
     setSaving(false); setEditing(null); load();
   };
@@ -620,6 +721,61 @@ function TabEvaluations() {
       {editing && (
         <Modal title={`Évaluation — ${editing.candidat_nom}`} onClose={() => setEditing(null)} width={680}>
           <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+
+            {/* ── ANALYSE IA ── */}
+            <div style={{ background: "rgba(99,102,241,.06)", border: `1px solid rgba(99,102,241,.25)`, borderRadius: 14, padding: 18 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                <Sparkles size={15} style={{ color: "#A5B4FC" }} />
+                <span style={{ color: "#A5B4FC", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Analyse IA — Entretien</span>
+                {aiResult && <Badge label="✓ Scores remplis" color={C.teal} />}
+              </div>
+              <div style={{ marginBottom: 10 }}>
+                <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>
+                  Transcription ou notes d'entretien
+                </label>
+                <textarea value={transcription} onChange={e => setTranscription(e.target.value)} rows={5}
+                  placeholder={"Collez ici la transcription de l'entretien ou vos notes...
+
+Ex: Le candidat a mentionné 5 ans d'expérience React, maîtrise TypeScript et Node.js. Autonome sur les projets, bon communicant. A dirigé une équipe de 3 devs. Disponible dans 4 semaines..."}
+                  style={{ width: "100%", padding: "10px 13px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid rgba(99,102,241,.3)`, color: C.text, fontSize: ".86rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
+                  onFocus={e => { e.target.style.borderColor = "rgba(99,102,241,.6)"; }}
+                  onBlur={e => { e.target.style.borderColor = "rgba(99,102,241,.3)"; }}
+                />
+              </div>
+              {aiError && (
+                <div style={{ padding: "8px 12px", borderRadius: 8, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#FCA5A5", fontSize: ".8rem", marginBottom: 10 }}>
+                  {aiError}
+                </div>
+              )}
+              {aiResult && (
+                <div style={{ padding: "12px 14px", borderRadius: 10, background: "rgba(20,184,166,.06)", border: `1px solid ${C.teal}30`, marginBottom: 10 }}>
+                  <div style={{ color: C.tealL, fontSize: ".7rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 8 }}>
+                    Résultat — Recommandation : <span style={{ color: aiResult.recommandation === "SHORTLIST" ? C.teal : aiResult.recommandation === "REFUS" ? C.red : C.gold }}>{aiResult.recommandation}</span>
+                  </div>
+                  {aiResult.points_forts?.length > 0 && (
+                    <div style={{ marginBottom: 6 }}>
+                      <span style={{ color: C.subtle, fontSize: ".72rem" }}>Points forts : </span>
+                      <span style={{ color: C.muted, fontSize: ".78rem" }}>{aiResult.points_forts.join(" · ")}</span>
+                    </div>
+                  )}
+                  {aiResult.points_vigilance?.length > 0 && (
+                    <div>
+                      <span style={{ color: C.subtle, fontSize: ".72rem" }}>Vigilance : </span>
+                      <span style={{ color: "#FCD34D", fontSize: ".78rem" }}>{aiResult.points_vigilance.join(" · ")}</span>
+                    </div>
+                  )}
+                </div>
+              )}
+              <button onClick={analyzeWithAI} disabled={aiLoading || !transcription.trim()}
+                style={{ display: "flex", alignItems: "center", gap: 8, padding: "10px 18px", borderRadius: 10, border: "none", background: aiLoading ? "rgba(99,102,241,.3)" : "linear-gradient(135deg, #4F46E5, #7C3AED)", color: "#fff", fontWeight: 700, fontSize: ".84rem", cursor: aiLoading || !transcription.trim() ? "not-allowed" : "pointer", opacity: !transcription.trim() ? .5 : 1, fontFamily: "'DM Sans',sans-serif", transition: "all .2s" }}>
+                {aiLoading
+                  ? <><div style={{ width: 14, height: 14, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Analyse en cours...</>
+                  : <><Bot size={15} />Analyser et remplir les scores</>
+                }
+              </button>
+              <p style={{ color: C.subtle, fontSize: ".68rem", marginTop: 8 }}>Les scores SS_ et SC_ seront remplis automatiquement · Vous pouvez les ajuster manuellement avant de sauvegarder.</p>
+            </div>
+
             {/* Statut */}
             <Select label="Statut du dossier" value={scores.statut} onChange={e => setS("statut")(e.target.value)}
               options={STATUTS.map(v => ({ value: v, label: v }))} />
