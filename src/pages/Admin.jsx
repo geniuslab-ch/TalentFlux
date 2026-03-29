@@ -68,6 +68,34 @@ const Btn = ({ onClick, children, variant = "primary", small, disabled }) => {
   );
 };
 
+// ── Tag selector (multi-select chips) ───────────────────
+const TagSelector = ({ label, options, values = [], onChange, color = C.blue }) => {
+  const toggle = (v) => {
+    const next = values.includes(v) ? values.filter(x => x !== v) : [...values, v];
+    onChange(next);
+  };
+  return (
+    <div>
+      {label && <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 7 }}>{label}</label>}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+        {options.map(opt => {
+          const sel = values.includes(opt);
+          return (
+            <button key={opt} type="button" onClick={() => toggle(opt)}
+              style={{ padding: "5px 12px", borderRadius: 100, fontSize: ".78rem", fontWeight: 600, cursor: "pointer", transition: "all .15s", fontFamily: "'DM Sans',sans-serif",
+                background: sel ? `${color}18` : "rgba(255,255,255,.04)",
+                border: `1px solid ${sel ? color + "60" : C.border}`,
+                color: sel ? color : C.subtle,
+              }}>
+              {opt}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+};
+
 const Input = ({ label, value, onChange, type = "text", placeholder, required }) => (
   <div>
     {label && <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{label}{required && <span style={{ color: C.blue }}> *</span>}</label>}
@@ -337,6 +365,12 @@ function TabMandats() {
     prio_formation: "Souhaité", prio_technique: "Non-négociable",
     prio_langues: "Souhaité", prio_exp_secteur: "Souhaité",
     prio_management: "Atout", prio_salaire_fit: "Non-négociable",
+    // IT
+    it_stack_requis: [], it_stack_bonus: [], it_cloud_requis: "", it_contrat_accepte: [],
+    // Finance
+    fin_specialite_requise: "", fin_normes_requises: [], fin_erp_requis: [],
+    // Ingénierie
+    ing_specialite_requise: "", ing_cao_requis: [], ing_normes_requises: [], ing_secteur_cible: "",
   });
   const [saving, setSaving] = useState(false);
 
@@ -350,10 +384,11 @@ function TabMandats() {
   useEffect(() => { load(); }, [load]);
 
   const setF = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+  const setArr = k => v => setForm(f => ({ ...f, [k]: v }));
 
   const openNew = () => {
     setEditing(null);
-    setForm({ titre_poste:"", secteur:"", statut:"Ouvert", budget_min_chf:"", budget_max_chf:"", remote_policy:"Hybride", remote_jours_max:"2", exp_min_annees:"3", exp_ideal_annees:"6", localisation:"Lausanne", langue_1:"FR", score_seuil_min:"70", test_score_min:"12", description_poste:"", prio_formation:"Souhaité", prio_technique:"Non-négociable", prio_langues:"Souhaité", prio_exp_secteur:"Souhaité", prio_management:"Atout", prio_salaire_fit:"Non-négociable" });
+    setForm({ titre_poste:"", secteur:"", statut:"Ouvert", budget_min_chf:"", budget_max_chf:"", remote_policy:"Hybride", remote_jours_max:"2", exp_min_annees:"3", exp_ideal_annees:"6", localisation:"Lausanne", langue_1:"FR", score_seuil_min:"70", test_score_min:"12", description_poste:"", prio_formation:"Souhaité", prio_technique:"Non-négociable", prio_langues:"Souhaité", prio_exp_secteur:"Souhaité", prio_management:"Atout", prio_salaire_fit:"Non-négociable", it_stack_requis:[], it_stack_bonus:[], it_cloud_requis:"", it_contrat_accepte:[], fin_specialite_requise:"", fin_normes_requises:[], fin_erp_requis:[], ing_specialite_requise:"", ing_cao_requis:[], ing_normes_requises:[], ing_secteur_cible:"" });
     setShowForm(true);
   };
 
@@ -425,6 +460,56 @@ function TabMandats() {
               <Input label="Score seuil shortlist (%)" type="number" value={form.score_seuil_min} onChange={setF("score_seuil_min")} placeholder="70" />
               <Input label="Score test min (/20)" type="number" value={form.test_score_min} onChange={setF("test_score_min")} placeholder="12" />
             </div>
+
+            {/* ── Compétences techniques secteur ── */}
+            {form.secteur === "IT" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences IT requises</div>
+                <TagSelector label="Stack requise (au moins 1)" color={C.blueL}
+                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","DevOps / K8s","Data / ML"]}
+                  values={form.it_stack_requis} onChange={setArr("it_stack_requis")} />
+                <TagSelector label="Stack bonus (nice to have)" color={C.tealL}
+                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","GraphQL","Docker","Kubernetes"]}
+                  values={form.it_stack_bonus} onChange={setArr("it_stack_bonus")} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <Select label="Cloud requis" value={form.it_cloud_requis} onChange={setF("it_cloud_requis")}
+                    options={[{value:"",label:"Indifférent"},{value:"AWS",label:"AWS"},{value:"GCP",label:"Google Cloud"},{value:"Azure",label:"Azure"},{value:"Multi-cloud",label:"Multi-cloud"}]} />
+                </div>
+                <TagSelector label="Type de contrat accepté" color={C.gold}
+                  options={["CDI","Mission","Indépendant"]}
+                  values={form.it_contrat_accepte} onChange={setArr("it_contrat_accepte")} />
+              </div>
+            )}
+
+            {form.secteur === "Finance" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences Finance requises</div>
+                <Select label="Spécialité recherchée" value={form.fin_specialite_requise} onChange={setF("fin_specialite_requise")}
+                  options={[{value:"",label:"Toutes"},{value:"CFO",label:"CFO / Direction financière"},{value:"Contrôle de gestion",label:"Contrôle de gestion"},{value:"Audit",label:"Audit"},{value:"Comptabilité",label:"Comptabilité"},{value:"Trésorerie",label:"Trésorerie"},{value:"M&A",label:"M&A"}]} />
+                <TagSelector label="Normes requises" color={C.gold}
+                  options={["IFRS","Swiss GAAP","Code des Obligations (OR)","US GAAP"]}
+                  values={form.fin_normes_requises} onChange={setArr("fin_normes_requises")} />
+                <TagSelector label="ERP requis" color={C.blueL}
+                  options={["SAP FI/CO","Oracle Financials","Sage","Microsoft Dynamics","Abacus","Power BI"]}
+                  values={form.fin_erp_requis} onChange={setArr("fin_erp_requis")} />
+              </div>
+            )}
+
+            {form.secteur === "Ingénierie" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: "#818CF8", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences Ingénierie requises</div>
+                <Select label="Spécialité recherchée" value={form.ing_specialite_requise} onChange={setF("ing_specialite_requise")}
+                  options={[{value:"",label:"Toutes"},{value:"Mécanique",label:"Mécanique / Conception"},{value:"Électronique",label:"Électronique / Embarqué"},{value:"Automation",label:"Automation / Robotique"},{value:"Qualité",label:"Qualité / Réglementaire"},{value:"Direction R&D",label:"Direction technique / R&D"}]} />
+                <TagSelector label="CAO requis" color="#818CF8"
+                  options={["SolidWorks","CATIA V5/V6","AutoCAD","Inventor","CREO","NX Siemens"]}
+                  values={form.ing_cao_requis} onChange={setArr("ing_cao_requis")} />
+                <TagSelector label="Normes requises" color={C.tealL}
+                  options={["ISO 9001","ISO 13485","MDR 2017/745","IVDR","IEC 62304","CE Machines","ATEX"]}
+                  values={form.ing_normes_requises} onChange={setArr("ing_normes_requises")} />
+                <Select label="Secteur cible" value={form.ing_secteur_cible} onChange={setF("ing_secteur_cible")}
+                  options={[{value:"",label:"Indifférent"},{value:"MedTech / Dispositifs médicaux",label:"MedTech"},{value:"Horlogerie / Microtechnique",label:"Horlogerie / Microtechnique"},{value:"Automation / Robotique industrielle",label:"Automation"},{value:"Aérospatiale / Défense",label:"Aérospatiale"}]} />
+              </div>
+            )}
 
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
               <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 12 }}>Matrice de priorités</div>
