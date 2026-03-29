@@ -424,17 +424,17 @@ export default function TalentFluxIT() {
                   <Users size={17} /> {hero.ctaLabel} <ArrowRight size={16} />
                 </button>
               ) : (
-                <button onClick={() => scrollTo("contact")} style={{
+                <Link to="/candidature/it" style={{
                   background: "rgba(20,184,166,.07)", border: "1.5px solid rgba(45,212,191,.5)", color: "#2DD4BF",
                   padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem",
                   cursor: "pointer", display: "flex", alignItems: "center", gap: 9,
-                  animation: "glowTeal 3s ease-in-out infinite", transition: "all .3s",
+                  animation: "glowTeal 3s ease-in-out infinite", transition: "all .3s", textDecoration: "none",
                 }}
                   onMouseEnter={e => { e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.background="rgba(20,184,166,.12)"; }}
                   onMouseLeave={e => { e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.background="rgba(20,184,166,.07)"; }}
                 >
                   <Terminal size={17} /> {hero.ctaLabel} <ArrowRight size={16} />
-                </button>
+                </Link>
               )}
             </div>
             {/* Lien candidat */}
@@ -575,12 +575,21 @@ export default function TalentFluxIT() {
             {/* FORM */}
             <div style={{ background: "rgba(11,15,26,.9)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,.07)" }}>
-                {[{ key:"recruiter", label:"🏢 Je recrute" },{ key:"candidate", label:"👤 Je cherche un poste" }].map(({ key, label }) => (
-                  <button key={key} onClick={() => { setActiveTab(key); setError(null); }}
-                    style={{ flex: 1, padding: "16px", border: "none", cursor: "pointer", background: activeTab===key?"linear-gradient(135deg,rgba(37,99,235,.15),rgba(20,184,166,.1))":"transparent", color: activeTab===key?"#F1F5F9":"#475569", fontWeight: 700, fontSize: ".86rem", borderBottom: activeTab===key?"2px solid #0EA5E9":"2px solid transparent", transition: "all .25s", fontFamily: "'DM Sans',sans-serif" }}>
-                    {label}
-                  </button>
-                ))}
+                <button
+                  style={{ flex: 1, padding: "16px", border: "none", cursor: "pointer", background: "linear-gradient(135deg,rgba(37,99,235,.15),rgba(20,184,166,.1))", color: "#F1F5F9", fontWeight: 700, fontSize: ".86rem", borderBottom: "2px solid #0EA5E9", transition: "all .25s", fontFamily: "'DM Sans',sans-serif" }}>
+                  🏢 Je recrute
+                </button>
+                <Link to="/candidature/it" style={{
+                  flex: 1, padding: "16px", display: "flex", alignItems: "center", justifyContent: "center", gap: 6,
+                  background: "transparent", borderBottom: "2px solid transparent",
+                  color: "#475569", fontWeight: 700, fontSize: ".86rem",
+                  textDecoration: "none", transition: "all .25s", fontFamily: "'DM Sans',sans-serif",
+                }}
+                  onMouseEnter={e => { e.currentTarget.style.color="#F1F5F9"; e.currentTarget.style.background="rgba(20,184,166,.05)"; }}
+                  onMouseLeave={e => { e.currentTarget.style.color="#475569"; e.currentTarget.style.background="transparent"; }}
+                >
+                  👤 Je suis candidat →
+                </Link>
               </div>
               {!submitted ? (
                 <div style={{ padding: 26 }}>
