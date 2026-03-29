@@ -5,6 +5,7 @@ import TalentFluxEngineering from './pages/TalentFluxEngineering';
 import CandidatureIT from './pages/CandidatureIT';
 import CandidatureFinance from './pages/CandidatureFinance';
 import CandidatureIngenierie from './pages/CandidatureIngenierie';
+import Admin from './pages/Admin';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
 import CGU from './pages/CGU';
@@ -15,13 +16,15 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Navigate to="/it" replace />} />
         {/* Landing pages */}
-        <Route path="/it"          element={<TalentFluxIT />} />
-        <Route path="/finance"     element={<TalentFluxFinance />} />
-        <Route path="/ingenierie"  element={<TalentFluxEngineering />} />
+        <Route path="/it"         element={<TalentFluxIT />} />
+        <Route path="/finance"    element={<TalentFluxFinance />} />
+        <Route path="/ingenierie" element={<TalentFluxEngineering />} />
         {/* Formulaires candidats */}
-        <Route path="/candidature/it"          element={<CandidatureIT />} />
-        <Route path="/candidature/finance"     element={<CandidatureFinance />} />
-        <Route path="/candidature/ingenierie"  element={<CandidatureIngenierie />} />
+        <Route path="/candidature/it"         element={<CandidatureIT />} />
+        <Route path="/candidature/finance"    element={<CandidatureFinance />} />
+        <Route path="/candidature/ingenierie" element={<CandidatureIngenierie />} />
+        {/* Admin */}
+        <Route path="/admin" element={<Admin />} />
         {/* Pages légales */}
         <Route path="/contact" element={<Contact />} />
         <Route path="/privacy" element={<Privacy />} />
