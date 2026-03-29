@@ -437,6 +437,19 @@ export default function TalentFluxIT() {
                 </button>
               )}
             </div>
+            {/* Lien candidat */}
+            <div style={{ marginTop: 20, textAlign: "center" }}>
+              <Link to="/candidature/it" style={{
+                color: "#475569", fontSize: ".8rem", textDecoration: "none",
+                borderBottom: "1px solid rgba(71,85,105,.3)", paddingBottom: 2,
+                transition: "color .2s",
+              }}
+                onMouseEnter={e => e.currentTarget.style.color="#94A3B8"}
+                onMouseLeave={e => e.currentTarget.style.color="#475569"}
+              >
+                Vous êtes développeur ? → Déposez votre candidature
+              </Link>
+            </div>
           </div>
 
           {/* STATS */}

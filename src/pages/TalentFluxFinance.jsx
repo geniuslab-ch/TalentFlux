@@ -433,6 +433,18 @@ export default function TalentFluxFinance() {
               </div>
             ))}
           </div>
+          {/* Lien candidat Finance */}
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <Link to="/candidature/finance" style={{
+              color: "#475569", fontSize: ".8rem", textDecoration: "none",
+              borderBottom: "1px solid rgba(71,85,105,.3)", paddingBottom: 2, transition: "color .2s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.color="#94A3B8"}
+              onMouseLeave={e => e.currentTarget.style.color="#475569"}
+            >
+              Vous êtes candidat Finance ? → Déposez votre dossier
+            </Link>
+          </div>
         </div>
       </header>
 

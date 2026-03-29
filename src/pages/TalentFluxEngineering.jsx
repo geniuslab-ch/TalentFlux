@@ -484,6 +484,19 @@ export default function TalentFluxEngineering() {
               </div>
             ))}
           </div>
+          {/* Lien candidat Ingénierie */}
+          <div style={{ marginTop: 16, textAlign: "center" }}>
+            <Link to="/candidature/ingenierie" style={{
+              color: "#475569", fontSize: ".8rem", textDecoration: "none",
+              borderBottom: "1px solid rgba(71,85,105,.3)", paddingBottom: 2, transition: "color .2s",
+              fontFamily: "'DM Mono', monospace",
+            }}
+              onMouseEnter={e => e.currentTarget.style.color="#94A3B8"}
+              onMouseLeave={e => e.currentTarget.style.color="#475569"}
+            >
+              Vous êtes ingénieur ? → Déposez votre candidature
+            </Link>
+          </div>
         </div>
       </header>
 
