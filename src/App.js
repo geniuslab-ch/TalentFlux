@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import TalentFluxIT from './pages/TalentFluxIT';
 import TalentFluxFinance from './pages/TalentFluxFinance';
 import TalentFluxEngineering from './pages/TalentFluxEngineering';
+import TalentFluxPaysagisme from './pages/TalentFluxPaysagisme';
 import CandidatureIT from './pages/CandidatureIT';
 import CandidatureFinance from './pages/CandidatureFinance';
 import CandidatureIngenierie from './pages/CandidatureIngenierie';
@@ -19,10 +20,12 @@ export default function App() {
         <Route path="/it"         element={<TalentFluxIT />} />
         <Route path="/finance"    element={<TalentFluxFinance />} />
         <Route path="/ingenierie" element={<TalentFluxEngineering />} />
+        <Route path="/paysagisme" element={<TalentFluxPaysagisme />} />
         {/* Formulaires candidats */}
         <Route path="/candidature/it"         element={<CandidatureIT />} />
         <Route path="/candidature/finance"    element={<CandidatureFinance />} />
         <Route path="/candidature/ingenierie" element={<CandidatureIngenierie />} />
+        <Route path="/candidature/paysagisme" element={<CandidatureIngenierie />} />
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
         {/* Pages légales */}
