@@ -422,7 +422,7 @@ function TabMandats() {
     remote_policy: "Hybride", remote_jours_max: "2",
     exp_min_annees: "3", exp_ideal_annees: "6",
     localisation: "Lausanne", langue_1: "FR",
-    score_seuil_min: "70", test_score_min: "12",
+    score_seuil_min: "70", test_score_min: "12", test_requis: true,
     // Skills secteur
     it_stack_requis: [], it_stack_bonus: [], it_cloud_requis: "", it_contrat_accepte: [],
     fin_specialite_requise: "", fin_normes_requises: [], fin_erp_requis: [],
@@ -487,6 +487,7 @@ function TabMandats() {
       langue_1:             m.langue_1 || "FR",
       score_seuil_min:      m.score_seuil_min ?? "70",
       test_score_min:       m.test_score_min ?? "12",
+      test_requis:          m.test_score_min !== null && m.test_score_min !== undefined,
       it_stack_requis:      m.it_stack_requis || [],
       it_stack_bonus:       m.it_stack_bonus || [],
       it_cloud_requis:      m.it_cloud_requis || "",
@@ -519,7 +520,7 @@ function TabMandats() {
       localisation:         form.localisation,
       langue_1:             form.langue_1,
       score_seuil_min:      parseInt(form.score_seuil_min) || 70,
-      test_score_min:       parseInt(form.test_score_min) || 12,
+      test_score_min:       form.test_requis ? (parseInt(form.test_score_min) || 12) : null,
       prio_skills:          form.prio_skills,
       it_stack_requis:      form.it_stack_requis,
       it_stack_bonus:       form.it_stack_bonus,
@@ -602,7 +603,29 @@ function TabMandats() {
               <Select label="Statut" value={form.statut} onChange={setF("statut")}
                 options={["Ouvert","En cours","Pourvu","Suspendu"].map(v=>({value:v,label:v}))} />
               <Input label="Score seuil shortlist (%)" type="number" value={form.score_seuil_min} onChange={setF("score_seuil_min")} placeholder="70" />
-              <Input label="Score test min (/20)" type="number" value={form.test_score_min} onChange={setF("test_score_min")} placeholder="12" />
+              <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 4 }}>Test technique</label>
+                <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer",
+                  padding: "10px 14px", borderRadius: 12,
+                  background: form.test_requis ? "rgba(59,130,246,.08)" : "rgba(255,255,255,.03)",
+                  border: `1px solid ${form.test_requis ? C.blue + "50" : C.border}`,
+                  transition: "all .2s" }}>
+                  <input type="checkbox" checked={form.test_requis}
+                    onChange={e => setForm(f => ({ ...f, test_requis: e.target.checked }))}
+                    style={{ width: 16, height: 16, accentColor: C.blue, flexShrink: 0 }} />
+                  <div>
+                    <div style={{ color: C.text, fontWeight: 600, fontSize: ".86rem" }}>
+                      {form.test_requis ? "Test requis" : "Test optionnel"}
+                    </div>
+                    <div style={{ color: C.subtle, fontSize: ".72rem" }}>
+                      {form.test_requis ? "Les 15% du test entrent dans le score" : "Les 15% sont redistribués aux autres critères"}
+                    </div>
+                  </div>
+                </label>
+                {form.test_requis && (
+                  <Input label="Score minimum (/20)" type="number" value={form.test_score_min} onChange={setF("test_score_min")} placeholder="12" />
+                )}
+              </div>
             </div>
 
             {/* Skills IT */}
