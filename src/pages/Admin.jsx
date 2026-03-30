@@ -228,7 +228,7 @@ function TabCandidats() {
     if (!error) { setLinkSuccess(true); setTimeout(() => { setLinkSuccess(false); setLinkMandat(""); }, 2000); }
   };
 
-  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8" };
+  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8", "Paysagisme": "#22C55E" };
 
   return (
     <div>
@@ -242,7 +242,7 @@ function TabCandidats() {
         <select value={filterSecteur} onChange={e => setFilterSecteur(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer" }}>
           <option value="">Tous secteurs</option>
-          {["IT","Finance","Ingénierie"].map(s => <option key={s} value={s}>{s}</option>)}
+          {["IT","Finance","Ingénierie","Paysagisme"].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <Btn onClick={load} variant="ghost" small><RefreshCw size={13} /> Actualiser</Btn>
       </div>
@@ -382,6 +382,16 @@ const FIXED_DEFAULTS = {
   "_salaire_fit":   "Non-négociable",
 };
 
+const PAYSAGISME_SKILL_DEFAULTS = {
+  "_formation":     "Souhaité",
+  "_langues":       "Atout",
+  "_exp_secteur":   "Non-négociable",
+  "_management":    "Souhaité",
+  "_remote_fit":    "Non-évalué",
+  "_disponibilite": "Non-négociable",
+  "_salaire_fit":   "Non-négociable",
+};
+
 // Composant : sélecteur de priorité pour un skill
 const PrioSelect = ({ skillKey, label, value, onChange, accentColor }) => (
   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
@@ -427,8 +437,11 @@ function TabMandats() {
     it_stack_requis: [], it_stack_bonus: [], it_cloud_requis: "", it_contrat_accepte: [],
     fin_specialite_requise: "", fin_normes_requises: [], fin_erp_requis: [],
     ing_specialite_requise: "", ing_cao_requis: [], ing_normes_requises: [], ing_secteur_cible: "",
+    // Paysagisme
+    pay_specialite_requise: "", pay_competences_requises: [], pay_certifications: [],
+    pay_contrat: "", pay_permis: "", pay_equipe_taille: "", pay_zone: "",
     // Matrice dynamique JSONB
-    prio_skills: { ...FIXED_DEFAULTS },
+    prio_skills: form?.secteur === "Paysagisme" ? { ...PAYSAGISME_SKILL_DEFAULTS } : { ...FIXED_DEFAULTS },
   });
 
   const [form, setForm] = useState(emptyForm());
@@ -499,6 +512,13 @@ function TabMandats() {
       ing_cao_requis:       m.ing_cao_requis || [],
       ing_normes_requises:  m.ing_normes_requises || [],
       ing_secteur_cible:    m.ing_secteur_cible || "",
+      pay_specialite_requise: m.pay_specialite_requise || "",
+      pay_competences_requises: m.pay_competences_requises || [],
+      pay_certifications:     m.pay_certifications || [],
+      pay_contrat:            m.pay_contrat || "",
+      pay_permis:             m.pay_permis || "",
+      pay_equipe_taille:      m.pay_equipe_taille || "",
+      pay_zone:               m.pay_zone || "",
       prio_skills:          prio,
     });
     setShowForm(true);
@@ -533,6 +553,13 @@ function TabMandats() {
       ing_cao_requis:       form.ing_cao_requis,
       ing_normes_requises:  form.ing_normes_requises,
       ing_secteur_cible:    form.ing_secteur_cible || null,
+      pay_specialite_requise: form.pay_specialite_requise || null,
+      pay_competences_requises: form.pay_competences_requises,
+      pay_certifications:     form.pay_certifications,
+      pay_contrat:            form.pay_contrat || null,
+      pay_permis:             form.pay_permis || null,
+      pay_equipe_taille:      parseInt(form.pay_equipe_taille) || null,
+      pay_zone:               form.pay_zone || null,
     };
     if (editing) {
       await supabase.from("mandats").update(payload).eq("id", editing.id);
@@ -563,7 +590,7 @@ function TabMandats() {
               <div>
                 <div style={{ color: C.text, fontWeight: 700, fontSize: ".92rem", marginBottom: 4 }}>{m.titre_poste}</div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : C.purple} />
+                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : m.secteur === "Paysagisme" ? "#22C55E" : C.purple} />
                   <Badge label={m.statut} color={statut_color[m.statut] || C.subtle} />
                   {m.budget_max_chf && <Badge label={`≤ ${m.budget_max_chf.toLocaleString()} CHF`} color={C.subtle} />}
                   {m.localisation && <Badge label={m.localisation} color={C.subtle} />}
@@ -591,7 +618,7 @@ function TabMandats() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Input label="Titre du poste" value={form.titre_poste} onChange={setF("titre_poste")} placeholder="Lead Developer React" required />
               <Select label="Secteur" value={form.secteur} onChange={setF("secteur")} required
-                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"}]} />
+                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"},{value:"Paysagisme",label:"🌿 Paysagisme"}]} />
               <Input label="Budget min (CHF)" type="number" value={form.budget_min_chf} onChange={setF("budget_min_chf")} placeholder="100000" />
               <Input label="Budget max (CHF)" type="number" value={form.budget_max_chf} onChange={setF("budget_max_chf")} placeholder="140000" />
               <Select label="Remote policy" value={form.remote_policy} onChange={setF("remote_policy")}
@@ -691,6 +718,46 @@ function TabMandats() {
                   options={["ISO 9001","ISO 13485","MDR 2017/745","IEC 62304","CE Machines","ATEX"]}
                   values={form.ing_normes_requises}
                   onChange={v => handleSkillChange("ing_normes_requises", v)} />
+              </div>
+            )}
+
+            {/* Skills Paysagisme */}
+            {form.secteur === "Paysagisme" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: "#22C55E", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences Paysagisme requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
+                </div>
+                <Select label="Spécialité recherchée" value={form.pay_specialite_requise || ""} onChange={setF("pay_specialite_requise")}
+                  options={[
+                    {value:"",label:"Toutes spécialités"},
+                    {value:"Jardinier-paysagiste",label:"🌱 Jardinier-paysagiste (CFC/AFP)"},
+                    {value:"Maçon paysagiste",label:"🧱 Maçon paysagiste"},
+                    {value:"Arboriste-grimpeur",label:"🌳 Arboriste-grimpeur (ISA/ECC)"},
+                    {value:"Chef de chantier",label:"👷 Chef de chantier"},
+                    {value:"Conducteur de travaux",label:"📋 Conducteur de travaux"},
+                    {value:"Dessinateur-projeteur",label:"📐 Dessinateur-projeteur"},
+                    {value:"Directeur technique",label:"🏗️ Directeur technique"},
+                  ]} />
+                <TagSelector label="Compétences techniques requises" color="#22C55E"
+                  options={["Maçonnerie paysagère","Pose de gazon naturel","Gazon synthétique","Arrosage automatique","Dallage / Pavage","Murs de soutènement","Terrains de sport","Espaces publics","Toitures végétalisées","Bassins / Étangs","SolidWorks / AutoCAD","Land F/X","DJI Drone certifié","Conduite engins (permis CFC)"]}
+                  values={form.pay_competences_requises || []}
+                  onChange={v => handleSkillChange("pay_competences_requises", v)} />
+                <TagSelector label="Certifications / Normes requises" color="#4ADE80"
+                  options={["CFC Paysagiste","AFP Paysagiste","Arboriste ISA","Arboriste ECC","Permis de conduire B","Permis engins (gr. 4/5)","SN 640 (routes)","SN 566 (terrains de sport)","Formation pesticides","SUVA Travaux en hauteur"]}
+                  values={form.pay_certifications || []}
+                  onChange={v => handleSkillChange("pay_certifications", v)} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <Select label="Type de contrat" value={form.pay_contrat || ""} onChange={setF("pay_contrat")}
+                    options={[{value:"",label:"Indifférent"},{value:"CDI",label:"CDI"},{value:"CDD saison",label:"CDD saison (mars–oct.)"},{value:"Temporaire",label:"Temporaire"},{value:"Apprentissage",label:"Apprentissage"}]} />
+                  <Select label="Permis de conduire" value={form.pay_permis || ""} onChange={setF("pay_permis")}
+                    options={[{value:"",label:"Indifférent"},{value:"B",label:"Permis B obligatoire"},{value:"BE",label:"Permis BE (remorque)"},{value:"C",label:"Permis C (camion)"},{value:"Engins",label:"Permis engins requis"}]} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <Input label="Taille équipe à gérer" type="number" value={form.pay_equipe_taille || ""} onChange={setF("pay_equipe_taille")} placeholder="Ex: 4" />
+                  <Select label="Zone d'intervention" value={form.pay_zone || ""} onChange={setF("pay_zone")}
+                    options={[{value:"",label:"Indifférent"},{value:"Vaud",label:"Canton de Vaud"},{value:"Genève",label:"Canton de Genève"},{value:"Fribourg",label:"Canton de Fribourg"},{value:"Valais",label:"Canton du Valais"},{value:"Neuchâtel",label:"Canton de Neuchâtel"},{value:"Suisse romande",label:"Suisse romande"},{value:"Suisse entière",label:"Suisse entière"}]} />
+                </div>
               </div>
             )}
 
