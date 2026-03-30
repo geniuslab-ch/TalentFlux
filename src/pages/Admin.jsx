@@ -319,6 +319,12 @@ function TabCandidats() {
                       <div style={{ color: C.purple, fontSize: ".84rem" }}>{c.ing_specialite} {c.ing_cao_logiciels?.length ? `· ${c.ing_cao_logiciels.join(", ")}` : ""}</div>
                     </div>
                   )}
+                  {c.secteur === "Paysagisme" && (
+                    <div style={{ marginBottom: 12 }}>
+                      <div style={{ color: "#22C55E", fontSize: ".65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 6 }}>Spécialité Paysage</div>
+                      <div style={{ color: C.text, fontSize: ".84rem" }}>{c.pay_specialite || "—"}</div>
+                    </div>
+                  )}
 
                   {/* Lier à un mandat */}
                   <div onClick={e => e.stopPropagation()} style={{ background: "rgba(37,99,235,.06)", border: `1px solid rgba(37,99,235,.15)`, borderRadius: 12, padding: "14px 16px" }}>
@@ -441,7 +447,7 @@ function TabMandats() {
     pay_specialite_requise: "", pay_competences_requises: [], pay_certifications: [],
     pay_contrat: "", pay_permis: "", pay_equipe_taille: "", pay_zone: "",
     // Matrice dynamique JSONB
-    prio_skills: form?.secteur === "Paysagisme" ? { ...PAYSAGISME_SKILL_DEFAULTS } : { ...FIXED_DEFAULTS },
+    prio_skills: { ...FIXED_DEFAULTS },
   });
 
   const [form, setForm] = useState(emptyForm());
@@ -455,7 +461,16 @@ function TabMandats() {
 
   useEffect(() => { load(); }, [load]);
 
-  const setF = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+  const setF = k => e => {
+    const val = e.target.value;
+    if (k === "secteur" && val === "Paysagisme") {
+      setForm(f => ({ ...f, [k]: val, prio_skills: { ...f.prio_skills, ...PAYSAGISME_SKILL_DEFAULTS } }));
+    } else if (k === "secteur" && val !== "Paysagisme") {
+      setForm(f => ({ ...f, [k]: val }));
+    } else {
+      setForm(f => ({ ...f, [k]: val }));
+    }
+  };
   const setArr = k => v => setForm(f => ({ ...f, [k]: v }));
 
   // Met à jour une priorité dans prio_skills
@@ -466,7 +481,7 @@ function TabMandats() {
   // Quand un skill est ajouté/retiré des chips, on sync prio_skills
   const syncSkills = (newSkills, prevSkills, defaultPrio = "Souhaité") => {
     setForm(f => {
-      const current = { ...f.prio_skills };
+      const current = { ...(typeof f.prio_skills === "object" ? f.prio_skills : FIXED_DEFAULTS) };
       // Ajouter les nouveaux skills
       newSkills.forEach(s => { if (!(s in current)) current[s] = defaultPrio; });
       // Supprimer les skills désélectionnés (pas les critères fixes _xxx)
@@ -485,7 +500,7 @@ function TabMandats() {
 
   const openEdit = (m) => {
     setEditing(m);
-    const prio = m.prio_skills || { ...FIXED_DEFAULTS };
+    const prio = (m.prio_skills && typeof m.prio_skills === "object") ? m.prio_skills : { ...FIXED_DEFAULTS };
     setForm({
       titre_poste:          m.titre_poste || "",
       secteur:              m.secteur || "",
@@ -595,9 +610,9 @@ function TabMandats() {
                   {m.budget_max_chf && <Badge label={`≤ ${m.budget_max_chf.toLocaleString()} CHF`} color={C.subtle} />}
                   {m.localisation && <Badge label={m.localisation} color={C.subtle} />}
                   {/* Aperçu matrice */}
-                  {m.prio_skills && Object.keys(m.prio_skills).filter(k => !k.startsWith("_")).length > 0 && (
+                  {m.prio_skills && typeof m.prio_skills === "object" && Object.keys(m.prio_skills || {}).filter(k => !k.startsWith("_")).length > 0 && (
                     <Badge
-                      label={`${Object.keys(m.prio_skills).filter(k => !k.startsWith("_")).length} skills évalués`}
+                      label={`${Object.keys(m.prio_skills || {}).filter(k => !k.startsWith("_")).length} skills évalués`}
                       color={C.teal}
                     />
                   )}
