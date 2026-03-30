@@ -351,28 +351,87 @@ function TabCandidats() {
 }
 
 // ── TAB MANDATS ───────────────────────────────────────────
+// Matrice de priorités dynamique par skill
+
+const PRIO_OPTIONS = [
+  { value: "Non-négociable", label: "🔴 Non-négociable" },
+  { value: "Souhaité",       label: "🟡 Souhaité" },
+  { value: "Atout",          label: "🟢 Atout" },
+  { value: "Non-évalué",     label: "⚪ Non-évalué" },
+];
+
+// Critères fixes (toujours présents quelle que soit la spécialité)
+const FIXED_CRITERIA = [
+  { key: "_formation",     label: "Formation / diplôme" },
+  { key: "_langues",       label: "Langues parlées" },
+  { key: "_exp_secteur",   label: "Expérience secteur" },
+  { key: "_management",    label: "Management d'équipe" },
+  { key: "_remote_fit",    label: "Compatibilité remote" },
+  { key: "_disponibilite", label: "Disponibilité / préavis" },
+  { key: "_salaire_fit",   label: "Salaire fit / budget" },
+];
+
+// Defaults selon le critère
+const FIXED_DEFAULTS = {
+  "_formation":     "Souhaité",
+  "_langues":       "Souhaité",
+  "_exp_secteur":   "Souhaité",
+  "_management":    "Atout",
+  "_remote_fit":    "Souhaité",
+  "_disponibilite": "Souhaité",
+  "_salaire_fit":   "Non-négociable",
+};
+
+// Composant : sélecteur de priorité pour un skill
+const PrioSelect = ({ skillKey, label, value, onChange, accentColor }) => (
+  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between",
+    padding: "9px 14px", borderRadius: 10,
+    background: value === "Non-négociable" ? "rgba(239,68,68,.06)"
+               : value === "Souhaité"      ? "rgba(234,179,8,.06)"
+               : value === "Atout"         ? "rgba(34,197,94,.06)"
+               : "rgba(255,255,255,.02)",
+    border: `1px solid ${
+      value === "Non-négociable" ? "rgba(239,68,68,.25)"
+    : value === "Souhaité"       ? "rgba(234,179,8,.25)"
+    : value === "Atout"          ? "rgba(34,197,94,.25)"
+    : C.border}`,
+    transition: "all .2s",
+  }}>
+    <span style={{ color: C.text, fontSize: ".86rem", fontWeight: 500 }}>{label}</span>
+    <select value={value} onChange={e => onChange(skillKey, e.target.value)}
+      style={{ background: "rgba(8,13,26,.9)", border: `1px solid ${C.border}`, color: C.text,
+        fontSize: ".8rem", borderRadius: 8, padding: "5px 10px", outline: "none",
+        fontFamily: "'DM Sans',sans-serif", cursor: "pointer", minWidth: 155 }}>
+      {PRIO_OPTIONS.map(o => (
+        <option key={o.value} value={o.value} style={{ background: "#080D1A" }}>{o.label}</option>
+      ))}
+    </select>
+  </div>
+);
+
 function TabMandats() {
   const [mandats, setMandats] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
-  const [form, setForm] = useState({
-    titre_poste: "", secteur: "", statut: "Ouvert",
-    budget_min_chf: "", budget_max_chf: "", remote_policy: "Hybride",
-    remote_jours_max: "2", exp_min_annees: "3", exp_ideal_annees: "6",
-    localisation: "Lausanne", langue_1: "FR", score_seuil_min: "70",
-    test_score_min: "12", description_poste: "",
-    prio_formation: "Souhaité", prio_technique: "Non-négociable",
-    prio_langues: "Souhaité", prio_exp_secteur: "Souhaité",
-    prio_management: "Atout", prio_salaire_fit: "Non-négociable",
-    // IT
-    it_stack_requis: [], it_stack_bonus: [], it_cloud_requis: "", it_contrat_accepte: [],
-    // Finance
-    fin_specialite_requise: "", fin_normes_requises: [], fin_erp_requis: [],
-    // Ingénierie
-    ing_specialite_requise: "", ing_cao_requis: [], ing_normes_requises: [], ing_secteur_cible: "",
-  });
   const [saving, setSaving] = useState(false);
+
+  const emptyForm = () => ({
+    titre_poste: "", secteur: "", statut: "Ouvert",
+    budget_min_chf: "", budget_max_chf: "",
+    remote_policy: "Hybride", remote_jours_max: "2",
+    exp_min_annees: "3", exp_ideal_annees: "6",
+    localisation: "Lausanne", langue_1: "FR",
+    score_seuil_min: "70", test_score_min: "12",
+    // Skills secteur
+    it_stack_requis: [], it_stack_bonus: [], it_cloud_requis: "", it_contrat_accepte: [],
+    fin_specialite_requise: "", fin_normes_requises: [], fin_erp_requis: [],
+    ing_specialite_requise: "", ing_cao_requis: [], ing_normes_requises: [], ing_secteur_cible: "",
+    // Matrice dynamique JSONB
+    prio_skills: { ...FIXED_DEFAULTS },
+  });
+
+  const [form, setForm] = useState(emptyForm());
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -386,46 +445,60 @@ function TabMandats() {
   const setF = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
   const setArr = k => v => setForm(f => ({ ...f, [k]: v }));
 
-  const openNew = () => {
-    setEditing(null);
-    setForm({ titre_poste:"", secteur:"", statut:"Ouvert", budget_min_chf:"", budget_max_chf:"", remote_policy:"Hybride", remote_jours_max:"2", exp_min_annees:"3", exp_ideal_annees:"6", localisation:"Lausanne", langue_1:"FR", score_seuil_min:"70", test_score_min:"12", description_poste:"", prio_formation:"Souhaité", prio_technique:"Non-négociable", prio_langues:"Souhaité", prio_exp_secteur:"Souhaité", prio_management:"Atout", prio_salaire_fit:"Non-négociable", it_stack_requis:[], it_stack_bonus:[], it_cloud_requis:"", it_contrat_accepte:[], fin_specialite_requise:"", fin_normes_requises:[], fin_erp_requis:[], ing_specialite_requise:"", ing_cao_requis:[], ing_normes_requises:[], ing_secteur_cible:"" });
-    setShowForm(true);
+  // Met à jour une priorité dans prio_skills
+  const setPrio = (skillKey, value) => {
+    setForm(f => ({ ...f, prio_skills: { ...f.prio_skills, [skillKey]: value } }));
   };
+
+  // Quand un skill est ajouté/retiré des chips, on sync prio_skills
+  const syncSkills = (newSkills, prevSkills, defaultPrio = "Souhaité") => {
+    setForm(f => {
+      const current = { ...f.prio_skills };
+      // Ajouter les nouveaux skills
+      newSkills.forEach(s => { if (!(s in current)) current[s] = defaultPrio; });
+      // Supprimer les skills désélectionnés (pas les critères fixes _xxx)
+      prevSkills.forEach(s => { if (!newSkills.includes(s) && !s.startsWith("_")) delete current[s]; });
+      return { ...f, prio_skills: current };
+    });
+  };
+
+  const handleSkillChange = (key, newArr) => {
+    const prevArr = form[key] || [];
+    setArr(key)(newArr);
+    syncSkills(newArr, prevArr);
+  };
+
+  const openNew = () => { setEditing(null); setForm(emptyForm()); setShowForm(true); };
 
   const openEdit = (m) => {
     setEditing(m);
+    const prio = m.prio_skills || { ...FIXED_DEFAULTS };
     setForm({
-      titre_poste: m.titre_poste || "",
-      secteur: m.secteur || "",
-      statut: m.statut || "Ouvert",
-      budget_min_chf: m.budget_min_chf || "",
-      budget_max_chf: m.budget_max_chf || "",
-      remote_policy: m.remote_policy || "Hybride",
-      remote_jours_max: m.remote_jours_max ?? "2",
-      exp_min_annees: m.exp_min_annees ?? "3",
-      exp_ideal_annees: m.exp_ideal_annees ?? "6",
-      localisation: m.localisation || "Lausanne",
-      langue_1: m.langue_1 || "FR",
-      score_seuil_min: m.score_seuil_min ?? "70",
-      test_score_min: m.test_score_min ?? "12",
-      description_poste: m.description_poste || "",
-      prio_formation: m.prio_formation || "Souhaité",
-      prio_technique: m.prio_technique || "Non-négociable",
-      prio_langues: m.prio_langues || "Souhaité",
-      prio_exp_secteur: m.prio_exp_secteur || "Souhaité",
-      prio_management: m.prio_management || "Atout",
-      prio_salaire_fit: m.prio_salaire_fit || "Non-négociable",
-      it_stack_requis: m.it_stack_requis || [],
-      it_stack_bonus: m.it_stack_bonus || [],
-      it_cloud_requis: m.it_cloud_requis || "",
-      it_contrat_accepte: m.it_contrat_accepte || [],
+      titre_poste:          m.titre_poste || "",
+      secteur:              m.secteur || "",
+      statut:               m.statut || "Ouvert",
+      budget_min_chf:       m.budget_min_chf || "",
+      budget_max_chf:       m.budget_max_chf || "",
+      remote_policy:        m.remote_policy || "Hybride",
+      remote_jours_max:     m.remote_jours_max ?? "2",
+      exp_min_annees:       m.exp_min_annees ?? "3",
+      exp_ideal_annees:     m.exp_ideal_annees ?? "6",
+      localisation:         m.localisation || "Lausanne",
+      langue_1:             m.langue_1 || "FR",
+      score_seuil_min:      m.score_seuil_min ?? "70",
+      test_score_min:       m.test_score_min ?? "12",
+      it_stack_requis:      m.it_stack_requis || [],
+      it_stack_bonus:       m.it_stack_bonus || [],
+      it_cloud_requis:      m.it_cloud_requis || "",
+      it_contrat_accepte:   m.it_contrat_accepte || [],
       fin_specialite_requise: m.fin_specialite_requise || "",
-      fin_normes_requises: m.fin_normes_requises || [],
-      fin_erp_requis: m.fin_erp_requis || [],
+      fin_normes_requises:  m.fin_normes_requises || [],
+      fin_erp_requis:       m.fin_erp_requis || [],
       ing_specialite_requise: m.ing_specialite_requise || "",
-      ing_cao_requis: m.ing_cao_requis || [],
-      ing_normes_requises: m.ing_normes_requises || [],
-      ing_secteur_cible: m.ing_secteur_cible || "",
+      ing_cao_requis:       m.ing_cao_requis || [],
+      ing_normes_requises:  m.ing_normes_requises || [],
+      ing_secteur_cible:    m.ing_secteur_cible || "",
+      prio_skills:          prio,
     });
     setShowForm(true);
   };
@@ -433,29 +506,45 @@ function TabMandats() {
   const handleSave = async () => {
     if (!form.titre_poste || !form.secteur) return;
     setSaving(true);
-    const { id, created_at, updated_at, reference, ...rest } = form;
     const payload = {
-      ...rest,
-      budget_min_chf:   parseInt(form.budget_min_chf) || null,
-      budget_max_chf:   parseInt(form.budget_max_chf) || null,
-      remote_jours_max: parseInt(form.remote_jours_max) || 0,
-      exp_min_annees:   parseInt(form.exp_min_annees) || 0,
-      exp_ideal_annees: parseInt(form.exp_ideal_annees) || 3,
-      score_seuil_min:  parseInt(form.score_seuil_min) || 70,
-      test_score_min:   parseInt(form.test_score_min) || 12,
+      titre_poste:          form.titre_poste,
+      secteur:              form.secteur,
+      statut:               form.statut,
+      budget_min_chf:       parseInt(form.budget_min_chf) || null,
+      budget_max_chf:       parseInt(form.budget_max_chf) || null,
+      remote_policy:        form.remote_policy,
+      remote_jours_max:     parseInt(form.remote_jours_max) || 0,
+      exp_min_annees:       parseInt(form.exp_min_annees) || 0,
+      exp_ideal_annees:     parseInt(form.exp_ideal_annees) || 3,
+      localisation:         form.localisation,
+      langue_1:             form.langue_1,
+      score_seuil_min:      parseInt(form.score_seuil_min) || 70,
+      test_score_min:       parseInt(form.test_score_min) || 12,
+      prio_skills:          form.prio_skills,
+      it_stack_requis:      form.it_stack_requis,
+      it_stack_bonus:       form.it_stack_bonus,
+      it_cloud_requis:      form.it_cloud_requis || null,
+      it_contrat_accepte:   form.it_contrat_accepte,
+      fin_specialite_requise: form.fin_specialite_requise || null,
+      fin_normes_requises:  form.fin_normes_requises,
+      fin_erp_requis:       form.fin_erp_requis,
+      ing_specialite_requise: form.ing_specialite_requise || null,
+      ing_cao_requis:       form.ing_cao_requis,
+      ing_normes_requises:  form.ing_normes_requises,
+      ing_secteur_cible:    form.ing_secteur_cible || null,
     };
     if (editing) {
-      const { error } = await supabase.from("mandats").update(payload).eq("id", editing.id);
-      if (error) console.error("Update error:", error);
+      await supabase.from("mandats").update(payload).eq("id", editing.id);
     } else {
-      const { error } = await supabase.from("mandats").insert(payload);
-      if (error) console.error("Insert error:", error);
+      await supabase.from("mandats").insert(payload);
     }
     setSaving(false); setShowForm(false); load();
   };
 
-  const PRIO_OPTIONS = ["Non-négociable","Souhaité","Atout","Non-évalué"].map(v => ({ value: v, label: v }));
   const statut_color = { "Ouvert": C.teal, "En cours": C.gold, "Pourvu": C.blue, "Suspendu": C.subtle };
+
+  // Skills actuellement dans la matrice (dynamiques uniquement)
+  const dynamicSkills = Object.keys(form.prio_skills || {}).filter(k => !k.startsWith("_"));
 
   return (
     <div>
@@ -464,17 +553,26 @@ function TabMandats() {
         <Btn onClick={openNew}><Plus size={14} /> Nouveau mandat</Btn>
       </div>
 
-      {loading ? <div style={{ textAlign: "center", padding: 40, color: C.subtle }}>Chargement...</div> : (
+      {loading ? (
+        <div style={{ textAlign: "center", padding: 40, color: C.subtle }}>Chargement...</div>
+      ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
           {mandats.map(m => (
             <div key={m.id} style={{ background: C.card, border: `1px solid ${C.border}`, borderRadius: 14, padding: "14px 18px", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10 }}>
               <div>
                 <div style={{ color: C.text, fontWeight: 700, fontSize: ".92rem", marginBottom: 4 }}>{m.titre_poste}</div>
-                <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
                   <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : C.purple} />
                   <Badge label={m.statut} color={statut_color[m.statut] || C.subtle} />
                   {m.budget_max_chf && <Badge label={`≤ ${m.budget_max_chf.toLocaleString()} CHF`} color={C.subtle} />}
                   {m.localisation && <Badge label={m.localisation} color={C.subtle} />}
+                  {/* Aperçu matrice */}
+                  {m.prio_skills && Object.keys(m.prio_skills).filter(k => !k.startsWith("_")).length > 0 && (
+                    <Badge
+                      label={`${Object.keys(m.prio_skills).filter(k => !k.startsWith("_")).length} skills évalués`}
+                      color={C.teal}
+                    />
+                  )}
                 </div>
               </div>
               <Btn onClick={() => openEdit(m)} variant="ghost" small><Eye size={12} /> Éditer</Btn>
@@ -485,12 +583,14 @@ function TabMandats() {
       )}
 
       {showForm && (
-        <Modal title={editing ? "Éditer le mandat" : "Nouveau mandat"} onClose={() => setShowForm(false)} width={700}>
+        <Modal title={editing ? "Éditer le mandat" : "Nouveau mandat"} onClose={() => setShowForm(false)} width={740}>
           <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+
+            {/* Infos de base */}
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Input label="Titre du poste" value={form.titre_poste} onChange={setF("titre_poste")} placeholder="Lead Developer React" required />
               <Select label="Secteur" value={form.secteur} onChange={setF("secteur")} required
-                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"IT"},{value:"Finance",label:"Finance"},{value:"Ingénierie",label:"Ingénierie"}]} />
+                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"}]} />
               <Input label="Budget min (CHF)" type="number" value={form.budget_min_chf} onChange={setF("budget_min_chf")} placeholder="100000" />
               <Input label="Budget max (CHF)" type="number" value={form.budget_max_chf} onChange={setF("budget_max_chf")} placeholder="140000" />
               <Select label="Remote policy" value={form.remote_policy} onChange={setF("remote_policy")}
@@ -505,62 +605,129 @@ function TabMandats() {
               <Input label="Score test min (/20)" type="number" value={form.test_score_min} onChange={setF("test_score_min")} placeholder="12" />
             </div>
 
-            {/* ── Compétences techniques secteur ── */}
+            {/* Skills IT */}
             {form.secteur === "IT" && (
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences IT requises</div>
-                <TagSelector label="Stack requise (au moins 1)" color={C.blueL}
-                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","DevOps / K8s","Data / ML"]}
-                  values={form.it_stack_requis} onChange={setArr("it_stack_requis")} />
-                <TagSelector label="Stack bonus (nice to have)" color={C.tealL}
-                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","GraphQL","Docker","Kubernetes"]}
-                  values={form.it_stack_bonus} onChange={setArr("it_stack_bonus")} />
+                <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences IT requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill sélectionné apparaît dans la matrice</span>
+                </div>
+                <TagSelector label="Stack requise" color={C.blueL}
+                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","DevOps / K8s","Data / ML","Swift","Kotlin"]}
+                  values={form.it_stack_requis}
+                  onChange={v => handleSkillChange("it_stack_requis", v)} />
+                <TagSelector label="Stack bonus" color={C.tealL}
+                  options={["GraphQL","Docker","Kubernetes","Redis","PostgreSQL","MongoDB","Terraform","AWS CDK"]}
+                  values={form.it_stack_bonus}
+                  onChange={v => handleSkillChange("it_stack_bonus", v)} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <Select label="Cloud requis" value={form.it_cloud_requis} onChange={setF("it_cloud_requis")}
-                    options={[{value:"",label:"Indifférent"},{value:"AWS",label:"AWS"},{value:"GCP",label:"Google Cloud"},{value:"Azure",label:"Azure"},{value:"Multi-cloud",label:"Multi-cloud"}]} />
+                    options={[{value:"",label:"Indifférent"},{value:"AWS",label:"AWS"},{value:"GCP",label:"Google Cloud"},{value:"Azure",label:"Azure"}]} />
                 </div>
-                <TagSelector label="Type de contrat accepté" color={C.gold}
+                <TagSelector label="Contrat accepté" color={C.gold}
                   options={["CDI","Mission","Indépendant"]}
-                  values={form.it_contrat_accepte} onChange={setArr("it_contrat_accepte")} />
+                  values={form.it_contrat_accepte}
+                  onChange={v => handleSkillChange("it_contrat_accepte", v)} />
               </div>
             )}
 
+            {/* Skills Finance */}
             {form.secteur === "Finance" && (
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences Finance requises</div>
+                <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences Finance requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
+                </div>
                 <Select label="Spécialité recherchée" value={form.fin_specialite_requise} onChange={setF("fin_specialite_requise")}
-                  options={[{value:"",label:"Toutes"},{value:"CFO",label:"CFO / Direction financière"},{value:"Contrôle de gestion",label:"Contrôle de gestion"},{value:"Audit",label:"Audit"},{value:"Comptabilité",label:"Comptabilité"},{value:"Trésorerie",label:"Trésorerie"},{value:"M&A",label:"M&A"}]} />
+                  options={[{value:"",label:"Toutes"},{value:"CFO",label:"CFO"},{value:"Contrôle de gestion",label:"Contrôle de gestion"},{value:"Audit",label:"Audit"},{value:"Comptabilité",label:"Comptabilité"},{value:"Trésorerie",label:"Trésorerie"},{value:"M&A",label:"M&A"}]} />
                 <TagSelector label="Normes requises" color={C.gold}
                   options={["IFRS","Swiss GAAP","Code des Obligations (OR)","US GAAP"]}
-                  values={form.fin_normes_requises} onChange={setArr("fin_normes_requises")} />
+                  values={form.fin_normes_requises}
+                  onChange={v => handleSkillChange("fin_normes_requises", v)} />
                 <TagSelector label="ERP requis" color={C.blueL}
                   options={["SAP FI/CO","Oracle Financials","Sage","Microsoft Dynamics","Abacus","Power BI"]}
-                  values={form.fin_erp_requis} onChange={setArr("fin_erp_requis")} />
+                  values={form.fin_erp_requis}
+                  onChange={v => handleSkillChange("fin_erp_requis", v)} />
               </div>
             )}
 
+            {/* Skills Ingénierie */}
             {form.secteur === "Ingénierie" && (
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
-                <div style={{ color: "#818CF8", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>Compétences Ingénierie requises</div>
-                <Select label="Spécialité recherchée" value={form.ing_specialite_requise} onChange={setF("ing_specialite_requise")}
-                  options={[{value:"",label:"Toutes"},{value:"Mécanique",label:"Mécanique / Conception"},{value:"Électronique",label:"Électronique / Embarqué"},{value:"Automation",label:"Automation / Robotique"},{value:"Qualité",label:"Qualité / Réglementaire"},{value:"Direction R&D",label:"Direction technique / R&D"}]} />
+                <div style={{ color: "#818CF8", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences Ingénierie requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
+                </div>
+                <Select label="Spécialité" value={form.ing_specialite_requise} onChange={setF("ing_specialite_requise")}
+                  options={[{value:"",label:"Toutes"},{value:"Mécanique",label:"Mécanique"},{value:"Électronique",label:"Électronique"},{value:"Automation",label:"Automation"},{value:"Qualité",label:"Qualité"},{value:"Direction R&D",label:"Direction R&D"}]} />
                 <TagSelector label="CAO requis" color="#818CF8"
                   options={["SolidWorks","CATIA V5/V6","AutoCAD","Inventor","CREO","NX Siemens"]}
-                  values={form.ing_cao_requis} onChange={setArr("ing_cao_requis")} />
+                  values={form.ing_cao_requis}
+                  onChange={v => handleSkillChange("ing_cao_requis", v)} />
                 <TagSelector label="Normes requises" color={C.tealL}
-                  options={["ISO 9001","ISO 13485","MDR 2017/745","IVDR","IEC 62304","CE Machines","ATEX"]}
-                  values={form.ing_normes_requises} onChange={setArr("ing_normes_requises")} />
-                <Select label="Secteur cible" value={form.ing_secteur_cible} onChange={setF("ing_secteur_cible")}
-                  options={[{value:"",label:"Indifférent"},{value:"MedTech / Dispositifs médicaux",label:"MedTech"},{value:"Horlogerie / Microtechnique",label:"Horlogerie / Microtechnique"},{value:"Automation / Robotique industrielle",label:"Automation"},{value:"Aérospatiale / Défense",label:"Aérospatiale"}]} />
+                  options={["ISO 9001","ISO 13485","MDR 2017/745","IEC 62304","CE Machines","ATEX"]}
+                  values={form.ing_normes_requises}
+                  onChange={v => handleSkillChange("ing_normes_requises", v)} />
               </div>
             )}
 
-            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14 }}>
-              <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 12 }}>Matrice de priorités</div>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
-                {[["Formation","prio_formation"],["Technique","prio_technique"],["Langues","prio_langues"],["Exp. secteur","prio_exp_secteur"],["Management","prio_management"],["Salaire fit","prio_salaire_fit"]].map(([label, key]) => (
-                  <Select key={key} label={label} value={form[key]} onChange={setF(key)} options={PRIO_OPTIONS} />
-                ))}
+            {/* ══ MATRICE DE PRIORITÉS DYNAMIQUE ══ */}
+            <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
+              <div style={{ marginBottom: 14 }}>
+                <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 4 }}>
+                  Matrice de priorités
+                </div>
+                <p style={{ color: C.subtle, fontSize: ".78rem" }}>
+                  Définissez l'importance de chaque compétence pour ce mandat. Les skills techniques sont ajoutés automatiquement depuis vos sélections ci-dessus.
+                </p>
+              </div>
+
+              {/* Skills dynamiques (depuis les chips) */}
+              {dynamicSkills.length > 0 && (
+                <div style={{ marginBottom: 16 }}>
+                  <div style={{ color: C.subtle, fontSize: ".68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.blue }} />
+                    Compétences techniques sélectionnées
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                    {dynamicSkills.map(skill => (
+                      <PrioSelect
+                        key={skill}
+                        skillKey={skill}
+                        label={skill}
+                        value={form.prio_skills[skill] || "Souhaité"}
+                        onChange={setPrio}
+                        accentColor={C.blue}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {dynamicSkills.length === 0 && form.secteur && (
+                <div style={{ padding: "12px 16px", borderRadius: 10, background: "rgba(255,255,255,.03)", border: `1px dashed ${C.border}`, color: C.subtle, fontSize: ".82rem", marginBottom: 16 }}>
+                  Sélectionnez des compétences ci-dessus — elles apparaîtront ici pour être pondérées.
+                </div>
+              )}
+
+              {/* Critères fixes */}
+              <div>
+                <div style={{ color: C.subtle, fontSize: ".68rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 8, display: "flex", alignItems: "center", gap: 8 }}>
+                  <div style={{ width: 8, height: 8, borderRadius: "50%", background: C.subtle }} />
+                  Critères transversaux
+                </div>
+                <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                  {FIXED_CRITERIA.map(({ key, label }) => (
+                    <PrioSelect
+                      key={key}
+                      skillKey={key}
+                      label={label}
+                      value={form.prio_skills[key] || FIXED_DEFAULTS[key]}
+                      onChange={setPrio}
+                      accentColor={C.subtle}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
 
