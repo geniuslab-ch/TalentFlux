@@ -1,3 +1,4 @@
+import { useMobile } from "../utils/responsive";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { ArrowLeft, Lock, CheckCircle, Clock, Users } from "lucide-react";
@@ -21,6 +22,7 @@ const LABELS = {
 };
 
 export default function CandidatureFinance() {
+  const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);

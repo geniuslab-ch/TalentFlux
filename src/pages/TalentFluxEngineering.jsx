@@ -1,3 +1,4 @@
+import { useMobile } from "../utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
   Settings2, Target, Zap, ArrowRight, CheckCircle,
@@ -201,6 +202,7 @@ const SelectField = ({ label, value, onChange, options, required }) => (
 );
 
 export default function TalentFluxEngineering() {
+  const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -330,6 +332,12 @@ export default function TalentFluxEngineering() {
         }
         .nav-link { color: ${E.muted}; font-size: .86rem; cursor: pointer; transition: color .2s; }
         .nav-link:hover { color: ${E.text}; }
+        @media (max-width: 768px) {
+          .tf-nav-desktop { display: none !important; }
+          .tf-badge-float { display: none !important; }
+          .dot-grid { background-size: 20px 20px; }
+          .line-grid { background-size: 32px 32px; }
+        }
       `}</style>
 
       {/* ── NAV ── */}
@@ -349,7 +357,7 @@ export default function TalentFluxEngineering() {
             border: `1px solid ${E.borderGlow}`, borderRadius: 4, padding: "2px 8px",
           }}>INGÉNIERIE</span>
         </div>
-        <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
+        <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
           {["Méthode","Matching","Contact"].map(item => (
             <span key={item} className="nav-link" onClick={() => scrollTo(item.toLowerCase())}>{item}</span>
           ))}
@@ -367,14 +375,14 @@ export default function TalentFluxEngineering() {
       </nav>
 
       {/* ── HERO ── */}
-      <header className="dot-grid" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: "120px 2rem 80px" }}>
+      <header className="dot-grid" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: isMobile ? "90px 1.2rem 60px" : "120px 2rem 80px" }}>
 
         {/* Ambient glows */}
         <div style={{ position: "absolute", top: "10%", left: "5%", width: 500, height: 500, borderRadius: "50%", background: "radial-gradient(circle, rgba(29,78,216,0.14), transparent 70%)", animation: "pulseBlue 6s ease-in-out infinite", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "8%", right: "8%", width: 350, height: 350, borderRadius: "50%", background: "radial-gradient(circle, rgba(56,189,248,0.08), transparent 70%)", animation: "pulseElec 7s ease-in-out infinite 2s", pointerEvents: "none" }} />
 
         {/* Floating badge left */}
-        <div className="animate-float" style={{ position: "absolute", left: "2%", top: "35%", zIndex: 1, animation: "float 5s ease-in-out infinite" }}>
+        <div className="animate-float" style={{ position: "absolute", display: isMobile ? "none" : "block", left: "2%", top: "35%", zIndex: 1, animation: "float 5s ease-in-out infinite" }}>
           <TechCard glow style={{ padding: "11px 16px", minWidth: 200 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(59,130,246,.12)", border: `1px solid ${E.borderGlow}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -389,7 +397,7 @@ export default function TalentFluxEngineering() {
         </div>
 
         {/* Floating badge right */}
-        <div style={{ position: "absolute", right: "2%", top: "42%", zIndex: 1, animation: "float 5s ease-in-out infinite 2.2s" }}>
+        <div style={{ position: "absolute", display: isMobile ? "none" : "block", right: "2%", top: "42%", zIndex: 1, animation: "float 5s ease-in-out infinite 2.2s" }}>
           <TechCard style={{ padding: "11px 16px", minWidth: 190, border: `1px solid rgba(249,115,22,0.3)` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.3)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -440,7 +448,7 @@ export default function TalentFluxEngineering() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 52, animation: "fadeUp .7s ease .3s both" }}>
+          <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 52, animation: "fadeUp .7s ease .3s both" }}>
             <button onClick={() => scrollTo("contact")} className="pulse-btn" style={{
               background: "linear-gradient(135deg, #1E40AF, #3B82F6, #38BDF8)",
               border: "none", color: "#fff",
@@ -466,7 +474,7 @@ export default function TalentFluxEngineering() {
 
           {/* Stats strip */}
           <div style={{
-            display: "flex", gap: 28, justifyContent: "center", flexWrap: "wrap",
+            display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: 28, justifyContent: "center", flexWrap: "wrap",
             paddingTop: 36, borderTop: `1px solid ${E.border}`,
             animation: "fadeUp .7s ease .4s both",
           }}>
@@ -501,7 +509,7 @@ export default function TalentFluxEngineering() {
       </header>
 
       {/* ── INTÉRÊT — 3 Method Cards ── */}
-      <section id="méthode" className="line-grid" style={{ padding: "90px 2rem", borderTop: `1px solid ${E.border}` }}>
+      <section id="méthode" className="line-grid" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", borderTop: `1px solid ${E.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <div style={{ color: E.blueLight, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>// Pourquoi TalentFlux Ingénierie</div>
@@ -549,7 +557,7 @@ export default function TalentFluxEngineering() {
       </section>
 
       {/* ── DÉSIR — Matching ── */}
-      <section id="matching" style={{ padding: "90px 2rem", background: `${E.bgDeep}`, borderTop: `1px solid ${E.border}` }}>
+      <section id="matching" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: `${E.bgDeep}`, borderTop: `1px solid ${E.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <div style={{ color: E.electric, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>// Algorithme de matching</div>
@@ -558,7 +566,7 @@ export default function TalentFluxEngineering() {
             </h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 32, alignItems: "center" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 32, alignItems: "center" }}>
             {/* Score visual */}
             <div>
               <TechCard glow className="scan-effect" style={{ padding: 36 }}>
@@ -638,7 +646,7 @@ export default function TalentFluxEngineering() {
       </section>
 
       {/* ── ACTION — Micro-Brief Form ── */}
-      <section id="contact" style={{ padding: "90px 2rem", position: "relative", borderTop: `1px solid ${E.border}`, background: `${E.bgDeep}` }}>
+      <section id="contact" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", position: "relative", borderTop: `1px solid ${E.border}`, background: `${E.bgDeep}` }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center, rgba(29,78,216,.07), transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 44 }}>
@@ -660,7 +668,7 @@ export default function TalentFluxEngineering() {
 
             {!submitted ? (
               <div style={{ padding: 28 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
                   <InputField label="Prénom" placeholder="Laurent" value={form.firstName} onChange={set("firstName")} required />
                   <InputField label="Nom" placeholder="Favre" value={form.lastName} onChange={set("lastName")} required />
                   <InputField label="Email professionnel" type="email" placeholder="l.favre@entreprise.ch" value={form.email} onChange={set("email")} required />
@@ -671,7 +679,7 @@ export default function TalentFluxEngineering() {
                   <InputField label="Entreprise / Site de production" placeholder="Nom de votre société" value={form.company} onChange={set("company")} />
                 </div>
 
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14, marginBottom: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
                   <SelectField label="Spécialité recherchée" value={form.specialty} onChange={set("specialty")} options={specialties} required />
                   <SelectField label="Urgence" value={form.urgency} onChange={set("urgency")} options={urgencies} />
                 </div>

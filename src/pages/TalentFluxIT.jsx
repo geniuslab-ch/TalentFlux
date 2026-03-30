@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from "react";
+import { useMobile } from "../utils/responsive";
 import {
   Clock, Users, ShieldAlert, Code2, Cpu, Network,
   ArrowRight, CheckCircle, Zap, ChevronDown, Star,
@@ -51,6 +52,7 @@ const ProblemCard = ({ icon: Icon, title, desc, color, delay }) => {
 const BentoCard = ({ icon: Icon, title, subtitle, desc, large, delay, accent }) => {
   const [ref, inView] = useInView();
   const [hovered, setHovered] = useState(false);
+  const { isMobile } = useMobile();
   return (
     <div ref={ref}
       onMouseEnter={() => setHovered(true)} onMouseLeave={() => setHovered(false)}
@@ -60,7 +62,7 @@ const BentoCard = ({ icon: Icon, title, subtitle, desc, large, delay, accent }) 
         boxShadow: hovered ? "0 0 40px rgba(14,165,233,0.12)" : "none",
         transition: `all 0.5s ease ${delay}ms`,
         opacity: inView ? 1 : 0, transform: inView ? "translateY(0)" : "translateY(25px)",
-        gridColumn: large ? "span 2" : "span 1",
+        gridColumn: (!isMobile && large) ? "span 2" : "span 1",
         borderRadius: 20, padding: 32, position: "relative", overflow: "hidden",
       }}
     >
@@ -144,6 +146,7 @@ const faqData = [
 const FAQItem = ({ item, index }) => {
   const [open, setOpen] = useState(false);
   const [ref, inView] = useInView();
+  const { isMobile } = useMobile();
   const Icon = item.icon;
   return (
     <div ref={ref} style={{
@@ -172,7 +175,7 @@ const FAQItem = ({ item, index }) => {
         </div>
       </button>
       <div style={{ maxHeight: open ? 260 : 0, overflow: "hidden", transition: "max-height .4s cubic-bezier(.4,0,.2,1)" }}>
-        <div style={{ padding: "0 24px 22px 78px" }}>
+        <div style={{ padding: isMobile ? "0 16px 18px 16px" : "0 24px 22px 78px" }}>
           <p style={{ color: "#94A3B8", lineHeight: 1.8, fontSize: ".88rem" }}>{item.answer}</p>
           <div style={{ display: "inline-flex", alignItems: "center", gap: 7, marginTop: 12, padding: "8px 14px", borderRadius: 9, fontWeight: 700, fontSize: ".82rem", background: item.highlightBg, border: `1px solid ${item.highlightBorder}`, color: item.highlightColor }}>
             <CheckCircle size={13} style={{ color: item.highlightColor }} />
@@ -205,6 +208,7 @@ const heroContent = {
 };
 
 export default function TalentFluxIT() {
+  const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [isCandidate, setIsCandidate] = useState(false);
   const [heroVisible, setHeroVisible] = useState(true);
@@ -307,6 +311,10 @@ export default function TalentFluxIT() {
         @keyframes slideUp { from{opacity:0;transform:translateY(36px)}to{opacity:1;transform:translateY(0)} }
         @keyframes spin { to{transform:rotate(360deg)} }
         @keyframes glowTeal { 0%,100%{box-shadow:0 0 18px rgba(20,184,166,.2)}50%{box-shadow:0 0 40px rgba(20,184,166,.5)} }
+        @media (max-width: 768px) {
+          .tf-nav-desktop { display: none !important; }
+          .tf-badge-float { display: none !important; }
+        }
         .grid-bg {
           background-image: linear-gradient(rgba(37,99,235,.04) 1px,transparent 1px), linear-gradient(90deg,rgba(37,99,235,.04) 1px,transparent 1px);
           background-size: 60px 60px;
@@ -327,7 +335,16 @@ export default function TalentFluxIT() {
           <img src="/logo.png" alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
           <span style={{ fontSize: ".6rem", fontWeight: 700, letterSpacing: ".12em", color: "#0EA5E9", background: "rgba(14,165,233,.1)", border: "1px solid rgba(14,165,233,.3)", borderRadius: 4, padding: "2px 7px" }}>IT</span>
         </div>
-        <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
+        {isMobile && (
+          <button
+            onClick={() => scrollTo("contact")}
+            style={{ background: "linear-gradient(135deg,#2563EB,#0EA5E9)", border: "none", color: "#fff",
+              padding: "8px 16px", borderRadius: 10, fontWeight: 700, fontSize: ".82rem", cursor: "pointer",
+              fontFamily: "'DM Sans',sans-serif" }}>
+            Recruter →
+          </button>
+        )}
+        <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
           {["Solution","FAQ","Contact"].map(item => (
             <span key={item} onClick={() => scrollTo(item.toLowerCase())}
               style={{ color: "#94A3B8", fontSize: ".86rem", cursor: "pointer", transition: "color .2s" }}
@@ -349,20 +366,20 @@ export default function TalentFluxIT() {
       </nav>
 
       {/* ═══ HERO ═══ */}
-      <section className="grid-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: "120px 2rem 80px" }}>
+      <section className="grid-bg" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: isMobile ? "90px 1.2rem 60px" : "120px 2rem 80px" }}>
         {/* Orbs */}
         <div style={{ position: "absolute", top: "12%", left: "6%", width: 440, height: 440, borderRadius: "50%", background: "radial-gradient(circle,rgba(37,99,235,.12),transparent 70%)", animation: "pulseGlow 5s ease-in-out infinite", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "12%", right: "5%", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(20,184,166,.09),transparent 70%)", animation: "pulseGlow 6s ease-in-out infinite 1.5s", pointerEvents: "none" }} />
 
         {/* Floating cards */}
-        <div style={{ position: "absolute", left: "2%", top: "38%", background: "rgba(15,23,42,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 16px", animation: "float 4s ease-in-out infinite", pointerEvents: "none", zIndex: 1, minWidth: 155 }}>
+        <div style={{ position: "absolute", left: "2%", top: "38%", display: isMobile ? "none" : "block", background: "rgba(15,23,42,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 16px", animation: "float 4s ease-in-out infinite", pointerEvents: "none", zIndex: 1, minWidth: 155 }}>
           <div style={{ color: "#475569", fontSize: ".65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Time-to-hire</div>
           <div style={{ color: "#E2E8F0", fontSize: ".83rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#14B8A6", boxShadow: "0 0 6px #14B8A6", flexShrink: 0, display: "inline-block" }} />
             72h en moyenne
           </div>
         </div>
-        <div style={{ position: "absolute", right: "2%", top: "42%", background: "rgba(15,23,42,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 16px", animation: "float 4s ease-in-out infinite 1.8s", pointerEvents: "none", zIndex: 1, minWidth: 155 }}>
+        <div style={{ position: "absolute", right: "2%", top: "42%", display: isMobile ? "none" : "block", background: "rgba(15,23,42,.95)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 14, padding: "12px 16px", animation: "float 4s ease-in-out infinite 1.8s", pointerEvents: "none", zIndex: 1, minWidth: 155 }}>
           <div style={{ color: "#475569", fontSize: ".65rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Satisfaction</div>
           <div style={{ color: "#E2E8F0", fontSize: ".83rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#0EA5E9", boxShadow: "0 0 6px #0EA5E9", flexShrink: 0, display: "inline-block" }} />
@@ -453,7 +470,7 @@ export default function TalentFluxIT() {
           </div>
 
           {/* STATS */}
-          <div style={{ display: "flex", gap: 28, justifyContent: "center", flexWrap: "wrap", marginTop: 52, paddingTop: 36, borderTop: "1px solid rgba(255,255,255,.07)" }}>
+          <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: isMobile ? 20 : 28, justifyContent: "center", flexWrap: "wrap", marginTop: 52, paddingTop: 36, borderTop: "1px solid rgba(255,255,255,.07)" }}>
             {[
               { v: "50+",  l: "Profils validés" },
               { v: "72h",  l: "Délai moyen" },
@@ -474,14 +491,14 @@ export default function TalentFluxIT() {
       </section>
 
       {/* PROBLÈME */}
-      <section style={{ padding: "90px 2rem", maxWidth: 1060, margin: "0 auto" }}>
+      <section style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", maxWidth: 1060, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 52 }}>
           <div style={{ color: "#EF4444", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>⚠ Le coût de l'erreur</div>
           <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.7rem,3.8vw,2.8rem)", fontWeight: 800, lineHeight: 1.2, color: "#F1F5F9" }}>
             Chaque mauvais recrutement vous coûte<br /><GradientText>en moyenne 30 000 CHF.</GradientText>
           </h2>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 22 }}>
+        <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 22 }}>
           <ProblemCard icon={Clock} title="Time-to-hire trop long" desc="Vos équipes attendent 3 à 6 mois pour un profil senior. Pendant ce temps, vos sprints dérivent et vos concurrents recrutent." color="#F97316" delay={0} />
           <ProblemCard icon={Users} title="Culture-fit raté" desc="Le CV est parfait. L'intégration est catastrophique. Sans évaluation comportementale, vous recrutez une compétence, pas un collaborateur." color="#EF4444" delay={100} />
           <ProblemCard icon={ShieldAlert} title="Fake-experts démasqués trop tard" desc="Ils connaissent le jargon, pas le code. Sans test technique live, vous découvrez la vérité après 3 mois de mission." color="#DC2626" delay={200} />
@@ -489,7 +506,7 @@ export default function TalentFluxIT() {
       </section>
 
       {/* SOLUTION */}
-      <section id="solution" style={{ padding: "90px 2rem", background: "rgba(15,23,42,.4)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
+      <section id="solution" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: "rgba(15,23,42,.4)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
             <div style={{ color: "#38BDF8", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ La Solution TalentFlux</div>
@@ -497,14 +514,14 @@ export default function TalentFluxIT() {
               La <GradientText>Stack TalentFlux</GradientText><br />appliquée au recrutement IT
             </h2>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(2,1fr)", gap: 18 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(2,1fr)", gap: 18 }}>
             <BentoCard icon={Terminal} subtitle="Méthode #1" title="Évaluation Live-Coding" desc="On ne croit que ce qu'on voit. Chaque candidat passe un entretien technique live avec nos ingénieurs seniors. Du vrai pair-programming, zéro triche." large={false} delay={0} accent="#2563EB" />
             <BentoCard icon={Cpu} subtitle="Méthode #2" title="Matching Algorithmique" desc="La précision du code appliquée aux RH. Notre système analyse les critères clés — stack, culture, timezone — pour un fit optimal dès le premier jour." large={false} delay={100} accent="#0EA5E9" />
             <BentoCard icon={Network} subtitle="Méthode #3" title="Réseau Invisible" desc="Accès aux talents qui ne cherchent pas activement. Ils ne sont pas sur LinkedIn. Ils sont dans notre réseau cultivé depuis le lancement de TalentFlux." large={true} delay={200} accent="#14B8A6" />
           </div>
           <div style={{ marginTop: 48, padding: 40, background: "rgba(11,15,26,.8)", borderRadius: 22, border: "1px solid rgba(255,255,255,.06)" }}>
             <div style={{ color: "#94A3B8", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 28, textAlign: "center" }}>Le processus en 4 étapes</div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4,1fr)", gap: 14 }}>
+            <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: isMobile ? 20 : 14 }}>
               {[
                 { n:"01", t:"Brief", d:"30 min pour cerner vos besoins", icon: GitBranch },
                 { n:"02", t:"Sourcing", d:"Activation du réseau sous 24h", icon: Network },
@@ -526,8 +543,8 @@ export default function TalentFluxIT() {
       </section>
 
       {/* TESTIMONIALS */}
-      <section style={{ padding: "72px 2rem" }}>
-        <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 20 }}>
+      <section style={{ padding: isMobile ? "48px 1.2rem" : "72px 2rem" }}>
+        <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 20 }}>
           {[
             { q: "On avait cherché 4 mois sans résultat. TalentFlux nous a envoyé 3 profils qualifiés en quelques jours. L'un d'eux est encore chez nous.", a: "CTO, Startup Lausanne" },
             { q: "Le live-coding m'a bluffé. On voyait enfin la réalité du niveau technique, pas la mise en scène des entretiens classiques.", a: "Head of Engineering, Scale-up Genève" },
@@ -545,7 +562,7 @@ export default function TalentFluxIT() {
       </section>
 
       {/* FAQ */}
-      <section id="faq" style={{ padding: "90px 2rem", background: "rgba(15,23,42,.3)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
+      <section id="faq" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: "rgba(15,23,42,.3)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
             <div style={{ color: "#38BDF8", fontSize: ".75rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Vos questions, nos réponses</div>
@@ -561,7 +578,7 @@ export default function TalentFluxIT() {
       </section>
 
       {/* CONTACT */}
-      <section id="contact" style={{ padding: "90px 2rem", position: "relative", background: "rgba(15,23,42,.4)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
+      <section id="contact" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", position: "relative", background: "rgba(15,23,42,.4)", borderTop: "1px solid rgba(255,255,255,.04)" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center,rgba(37,99,235,.07),transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1060, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
@@ -571,7 +588,7 @@ export default function TalentFluxIT() {
             </h2>
             <p style={{ color: "#94A3B8", fontSize: ".92rem", lineHeight: 1.7 }}>Aucun frais avant l'embauche. Satisfaction garantie. Premier brief sous 24h.</p>
           </div>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 310px", gap: 22 }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 310px", gap: 22 }}>
             {/* FORM */}
             <div style={{ background: "rgba(11,15,26,.9)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,.07)" }}>
@@ -593,7 +610,7 @@ export default function TalentFluxIT() {
               </div>
               {!submitted ? (
                 <div style={{ padding: 26 }}>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 13, marginBottom: 13 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 13, marginBottom: 13 }}>
                     <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
                     <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="sophie@acme.com" value={form.email} onChange={set("email")} required />
@@ -721,7 +738,7 @@ export default function TalentFluxIT() {
             <span style={{ color: "#334155", fontSize: ".7rem" }}>· IT · Yverdon-les-Bains, Suisse</span>
           </div>
           <p style={{ color: "#334155", fontSize: ".73rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
-          <div style={{ display: "flex", gap: 16 }}>
+          <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
             {[["Confidentialité","/privacy"],["CGU","/cgu"],["Contact","/contact"]].map(([label, to]) => (
               <Link key={to} to={to} style={{ color: "#475569", fontSize: ".73rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e=>e.target.style.color="#94A3B8"} onMouseLeave={e=>e.target.style.color="#475569"}

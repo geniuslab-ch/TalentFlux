@@ -1,3 +1,4 @@
+import { useMobile } from "../utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
   TrendingDown, ShieldCheck, Cpu, ArrowRight, CheckCircle,
@@ -190,6 +191,7 @@ const StatBar = ({ label, value, pct, color, delay }) => {
 };
 
 export default function TalentFluxFinance() {
+  const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -281,6 +283,11 @@ export default function TalentFluxFinance() {
           animation: shimmer 3s linear infinite;
         }
         .shimmer-btn:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 0 40px rgba(180,145,60,0.5) !important; }
+        @media (max-width: 768px) {
+          .tf-nav-desktop { display: none !important; }
+          .tf-badge-float { display: none !important; }
+          .fine-grid { background-size: 32px 32px; }
+        }
       `}</style>
 
       {/* ── NAV ── */}
@@ -300,7 +307,7 @@ export default function TalentFluxFinance() {
             border: `1px solid ${C.borderGold}`, borderRadius: 4, padding: "2px 8px",
           }}>FINANCE</span>
         </div>
-        <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
+        <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
           {["Approche","Méthodologie","Contact"].map(item => (
             <span key={item} onClick={() => scrollTo(item.toLowerCase())}
               style={{ color: C.muted, fontSize: ".86rem", cursor: "pointer", transition: "color .2s" }}
@@ -320,14 +327,14 @@ export default function TalentFluxFinance() {
       </nav>
 
       {/* ── HERO ── */}
-      <header className="grid-fine" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: "120px 2rem 80px" }}>
+      <header className="grid-fine" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: isMobile ? "90px 1.2rem 60px" : "120px 2rem 80px" }}>
 
         {/* Orbs */}
         <div style={{ position: "absolute", top: "8%", left: "3%", width: 500, height: 500, borderRadius: "50%", background: `radial-gradient(circle, rgba(30,64,175,0.12), transparent 70%)`, animation: "pulseBlue 6s ease-in-out infinite", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "10%", right: "5%", width: 360, height: 360, borderRadius: "50%", background: `radial-gradient(circle, rgba(180,145,60,0.08), transparent 70%)`, animation: "pulseGold 7s ease-in-out infinite 1s", pointerEvents: "none" }} />
 
         {/* Floating trust badges */}
-        <div className="animate-float" style={{ position: "absolute", left: "2%", top: "36%", pointerEvents: "none", zIndex: 1 }}>
+        <div className="animate-float" style={{ position: "absolute", display: isMobile ? "none" : "block", left: "2%", top: "36%", pointerEvents: "none", zIndex: 1 }}>
           <GlassCard gold style={{ padding: "12px 18px", minWidth: 190 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(180,145,60,.12)", border: `1px solid ${C.borderGold}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -341,7 +348,7 @@ export default function TalentFluxFinance() {
           </GlassCard>
         </div>
 
-        <div className="animate-float" style={{ position: "absolute", right: "2%", top: "42%", animationDelay: "2s", pointerEvents: "none", zIndex: 1 }}>
+        <div className="animate-float" style={{ position: "absolute", display: isMobile ? "none" : "block", right: "2%", top: "42%", animationDelay: "2s", pointerEvents: "none", zIndex: 1 }}>
           <GlassCard style={{ padding: "12px 18px", minWidth: 190, border: `1px solid ${C.borderBlue}` }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
               <div style={{ width: 32, height: 32, borderRadius: 8, background: "rgba(59,130,246,.1)", border: `1px solid ${C.borderBlue}`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -389,7 +396,7 @@ export default function TalentFluxFinance() {
           </p>
 
           {/* CTAs */}
-          <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 52, animation: "fadeUp .7s ease .3s both" }}>
+          <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 52, animation: "fadeUp .7s ease .3s both" }}>
             <button onClick={() => scrollTo("contact")} className="shimmer-btn" style={{
               border: "none", color: "#0B1120", padding: "15px 32px", borderRadius: 14,
               fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: ".95rem",
@@ -413,7 +420,7 @@ export default function TalentFluxFinance() {
 
           {/* Trust strip */}
           <div style={{
-            display: "flex", gap: 32, justifyContent: "center", flexWrap: "wrap",
+            display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: 32, justifyContent: "center", flexWrap: "wrap",
             paddingTop: 36, borderTop: `1px solid ${C.border}`,
             animation: "fadeUp .7s ease .4s both",
           }}>
@@ -449,7 +456,7 @@ export default function TalentFluxFinance() {
       </header>
 
       {/* ── INTÉRÊT — 3 Glass Cards ── */}
-      <section id="approche" style={{ padding: "90px 2rem" }}>
+      <section id="approche" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
             <div style={{ color: C.goldLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Pourquoi TalentFlux Finance</div>
@@ -482,7 +489,7 @@ export default function TalentFluxFinance() {
           {/* Match score bars */}
           <div style={{ marginTop: 48 }}>
             <GlassCard style={{ padding: "36px 40px" }}>
-              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "24px 48px" }}>
+              <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "24px 48px" }}>
                 <div>
                   <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 20 }}>Critères évalués</div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -514,7 +521,7 @@ export default function TalentFluxFinance() {
       </section>
 
       {/* ── DÉSIR — Timeline Méthodologie ── */}
-      <section id="méthodologie" style={{ padding: "90px 2rem", background: "rgba(15,22,40,0.5)", borderTop: `1px solid ${C.border}` }}>
+      <section id="méthodologie" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: "rgba(15,22,40,0.5)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
             <div style={{ color: C.blueLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Comment ça marche</div>
@@ -523,7 +530,7 @@ export default function TalentFluxFinance() {
             </h2>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 48, alignItems: "start" }}>
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 48, alignItems: "start" }}>
             {/* Timeline */}
             <div>
               <TimelineStep num={1}
@@ -603,7 +610,7 @@ export default function TalentFluxFinance() {
       </section>
 
       {/* ── ACTION — Micro-Brief Form ── */}
-      <section id="contact" style={{ padding: "90px 2rem", position: "relative", borderTop: `1px solid ${C.border}` }}>
+      <section id="contact" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", position: "relative", borderTop: `1px solid ${C.border}` }}>
         <div style={{ position: "absolute", inset: 0, background: `radial-gradient(ellipse at center, rgba(30,64,175,.06), transparent 65%)`, pointerEvents: "none" }} />
         <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
@@ -626,7 +633,7 @@ export default function TalentFluxFinance() {
 
             {!submitted ? (
               <div style={{ padding: 32 }}>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 16 }}>
+                <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
                   <InputField label="Prénom" placeholder="Antoine" value={form.firstName} onChange={set("firstName")} required />
                   <InputField label="Nom" placeholder="Dupont" value={form.lastName} onChange={set("lastName")} required />
                   <InputField label="Email professionnel" type="email" placeholder="a.dupont@entreprise.ch" value={form.email} onChange={set("email")} required />
