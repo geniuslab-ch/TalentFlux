@@ -228,7 +228,7 @@ function TabCandidats() {
     if (!error) { setLinkSuccess(true); setTimeout(() => { setLinkSuccess(false); setLinkMandat(""); }, 2000); }
   };
 
-  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8", "Paysagisme": "#22C55E" };
+  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8", "Paysagisme": "#22C55E", "Télécommunications": "#0EA5E9" };
 
   return (
     <div>
@@ -242,7 +242,7 @@ function TabCandidats() {
         <select value={filterSecteur} onChange={e => setFilterSecteur(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer" }}>
           <option value="">Tous secteurs</option>
-          {["IT","Finance","Ingénierie","Paysagisme"].map(s => <option key={s} value={s}>{s}</option>)}
+          {["IT","Finance","Ingénierie","Paysagisme","Télécommunications"].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <Btn onClick={load} variant="ghost" small><RefreshCw size={13} /> Actualiser</Btn>
       </div>
@@ -446,6 +446,9 @@ function TabMandats() {
     // Paysagisme
     pay_specialite_requise: "", pay_competences_requises: [], pay_certifications: [],
     pay_contrat: "", pay_permis: "", pay_equipe_taille: "", pay_zone: "",
+    // Télécommunications
+    tel_specialite: "", tel_normes: [], tel_outils_mesure: [], tel_logiciels: [],
+    tel_operateurs: [], tel_drone_certif: false, tel_habilitations: "",
     // Matrice dynamique JSONB
     prio_skills: { ...FIXED_DEFAULTS },
   });
@@ -534,6 +537,13 @@ function TabMandats() {
       pay_permis:             m.pay_permis || "",
       pay_equipe_taille:      m.pay_equipe_taille || "",
       pay_zone:               m.pay_zone || "",
+      tel_specialite:         m.tel_specialite || "",
+      tel_normes:             m.tel_normes || [],
+      tel_outils_mesure:      m.tel_outils_mesure || [],
+      tel_logiciels:          m.tel_logiciels || [],
+      tel_operateurs:         m.tel_operateurs || [],
+      tel_drone_certif:       m.tel_drone_certif || false,
+      tel_habilitations:      m.tel_habilitations || "",
       prio_skills:          prio,
     });
     setShowForm(true);
@@ -575,6 +585,13 @@ function TabMandats() {
       pay_permis:             form.pay_permis || null,
       pay_equipe_taille:      parseInt(form.pay_equipe_taille) || null,
       pay_zone:               form.pay_zone || null,
+      tel_specialite:         form.tel_specialite || null,
+      tel_normes:             form.tel_normes,
+      tel_outils_mesure:      form.tel_outils_mesure,
+      tel_logiciels:          form.tel_logiciels,
+      tel_operateurs:         form.tel_operateurs,
+      tel_drone_certif:       form.tel_drone_certif || false,
+      tel_habilitations:      form.tel_habilitations || null,
     };
     if (editing) {
       await supabase.from("mandats").update(payload).eq("id", editing.id);
@@ -605,7 +622,7 @@ function TabMandats() {
               <div>
                 <div style={{ color: C.text, fontWeight: 700, fontSize: ".92rem", marginBottom: 4 }}>{m.titre_poste}</div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : m.secteur === "Paysagisme" ? "#22C55E" : C.purple} />
+                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : m.secteur === "Paysagisme" ? "#22C55E" : m.secteur === "Télécommunications" ? "#0EA5E9" : C.purple} />
                   <Badge label={m.statut} color={statut_color[m.statut] || C.subtle} />
                   {m.budget_max_chf && <Badge label={`≤ ${m.budget_max_chf.toLocaleString()} CHF`} color={C.subtle} />}
                   {m.localisation && <Badge label={m.localisation} color={C.subtle} />}
@@ -633,7 +650,7 @@ function TabMandats() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Input label="Titre du poste" value={form.titre_poste} onChange={setF("titre_poste")} placeholder="Lead Developer React" required />
               <Select label="Secteur" value={form.secteur} onChange={setF("secteur")} required
-                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"},{value:"Paysagisme",label:"🌿 Paysagisme"}]} />
+                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"},{value:"Paysagisme",label:"🌿 Paysagisme"},{value:"Télécommunications",label:"📡 Télécommunications"}]} />
               <Input label="Budget min (CHF)" type="number" value={form.budget_min_chf} onChange={setF("budget_min_chf")} placeholder="100000" />
               <Input label="Budget max (CHF)" type="number" value={form.budget_max_chf} onChange={setF("budget_max_chf")} placeholder="140000" />
               <Select label="Remote policy" value={form.remote_policy} onChange={setF("remote_policy")}
@@ -772,6 +789,58 @@ function TabMandats() {
                   <Input label="Taille équipe à gérer" type="number" value={form.pay_equipe_taille || ""} onChange={setF("pay_equipe_taille")} placeholder="Ex: 4" />
                   <Select label="Zone d'intervention" value={form.pay_zone || ""} onChange={setF("pay_zone")}
                     options={[{value:"",label:"Indifférent"},{value:"Vaud",label:"Canton de Vaud"},{value:"Genève",label:"Canton de Genève"},{value:"Fribourg",label:"Canton de Fribourg"},{value:"Valais",label:"Canton du Valais"},{value:"Neuchâtel",label:"Canton de Neuchâtel"},{value:"Suisse romande",label:"Suisse romande"},{value:"Suisse entière",label:"Suisse entière"}]} />
+                </div>
+              </div>
+            )}
+
+            {/* Skills Télécommunications */}
+            {form.secteur === "Télécommunications" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: "#0EA5E9", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences Télécommunications requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
+                </div>
+                <Select label="Spécialité" value={form.tel_specialite || ""} onChange={setF("tel_specialite")}
+                  options={[
+                    {value:"",label:"Toutes spécialités"},
+                    {value:"Spécialiste RNI",label:"📡 Spécialiste RNI / Rayonnement Non Ionisant"},
+                    {value:"RF Planning",label:"📶 RF Planner / Planificateur radio"},
+                    {value:"Géomatique télécom",label:"🗺️ Géomaticien télécom"},
+                    {value:"Infrastructure passive",label:"🗼 Infrastructure passive (mâts, shelters)"},
+                    {value:"Fibre optique",label:"🔌 Technicien fibre optique (FTTH/FTTB)"},
+                    {value:"Transmission IP",label:"🌐 Ingénieur transmission / IP"},
+                    {value:"Conformité réglementaire",label:"⚖️ Expert conformité réglementaire"},
+                    {value:"Pilote drone télécom",label:"🚁 Pilote drone certifié télécom"},
+                  ]} />
+                <TagSelector label="Normes et réglementations requises" color="#0EA5E9"
+                  options={["ORNI (Suisse)","OFCOM","LTC (Loi télécom)","EN 50492 (mesures EMF)","UIT-R","ICNIRP","RED (EU)","ETSI","3GPP 5G NR","IEC 62232"]}
+                  values={form.tel_normes || []}
+                  onChange={v => handleSkillChange("tel_normes", v)} />
+                <TagSelector label="Outils de mesure" color="#38BDF8"
+                  options={["Narda SRM-3006","Narda ELT-400","Rohde & Schwarz FSH","SITEMASTER S331","Spectromètre portable","GPS différentiel","Station totale","Drone DJI Matrice","Drone Autel","Sonomètre (si EMF basse fréq.)"]}
+                  values={form.tel_outils_mesure || []}
+                  onChange={v => handleSkillChange("tel_outils_mesure", v)} />
+                <TagSelector label="Logiciels requis" color="#7DD3FC"
+                  options={["ArcGIS","QGIS","AutoCAD","iBWave","Atoll","RPS (Radio Planning Suite)","WRAP","Asset","NetCracker","Suite Office","Python/scripts calcul"]}
+                  values={form.tel_logiciels || []}
+                  onChange={v => handleSkillChange("tel_logiciels", v)} />
+                <TagSelector label="Opérateurs / clients cibles" color="#0369A1"
+                  options={["Swisscom","Sunrise","Salt","SBB/CFF Telecom","Ericsson","Huawei","Nokia","Axians","Elca","Opérateurs privés"]}
+                  values={form.tel_operateurs || []}
+                  onChange={v => handleSkillChange("tel_operateurs", v)} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: form.tel_drone_certif ? "rgba(14,165,233,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${form.tel_drone_certif ? "rgba(14,165,233,.3)" : C.border}`, transition: "all .2s" }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                      <input type="checkbox" checked={form.tel_drone_certif || false}
+                        onChange={e => setForm(f => ({ ...f, tel_drone_certif: e.target.checked }))}
+                        style={{ width: 16, height: 16, accentColor: "#0EA5E9" }} />
+                      <div>
+                        <div style={{ color: C.text, fontWeight: 600, fontSize: ".86rem" }}>Certification drone OFAC requise</div>
+                        <div style={{ color: C.subtle, fontSize: ".72rem" }}>A1/A2/A3 — prend 3 mois à obtenir</div>
+                      </div>
+                    </label>
+                  </div>
+                  <Input label="Habilitations requises" value={form.tel_habilitations || ""} onChange={setF("tel_habilitations")} placeholder="Ex: NATEL Securité, accès sites militaires" />
                 </div>
               </div>
             )}
