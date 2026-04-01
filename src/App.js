@@ -4,7 +4,6 @@ import TalentFluxFinance from './pages/TalentFluxFinance';
 import TalentFluxEngineering from './pages/TalentFluxEngineering';
 import TalentFluxPaysagisme from './pages/TalentFluxPaysagisme';
 import TalentFluxTelecom from './pages/TalentFluxTelecom';
-import CandidaturePaysagisme from './pages/CandidaturePaysagisme';
 import CandidatureIT from './pages/CandidatureIT';
 import CandidatureFinance from './pages/CandidatureFinance';
 import CandidatureIngenierie from './pages/CandidatureIngenierie';
@@ -28,7 +27,8 @@ export default function App() {
         <Route path="/candidature/it"         element={<CandidatureIT />} />
         <Route path="/candidature/finance"    element={<CandidatureFinance />} />
         <Route path="/candidature/ingenierie" element={<CandidatureIngenierie />} />
-        <Route path="/candidature/paysagisme" element={<CandidaturePaysagisme />} />
+        <Route path="/candidature/paysagisme" element={<CandidatureIngenierie />} />
+        <Route path="/candidature/telecom" element={<CandidatureIngenierie />} />
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
         {/* Pages légales */}
