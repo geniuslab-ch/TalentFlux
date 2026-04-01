@@ -7,6 +7,8 @@ import TalentFluxTelecom from './pages/TalentFluxTelecom';
 import CandidatureIT from './pages/CandidatureIT';
 import CandidatureFinance from './pages/CandidatureFinance';
 import CandidatureIngenierie from './pages/CandidatureIngenierie';
+import CandidaturePaysagisme from './pages/CandidaturePaysagisme';
+import CandidatureTelecom from './pages/CandidatureTelecom';
 import Admin from './pages/Admin';
 import Contact from './pages/Contact';
 import Privacy from './pages/Privacy';
@@ -22,19 +24,19 @@ export default function App() {
         <Route path="/finance"    element={<TalentFluxFinance />} />
         <Route path="/ingenierie" element={<TalentFluxEngineering />} />
         <Route path="/paysagisme" element={<TalentFluxPaysagisme />} />
-        <Route path="/telecom" element={<TalentFluxTelecom />} />
+        <Route path="/telecom"    element={<TalentFluxTelecom />} />
         {/* Formulaires candidats */}
         <Route path="/candidature/it"         element={<CandidatureIT />} />
         <Route path="/candidature/finance"    element={<CandidatureFinance />} />
         <Route path="/candidature/ingenierie" element={<CandidatureIngenierie />} />
-        <Route path="/candidature/paysagisme" element={<CandidatureIngenierie />} />
-        <Route path="/candidature/telecom" element={<CandidatureIngenierie />} />
+        <Route path="/candidature/paysagisme" element={<CandidaturePaysagisme />} />
+        <Route path="/candidature/telecom"    element={<CandidatureTelecom />} />
         {/* Admin */}
         <Route path="/admin" element={<Admin />} />
         {/* Pages légales */}
         <Route path="/contact" element={<Contact />} />
-        <Route path="/privacy" element={<Privacy />} />
-        <Route path="/cgu"     element={<CGU />} />
+        <Route path="/privacy"  element={<Privacy />} />
+        <Route path="/cgu"      element={<CGU />} />
       </Routes>
     </BrowserRouter>
   );
