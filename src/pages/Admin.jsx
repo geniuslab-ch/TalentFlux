@@ -446,9 +446,29 @@ function TabMandats() {
     // Paysagisme
     pay_specialite_requise: "", pay_competences_requises: [], pay_certifications: [],
     pay_contrat: "", pay_permis: "", pay_equipe_taille: "", pay_zone: "",
-    // Télécommunications
-    tel_specialite: "", tel_normes: [], tel_outils_mesure: [], tel_logiciels: [],
-    tel_operateurs: [], tel_drone_certif: false, tel_habilitations: "",
+    // IT supplémentaire
+    it_type_poste_requis: "", it_certif_cloud_requis: [],
+    // Ingénierie supplémentaire
+    ing_automates_requis: [], ing_habilitations_elec_requises: [], ing_certif_projet_requis: [],
+    // Finance supplémentaire
+    fin_industries_cibles: [], fin_certifications_requises: [],
+    // Télécommunications — tronc commun
+    tel_sous_domaine: [], tel_specialite: "", tel_operateurs: [],
+    tel_drone_certif: false, tel_habilitations: "", tel_cantons_requis: [],
+    // Télécom — Réseau IP
+    tel_stack_reseau_requis: [], tel_protocols_requis: [],
+    tel_certif_reseau_requises: [], tel_supervision_requis: [],
+    // Télécom — Radio / RAN
+    tel_tech_radio_requises: [], tel_outils_rf_requis: [], tel_constructeurs_ran_requis: [],
+    // Télécom — RNI / ORNI
+    tel_normes: [], tel_outils_mesure: [], tel_logiciels: [],
+    tel_dossiers_permis_requis: false,
+    // Télécom — Fibre
+    tel_competences_fibre_requises: [],
+    // Télécom — VoIP
+    tel_voip_stack_requis: [], tel_protocols_uc_requis: [],
+    // Télécom — Transmission
+    tel_tech_transmission_requises: [],
     // Matrice dynamique JSONB
     prio_skills: { ...FIXED_DEFAULTS },
   });
@@ -537,13 +557,34 @@ function TabMandats() {
       pay_permis:             m.pay_permis || "",
       pay_equipe_taille:      m.pay_equipe_taille || "",
       pay_zone:               m.pay_zone || "",
-      tel_specialite:         m.tel_specialite || "",
-      tel_normes:             m.tel_normes || [],
-      tel_outils_mesure:      m.tel_outils_mesure || [],
-      tel_logiciels:          m.tel_logiciels || [],
-      tel_operateurs:         m.tel_operateurs || [],
-      tel_drone_certif:       m.tel_drone_certif || false,
-      tel_habilitations:      m.tel_habilitations || "",
+      it_type_poste_requis:         m.it_type_poste_requis || "",
+      it_certif_cloud_requis:       m.it_certif_cloud_requis || [],
+      ing_automates_requis:         m.ing_automates_requis || [],
+      ing_habilitations_elec_requises: m.ing_habilitations_elec_requises || [],
+      ing_certif_projet_requis:     m.ing_certif_projet_requis || [],
+      fin_industries_cibles:        m.fin_industries_cibles || [],
+      fin_certifications_requises:  m.fin_certifications_requises || [],
+      tel_sous_domaine:             m.tel_sous_domaine || [],
+      tel_specialite:               m.tel_specialite || "",
+      tel_operateurs:               m.tel_operateurs || [],
+      tel_drone_certif:             m.tel_drone_certif || false,
+      tel_habilitations:            m.tel_habilitations || "",
+      tel_cantons_requis:           m.tel_cantons_requis || [],
+      tel_stack_reseau_requis:      m.tel_stack_reseau_requis || [],
+      tel_protocols_requis:         m.tel_protocols_requis || [],
+      tel_certif_reseau_requises:   m.tel_certif_reseau_requises || [],
+      tel_supervision_requis:       m.tel_supervision_requis || [],
+      tel_tech_radio_requises:      m.tel_tech_radio_requises || [],
+      tel_outils_rf_requis:         m.tel_outils_rf_requis || [],
+      tel_constructeurs_ran_requis: m.tel_constructeurs_ran_requis || [],
+      tel_normes:                   m.tel_normes || [],
+      tel_outils_mesure:            m.tel_outils_mesure || [],
+      tel_logiciels:                m.tel_logiciels || [],
+      tel_dossiers_permis_requis:   m.tel_dossiers_permis_requis || false,
+      tel_competences_fibre_requises: m.tel_competences_fibre_requises || [],
+      tel_voip_stack_requis:        m.tel_voip_stack_requis || [],
+      tel_protocols_uc_requis:      m.tel_protocols_uc_requis || [],
+      tel_tech_transmission_requises: m.tel_tech_transmission_requises || [],
       prio_skills:          prio,
     });
     setShowForm(true);
@@ -585,13 +626,34 @@ function TabMandats() {
       pay_permis:             form.pay_permis || null,
       pay_equipe_taille:      parseInt(form.pay_equipe_taille) || null,
       pay_zone:               form.pay_zone || null,
-      tel_specialite:         form.tel_specialite || null,
-      tel_normes:             form.tel_normes,
-      tel_outils_mesure:      form.tel_outils_mesure,
-      tel_logiciels:          form.tel_logiciels,
-      tel_operateurs:         form.tel_operateurs,
-      tel_drone_certif:       form.tel_drone_certif || false,
-      tel_habilitations:      form.tel_habilitations || null,
+      it_type_poste_requis:         form.it_type_poste_requis || null,
+      it_certif_cloud_requis:       form.it_certif_cloud_requis,
+      ing_automates_requis:         form.ing_automates_requis,
+      ing_habilitations_elec_requises: form.ing_habilitations_elec_requises,
+      ing_certif_projet_requis:     form.ing_certif_projet_requis,
+      fin_industries_cibles:        form.fin_industries_cibles,
+      fin_certifications_requises:  form.fin_certifications_requises,
+      tel_sous_domaine:             form.tel_sous_domaine,
+      tel_specialite:               form.tel_specialite || null,
+      tel_operateurs:               form.tel_operateurs,
+      tel_drone_certif:             form.tel_drone_certif || false,
+      tel_habilitations:            form.tel_habilitations || null,
+      tel_cantons_requis:           form.tel_cantons_requis,
+      tel_stack_reseau_requis:      form.tel_stack_reseau_requis,
+      tel_protocols_requis:         form.tel_protocols_requis,
+      tel_certif_reseau_requises:   form.tel_certif_reseau_requises,
+      tel_supervision_requis:       form.tel_supervision_requis,
+      tel_tech_radio_requises:      form.tel_tech_radio_requises,
+      tel_outils_rf_requis:         form.tel_outils_rf_requis,
+      tel_constructeurs_ran_requis: form.tel_constructeurs_ran_requis,
+      tel_normes:                   form.tel_normes,
+      tel_outils_mesure:            form.tel_outils_mesure,
+      tel_logiciels:                form.tel_logiciels,
+      tel_dossiers_permis_requis:   form.tel_dossiers_permis_requis,
+      tel_competences_fibre_requises: form.tel_competences_fibre_requises,
+      tel_voip_stack_requis:        form.tel_voip_stack_requis,
+      tel_protocols_uc_requis:      form.tel_protocols_uc_requis,
+      tel_tech_transmission_requises: form.tel_tech_transmission_requises,
     };
     if (editing) {
       await supabase.from("mandats").update(payload).eq("id", editing.id);
@@ -692,20 +754,26 @@ function TabMandats() {
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
                   Compétences IT requises
-                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill sélectionné apparaît dans la matrice</span>
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill sélectionné alimente la matrice</span>
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                  <Select label="Type de poste visé" value={form.it_type_poste_requis} onChange={setF("it_type_poste_requis")}
+                    options={[{value:"",label:"Indifférent"},{value:"Développeur full-stack",label:"Full-stack"},{value:"Développeur front-end",label:"Front-end"},{value:"Développeur back-end",label:"Back-end"},{value:"DevOps / SRE / Platform",label:"DevOps / SRE"},{value:"Data Engineer",label:"Data Engineer"},{value:"ML / IA",label:"ML / IA"},{value:"Cloud Architect",label:"Cloud Architect"},{value:"Tech Lead / Engineering Manager",label:"Tech Lead / EM"},{value:"RSSI / Sécurité",label:"RSSI / Sécurité"},{value:"QA / Test",label:"QA / Test"}]} />
+                  <Select label="Cloud requis" value={form.it_cloud_requis} onChange={setF("it_cloud_requis")}
+                    options={[{value:"",label:"Indifférent"},{value:"AWS",label:"AWS"},{value:"GCP",label:"Google Cloud"},{value:"Azure",label:"Azure"},{value:"Multi-cloud",label:"Multi-cloud"}]} />
                 </div>
                 <TagSelector label="Stack requise" color={C.blueL}
-                  options={["React","Vue.js","Angular","Node.js","Python","Java","Go","PHP",".NET / C#","TypeScript","DevOps / K8s","Data / ML","Swift","Kotlin"]}
+                  options={["React / Next.js","Vue.js","Angular","Node.js / Express","Python","Java / Spring","Go","PHP / Laravel",".NET / C#","TypeScript","DevOps / Kubernetes","Terraform","Data Engineering","ML / AI / LLM","Cybersécurité / Pentest"]}
                   values={form.it_stack_requis}
                   onChange={v => handleSkillChange("it_stack_requis", v)} />
-                <TagSelector label="Stack bonus" color={C.tealL}
-                  options={["GraphQL","Docker","Kubernetes","Redis","PostgreSQL","MongoDB","Terraform","AWS CDK"]}
+                <TagSelector label="Stack bonus (atout)" color={C.tealL}
+                  options={["GraphQL","Docker","Redis","PostgreSQL","MongoDB","Elasticsearch","Kafka","Spark","dbt","AWS CDK","Ansible"]}
                   values={form.it_stack_bonus}
                   onChange={v => handleSkillChange("it_stack_bonus", v)} />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Select label="Cloud requis" value={form.it_cloud_requis} onChange={setF("it_cloud_requis")}
-                    options={[{value:"",label:"Indifférent"},{value:"AWS",label:"AWS"},{value:"GCP",label:"Google Cloud"},{value:"Azure",label:"Azure"}]} />
-                </div>
+                <TagSelector label="Certifications cloud / DevOps" color={C.purple}
+                  options={["AWS SAA","AWS DevOps Pro","GCP Professional","Azure Architect","CKA","CKAD","Terraform Associate","CISSP","OSCP","CEH"]}
+                  values={form.it_certif_cloud_requis}
+                  onChange={v => handleSkillChange("it_certif_cloud_requis", v)} />
                 <TagSelector label="Contrat accepté" color={C.gold}
                   options={["CDI","Mission","Indépendant"]}
                   values={form.it_contrat_accepte}
@@ -718,18 +786,25 @@ function TabMandats() {
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
                   Compétences Finance requises
-                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
                 </div>
                 <Select label="Spécialité recherchée" value={form.fin_specialite_requise} onChange={setF("fin_specialite_requise")}
-                  options={[{value:"",label:"Toutes"},{value:"CFO",label:"CFO"},{value:"Contrôle de gestion",label:"Contrôle de gestion"},{value:"Audit",label:"Audit"},{value:"Comptabilité",label:"Comptabilité"},{value:"Trésorerie",label:"Trésorerie"},{value:"M&A",label:"M&A"}]} />
+                  options={[{value:"",label:"Toutes"},{value:"CFO / Direction financière",label:"CFO / Direction financière"},{value:"Contrôle de gestion",label:"Contrôle de gestion / FP&A"},{value:"Comptabilité / Clôture",label:"Chef comptable / Reporting"},{value:"Audit interne",label:"Audit interne / Risk"},{value:"Audit externe",label:"Audit externe (Big4)"},{value:"Trésorerie",label:"Trésorerie / Cash management"},{value:"M&A / Corporate Finance",label:"M&A / Corporate Finance"},{value:"Fiscalité",label:"Fiscalité / Tax"},{value:"Compliance / Conformité",label:"Compliance FINMA / AML"},{value:"Risk Management",label:"Risk Management"}]} />
                 <TagSelector label="Normes requises" color={C.gold}
-                  options={["IFRS","Swiss GAAP","Code des Obligations (OR)","US GAAP"]}
+                  options={["Swiss GAAP RPC","IFRS","Code des Obligations (CO/OR)","US GAAP","Lux GAAP"]}
                   values={form.fin_normes_requises}
                   onChange={v => handleSkillChange("fin_normes_requises", v)} />
-                <TagSelector label="ERP requis" color={C.blueL}
-                  options={["SAP FI/CO","Oracle Financials","Sage","Microsoft Dynamics","Abacus","Power BI"]}
+                <TagSelector label="ERP & outils requis" color={C.blueL}
+                  options={["SAP FI/CO","SAP S/4HANA","Oracle Financials","Microsoft Dynamics 365","Abacus","Sage","Power BI","Cognos / TM1","Hyperion / EPBCS","Anaplan","Lucanet","Excel VBA / Power Query"]}
                   values={form.fin_erp_requis}
                   onChange={v => handleSkillChange("fin_erp_requis", v)} />
+                <TagSelector label="Industries cibles" color={C.tealL}
+                  options={["Banque / Finance de marché","Asset Management","Assurance","MedTech / Pharma","Industrie / Manufacturing","Horlogerie / Luxe","Immobilier","Start-up / Scale-up","Secteur public"]}
+                  values={form.fin_industries_cibles}
+                  onChange={v => handleSkillChange("fin_industries_cibles", v)} />
+                <TagSelector label="Certifications requises" color={C.purple}
+                  options={["Expert-comptable CH","ACCA","CFA Level 1","CFA Level 2/3","CMA","CIA","AMF / FINMA","Aucune exigée"]}
+                  values={form.fin_certifications_requises}
+                  onChange={v => handleSkillChange("fin_certifications_requises", v)} />
               </div>
             )}
 
@@ -738,18 +813,33 @@ function TabMandats() {
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ color: "#818CF8", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
                   Compétences Ingénierie requises
-                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
                 </div>
                 <Select label="Spécialité" value={form.ing_specialite_requise} onChange={setF("ing_specialite_requise")}
-                  options={[{value:"",label:"Toutes"},{value:"Mécanique",label:"Mécanique"},{value:"Électronique",label:"Électronique"},{value:"Automation",label:"Automation"},{value:"Qualité",label:"Qualité"},{value:"Direction R&D",label:"Direction R&D"}]} />
-                <TagSelector label="CAO requis" color="#818CF8"
-                  options={["SolidWorks","CATIA V5/V6","AutoCAD","Inventor","CREO","NX Siemens"]}
+                  options={[{value:"",label:"Toutes"},{value:"Mécanique / Conception",label:"Mécanique / Conception / Horlogerie"},{value:"Électronique / Embarqué",label:"Électronique / Embarqué / Hardware"},{value:"Automation / Robotique",label:"Automation / Robotique / PLC"},{value:"Qualité / Réglementaire",label:"Qualité / Réglementaire (ISO / MDR)"},{value:"R&D / Innovation",label:"Direction R&D / Innovation"},{value:"Électrotechnique",label:"Électrotechnique / Énergies / HVAC"},{value:"Génie civil / Structure",label:"Génie civil / Structure"},{value:"Supply Chain / Industrialisation",label:"Supply Chain / Industrialisation"}]} />
+                <TagSelector label="CAO / Simulation requis" color="#818CF8"
+                  options={["SolidWorks","CATIA V5/V6","AutoCAD / Civil 3D","Inventor","CREO / Pro-E","NX Siemens","ANSYS","MATLAB / Simulink","LabVIEW","Altium Designer"]}
                   values={form.ing_cao_requis}
                   onChange={v => handleSkillChange("ing_cao_requis", v)} />
                 <TagSelector label="Normes requises" color={C.tealL}
-                  options={["ISO 9001","ISO 13485","MDR 2017/745","IEC 62304","CE Machines","ATEX"]}
+                  options={["ISO 9001","ISO 13485","MDR 2017/745 (DM)","IVDR 2017/746","IEC 62304","IEC 62061 / ISO 13849","CE Machines 2006/42","ISO 14001","ATEX","ISO 14971","AS9100"]}
                   values={form.ing_normes_requises}
                   onChange={v => handleSkillChange("ing_normes_requises", v)} />
+                {form.ing_specialite_requise === "Automation / Robotique" && (
+                  <TagSelector label="Automates / PLCs requis" color={C.blue}
+                    options={["Siemens S7 / TIA Portal","Siemens WinCC","ABB","Rockwell / Allen-Bradley","Beckhoff TwinCAT","Schneider / Unity Pro","Fanuc","KUKA","Universal Robots"]}
+                    values={form.ing_automates_requis}
+                    onChange={v => handleSkillChange("ing_automates_requis", v)} />
+                )}
+                {(form.ing_specialite_requise === "Électrotechnique" || form.ing_specialite_requise === "Automation / Robotique") && (
+                  <TagSelector label="Habilitations électriques requises (OIBT/NIBT)" color={C.gold}
+                    options={["B0","BR","BC","B2V","B2T","H0","HC","Aucune exigée"]}
+                    values={form.ing_habilitations_elec_requises}
+                    onChange={v => handleSkillChange("ing_habilitations_elec_requises", v)} />
+                )}
+                <TagSelector label="Certifications gestion de projet" color={C.teal}
+                  options={["PMP","IPMA Level C","IPMA Level B","Prince2","Scrum Master","SAFe Agilist","Aucune exigée"]}
+                  values={form.ing_certif_projet_requis}
+                  onChange={v => handleSkillChange("ing_certif_projet_requis", v)} />
               </div>
             )}
 
@@ -758,93 +848,182 @@ function TabMandats() {
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ color: "#22C55E", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
                   Compétences Paysagisme requises
-                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
                 </div>
                 <Select label="Spécialité recherchée" value={form.pay_specialite_requise || ""} onChange={setF("pay_specialite_requise")}
-                  options={[
-                    {value:"",label:"Toutes spécialités"},
-                    {value:"Jardinier-paysagiste",label:"🌱 Jardinier-paysagiste (CFC/AFP)"},
-                    {value:"Maçon paysagiste",label:"🧱 Maçon paysagiste"},
-                    {value:"Arboriste-grimpeur",label:"🌳 Arboriste-grimpeur (ISA/ECC)"},
-                    {value:"Chef de chantier",label:"👷 Chef de chantier"},
-                    {value:"Conducteur de travaux",label:"📋 Conducteur de travaux"},
-                    {value:"Dessinateur-projeteur",label:"📐 Dessinateur-projeteur"},
-                    {value:"Directeur technique",label:"🏗️ Directeur technique"},
-                  ]} />
+                  options={[{value:"",label:"Toutes spécialités"},{value:"Jardinier-paysagiste",label:"🌱 Jardinier-paysagiste (CFC)"},{value:"AFP Paysagiste",label:"🌾 Aide-paysagiste (AFP)"},{value:"Maçon paysagiste",label:"🧱 Maçon paysagiste"},{value:"Arboriste-grimpeur",label:"🌳 Arboriste-grimpeur (ISA/ECC)"},{value:"Technicien irrigation",label:"💧 Technicien irrigation"},{value:"Chef de chantier",label:"👷 Chef de chantier"},{value:"Conducteur de travaux",label:"📋 Conducteur de travaux"},{value:"Dessinateur-projeteur",label:"📐 Dessinateur-projeteur"},{value:"Directeur technique",label:"🏗️ Directeur technique"}]} />
                 <TagSelector label="Compétences techniques requises" color="#22C55E"
-                  options={["Maçonnerie paysagère","Pose de gazon naturel","Gazon synthétique","Arrosage automatique","Dallage / Pavage","Murs de soutènement","Terrains de sport","Espaces publics","Toitures végétalisées","Bassins / Étangs","SolidWorks / AutoCAD","Land F/X","DJI Drone certifié","Conduite engins (permis CFC)"]}
+                  options={["Maçonnerie paysagère","Dallage / Pavage","Murs de soutènement","Pose gazon naturel","Gazon synthétique","Arrosage automatique","Toitures végétalisées","Bassins / Étangs","Terrains de sport (SN 566)","Espaces publics (SN 640)","Taille / Élagage arbres","SketchUp","AutoCAD / Land F·X","Conduite mini-pelle / chargeur"]}
                   values={form.pay_competences_requises || []}
                   onChange={v => handleSkillChange("pay_competences_requises", v)} />
-                <TagSelector label="Certifications / Normes requises" color="#4ADE80"
-                  options={["CFC Paysagiste","AFP Paysagiste","Arboriste ISA","Arboriste ECC","Permis de conduire B","Permis engins (gr. 4/5)","SN 640 (routes)","SN 566 (terrains de sport)","Formation pesticides","SUVA Travaux en hauteur"]}
+                <TagSelector label="Certifications requises" color="#4ADE80"
+                  options={["CFC Paysagiste","AFP Paysagiste","Arboriste ISA","Arboriste ECC","Certificat phyto OFAG","SUVA Travaux en hauteur","IPAF (nacelle)","SN 566 (terrains de sport)","Chef de chantier OACOT"]}
                   values={form.pay_certifications || []}
                   onChange={v => handleSkillChange("pay_certifications", v)} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
                   <Select label="Type de contrat" value={form.pay_contrat || ""} onChange={setF("pay_contrat")}
                     options={[{value:"",label:"Indifférent"},{value:"CDI",label:"CDI"},{value:"CDD saison",label:"CDD saison (mars–oct.)"},{value:"Temporaire",label:"Temporaire"},{value:"Apprentissage",label:"Apprentissage"}]} />
                   <Select label="Permis de conduire" value={form.pay_permis || ""} onChange={setF("pay_permis")}
-                    options={[{value:"",label:"Indifférent"},{value:"B",label:"Permis B obligatoire"},{value:"BE",label:"Permis BE (remorque)"},{value:"C",label:"Permis C (camion)"},{value:"Engins",label:"Permis engins requis"}]} />
-                </div>
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <Input label="Taille équipe à gérer" type="number" value={form.pay_equipe_taille || ""} onChange={setF("pay_equipe_taille")} placeholder="Ex: 4" />
+                    options={[{value:"",label:"Indifférent"},{value:"B",label:"Permis B"},{value:"BE",label:"Permis B+E"},{value:"C",label:"Permis C (camion)"},{value:"CE",label:"Permis C+E"},{value:"Engins",label:"Permis engins requis"}]} />
+                  <Input label="Taille équipe à gérer" type="number" value={form.pay_equipe_taille || ""} onChange={setF("pay_equipe_taille")} placeholder="0 si pas de management" />
                   <Select label="Zone d'intervention" value={form.pay_zone || ""} onChange={setF("pay_zone")}
-                    options={[{value:"",label:"Indifférent"},{value:"Vaud",label:"Canton de Vaud"},{value:"Genève",label:"Canton de Genève"},{value:"Fribourg",label:"Canton de Fribourg"},{value:"Valais",label:"Canton du Valais"},{value:"Neuchâtel",label:"Canton de Neuchâtel"},{value:"Suisse romande",label:"Suisse romande"},{value:"Suisse entière",label:"Suisse entière"}]} />
+                    options={[{value:"",label:"Indifférent"},{value:"Vaud",label:"Canton de Vaud"},{value:"Genève",label:"Canton de Genève"},{value:"Fribourg",label:"Canton de Fribourg"},{value:"Valais",label:"Canton du Valais"},{value:"Neuchâtel",label:"Canton de Neuchâtel"},{value:"Berne",label:"Canton de Berne"},{value:"Suisse romande",label:"Suisse romande"},{value:"Suisse entière",label:"Suisse entière"}]} />
                 </div>
               </div>
             )}
 
             {/* Skills Télécommunications */}
-            {form.secteur === "Télécommunications" && (
+            {form.secteur === "Télécommunications" && (() => {
+              const hasTelDom = (...d) => d.some(x => (form.tel_sous_domaine || []).includes(x));
+              return (
               <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
                 <div style={{ color: "#0EA5E9", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
                   Compétences Télécommunications requises
-                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill apparaît dans la matrice</span>
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— sélectionnez le(s) sous-domaine(s) pour afficher les champs</span>
                 </div>
-                <Select label="Spécialité" value={form.tel_specialite || ""} onChange={setF("tel_specialite")}
-                  options={[
-                    {value:"",label:"Toutes spécialités"},
-                    {value:"Spécialiste RNI",label:"📡 Spécialiste RNI / Rayonnement Non Ionisant"},
-                    {value:"RF Planning",label:"📶 RF Planner / Planificateur radio"},
-                    {value:"Géomatique télécom",label:"🗺️ Géomaticien télécom"},
-                    {value:"Infrastructure passive",label:"🗼 Infrastructure passive (mâts, shelters)"},
-                    {value:"Fibre optique",label:"🔌 Technicien fibre optique (FTTH/FTTB)"},
-                    {value:"Transmission IP",label:"🌐 Ingénieur transmission / IP"},
-                    {value:"Conformité réglementaire",label:"⚖️ Expert conformité réglementaire"},
-                    {value:"Pilote drone télécom",label:"🚁 Pilote drone certifié télécom"},
-                  ]} />
-                <TagSelector label="Normes et réglementations requises" color="#0EA5E9"
-                  options={["ORNI (Suisse)","OFCOM","LTC (Loi télécom)","EN 50492 (mesures EMF)","UIT-R","ICNIRP","RED (EU)","ETSI","3GPP 5G NR","IEC 62232"]}
-                  values={form.tel_normes || []}
-                  onChange={v => handleSkillChange("tel_normes", v)} />
-                <TagSelector label="Outils de mesure" color="#38BDF8"
-                  options={["Narda SRM-3006","Narda ELT-400","Rohde & Schwarz FSH","SITEMASTER S331","Spectromètre portable","GPS différentiel","Station totale","Drone DJI Matrice","Drone Autel","Sonomètre (si EMF basse fréq.)"]}
-                  values={form.tel_outils_mesure || []}
-                  onChange={v => handleSkillChange("tel_outils_mesure", v)} />
-                <TagSelector label="Logiciels requis" color="#7DD3FC"
-                  options={["ArcGIS","QGIS","AutoCAD","iBWave","Atoll","RPS (Radio Planning Suite)","WRAP","Asset","NetCracker","Suite Office","Python/scripts calcul"]}
-                  values={form.tel_logiciels || []}
-                  onChange={v => handleSkillChange("tel_logiciels", v)} />
+
+                <TagSelector label="Sous-domaine(s) du poste" color="#0EA5E9"
+                  options={["Réseau IP / Infrastructure réseau","Radio mobile / RAN / 5G","RNI / Conformité ORNI","Fibre optique / FTTH / FTTB","VoIP / Unified Communications","Transmission / Microwave"]}
+                  values={form.tel_sous_domaine || []}
+                  onChange={v => handleSkillChange("tel_sous_domaine", v)} />
+
+                <Select label="Rôle / poste visé" value={form.tel_specialite || ""} onChange={setF("tel_specialite")}
+                  options={[{value:"",label:"Indifférent"},{value:"Ingénieur réseau IP",label:"🌐 Ingénieur réseau IP / Infrastructure"},{value:"Architecte réseau",label:"🏗️ Architecte réseau"},{value:"Tech Lead / NOC Lead",label:"👨‍💼 Tech Lead / Responsable NOC"},{value:"RF Planner",label:"📶 RF Planner / Planificateur radio"},{value:"Ingénieur RAN",label:"📡 Ingénieur RAN (4G/5G)"},{value:"Spécialiste RNI / ORNI",label:"📏 Spécialiste RNI / Expert ORNI"},{value:"Géomaticien télécom",label:"🗺️ Géomaticien télécom"},{value:"Technicien fibre",label:"🔌 Technicien fibre optique"},{value:"Ingénieur VoIP / UC",label:"📞 Ingénieur VoIP / UC"},{value:"Ingénieur transmission",label:"⚡ Ingénieur transmission / Microwave"},{value:"Chef de projet télécom",label:"📋 Chef de projet télécom"}]} />
+
+                {/* ── RÉSEAU IP ── */}
+                {hasTelDom("Réseau IP / Infrastructure réseau") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #0EA5E9" }}>
+                    <span style={{ color: "#0EA5E9", fontSize: ".7rem", fontWeight: 700 }}>RÉSEAU IP</span>
+                  </div>
+                  <TagSelector label="Équipements requis" color={C.blueL}
+                    options={["Cisco IOS / IOS-XE","Cisco IOS-XR (ASR/NCS)","Cisco NX-OS (Nexus)","Nokia SR-OS (7750/7210)","Juniper JunOS (MX/EX/SRX)","Arista EOS","Huawei VRP","Fortinet FortiGate","Palo Alto PAN-OS","F5 BIG-IP","HPE / Aruba CX"]}
+                    values={form.tel_stack_reseau_requis}
+                    onChange={v => handleSkillChange("tel_stack_reseau_requis", v)} />
+                  <TagSelector label="Protocoles requis" color="#38BDF8"
+                    options={["BGP (iBGP / eBGP)","MPLS / SR-MPLS","OSPF / OSPFv3","IS-IS","VLAN / 802.1Q","VxLAN / EVPN","SD-WAN","QoS (DSCP)","IPv6","DMVPN","IPSec / SSL VPN","DWDM / OTN","WiFi 6"]}
+                    values={form.tel_protocols_requis}
+                    onChange={v => handleSkillChange("tel_protocols_requis", v)} />
+                  <TagSelector label="Certifications réseau requises" color={C.purple}
+                    options={["CCNA","CCNP Enterprise","CCNP Service Provider","CCIE Enterprise","CCIE SP","JNCIA-Junos","JNCIP-SP","Nokia NRS I","Nokia NRS II","Fortinet NSE 4","Fortinet NSE 7","Palo Alto PCNSE","Aucune exigée"]}
+                    values={form.tel_certif_reseau_requises}
+                    onChange={v => handleSkillChange("tel_certif_reseau_requises", v)} />
+                  <TagSelector label="Supervision / Automation requis" color={C.teal}
+                    options={["Zabbix","PRTG","SolarWinds","Netbox (DCIM/IPAM)","Ansible","Python / Netmiko / NAPALM","Terraform / YANG","Grafana / Prometheus","LibreNMS","ELK Stack"]}
+                    values={form.tel_supervision_requis}
+                    onChange={v => handleSkillChange("tel_supervision_requis", v)} />
+                </>)}
+
+                {/* ── RADIO / RAN ── */}
+                {hasTelDom("Radio mobile / RAN / 5G") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #38BDF8" }}>
+                    <span style={{ color: "#38BDF8", fontSize: ".7rem", fontWeight: 700 }}>RADIO MOBILE / RAN / 5G</span>
+                  </div>
+                  <TagSelector label="Technologies radio requises" color="#38BDF8"
+                    options={["2G / GSM","3G / UMTS","4G / LTE","5G NR NSA","5G NR SA (Standalone)","GSM-R (ferroviaire)","Private LTE / 5G","LoRaWAN / NB-IoT","TETRA / PMR"]}
+                    values={form.tel_tech_radio_requises}
+                    onChange={v => handleSkillChange("tel_tech_radio_requises", v)} />
+                  <TagSelector label="Outils RF planning & drive test" color="#7DD3FC"
+                    options={["Atoll (Forsk)","RPS (Radio Planning Suite)","iBWave (indoor)","TEMS Investigation","NEMO Outdoor / NEMO Handy","MapInfo","Infovista","Google Earth Pro"]}
+                    values={form.tel_outils_rf_requis}
+                    onChange={v => handleSkillChange("tel_outils_rf_requis", v)} />
+                  <TagSelector label="Constructeurs RAN" color="#0369A1"
+                    options={["Ericsson (ENM / Radio System)","Nokia (NetAct / AirScale)","Huawei (U2020 / SingleRAN)","ZTE","Samsung","Open RAN"]}
+                    values={form.tel_constructeurs_ran_requis}
+                    onChange={v => handleSkillChange("tel_constructeurs_ran_requis", v)} />
+                </>)}
+
+                {/* ── RNI / ORNI ── */}
+                {hasTelDom("RNI / Conformité ORNI") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #7DD3FC" }}>
+                    <span style={{ color: "#7DD3FC", fontSize: ".7rem", fontWeight: 700 }}>RNI / CONFORMITÉ ORNI</span>
+                  </div>
+                  <TagSelector label="Normes et réglementations" color="#7DD3FC"
+                    options={["ORNI (Suisse)","OFCOM / LTC","Procédures cantonales dépôt permis","EN 50492","EN 50383 / EN 62232","ICNIRP 2020","UIT-R","RED (EU)"]}
+                    values={form.tel_normes}
+                    onChange={v => handleSkillChange("tel_normes", v)} />
+                  <TagSelector label="Appareils de mesure" color="#0EA5E9"
+                    options={["Narda SRM-3006","Narda SRM-3000","Narda ELT-400","R&S FSH","Anritsu SITEMASTER","GPS différentiel (RTK)","Station totale Leica/Trimble"]}
+                    values={form.tel_outils_mesure}
+                    onChange={v => handleSkillChange("tel_outils_mesure", v)} />
+                  <TagSelector label="Logiciels EMF & SIG" color="#38BDF8"
+                    options={["ArcGIS Pro","QGIS","AutoCAD / Civil 3D","Google Earth Pro","WRAP","Python / scripts EMF","Excel avancé"]}
+                    values={form.tel_logiciels}
+                    onChange={v => handleSkillChange("tel_logiciels", v)} />
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: form.tel_dossiers_permis_requis ? "rgba(14,165,233,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${form.tel_dossiers_permis_requis ? "rgba(14,165,233,.3)" : C.border}` }}>
+                    <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                      <input type="checkbox" checked={form.tel_dossiers_permis_requis || false}
+                        onChange={e => setForm(f => ({ ...f, tel_dossiers_permis_requis: e.target.checked }))}
+                        style={{ width: 16, height: 16, accentColor: "#0EA5E9" }} />
+                      <div>
+                        <div style={{ color: C.text, fontWeight: 600, fontSize: ".86rem" }}>Expérience dossiers permis antennes (ORNI) obligatoire</div>
+                        <div style={{ color: C.subtle, fontSize: ".72rem" }}>Constitution et dépôt de dossiers ORNI auprès des autorités cantonales</div>
+                      </div>
+                    </label>
+                  </div>
+                </>)}
+
+                {/* ── FIBRE OPTIQUE ── */}
+                {hasTelDom("Fibre optique / FTTH / FTTB") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #2DD4BF" }}>
+                    <span style={{ color: "#2DD4BF", fontSize: ".7rem", fontWeight: 700 }}>FIBRE OPTIQUE</span>
+                  </div>
+                  <TagSelector label="Compétences fibre requises" color="#2DD4BF"
+                    options={["Soudure fibre — monomode","Soudure fibre — multimode","Mesure OTDR","Câblage souterrain FTTH","Câblage aérien (façade / poteau)","Installation armoires FDI / FDP","Distribution indoor","Pose micro-tubages","Raccordement clients GPON / XGS-PON"]}
+                    values={form.tel_competences_fibre_requises}
+                    onChange={v => handleSkillChange("tel_competences_fibre_requises", v)} />
+                </>)}
+
+                {/* ── VOIP / UC ── */}
+                {hasTelDom("VoIP / Unified Communications") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #818CF8" }}>
+                    <span style={{ color: "#818CF8", fontSize: ".7rem", fontWeight: 700 }}>VOIP / UNIFIED COMMUNICATIONS</span>
+                  </div>
+                  <TagSelector label="Plateformes VoIP / UC requises" color="#818CF8"
+                    options={["Cisco CUCM / Unity","Cisco Webex Calling","Microsoft Teams Phone","Avaya Aura","Mitel MiVoice","3CX","Asterisk / FreePBX","Zoom Phone","RingCentral"]}
+                    values={form.tel_voip_stack_requis}
+                    onChange={v => handleSkillChange("tel_voip_stack_requis", v)} />
+                  <TagSelector label="Protocoles VoIP requis" color="#A78BFA"
+                    options={["SIP","H.323","MGCP","RTP / SRTP","WebRTC","SCCP","ISDN / PRI","SIP Trunking"]}
+                    values={form.tel_protocols_uc_requis}
+                    onChange={v => handleSkillChange("tel_protocols_uc_requis", v)} />
+                </>)}
+
+                {/* ── TRANSMISSION ── */}
+                {hasTelDom("Transmission / Microwave") && (<>
+                  <div style={{ padding: "6px 10px", background: "rgba(14,165,233,.07)", borderRadius: 7, borderLeft: "3px solid #F59E0B" }}>
+                    <span style={{ color: "#F59E0B", fontSize: ".7rem", fontWeight: 700 }}>TRANSMISSION / MICROWAVE</span>
+                  </div>
+                  <TagSelector label="Technologies de transmission" color="#F59E0B"
+                    options={["SDH / STM-1/4/16/64","OTN / OTU-1/2/3/4","DWDM","CWDM","Microwave PTN (Ericsson / Nokia / Ceragon)","IP/MPLS backbone","ROADM","Packet Optical Transport"]}
+                    values={form.tel_tech_transmission_requises}
+                    onChange={v => handleSkillChange("tel_tech_transmission_requises", v)} />
+                </>)}
+
+                {/* Commun à tous les sous-domaines télécom */}
                 <TagSelector label="Opérateurs / clients cibles" color="#0369A1"
-                  options={["Swisscom","Sunrise","Salt","SBB/CFF Telecom","Ericsson","Huawei","Nokia","Axians","Elca","Opérateurs privés"]}
-                  values={form.tel_operateurs || []}
+                  options={["Swisscom","Sunrise / UPC","Salt","SBB / CFF Telecom","Ericsson Suisse","Nokia Suisse","Huawei Suisse","Axians","Cablex / Elca","Administration cantonale / OFCOM","MVNO / Opérateur privé"]}
+                  values={form.tel_operateurs}
                   onChange={v => handleSkillChange("tel_operateurs", v)} />
+                <TagSelector label="Cantons d'intervention" color="#0EA5E9"
+                  options={["Vaud (VD)","Genève (GE)","Fribourg (FR)","Valais (VS)","Neuchâtel (NE)","Berne (BE)","Zürich (ZH)","Suisse romande entière","Suisse entière"]}
+                  values={form.tel_cantons_requis}
+                  onChange={v => handleSkillChange("tel_cantons_requis", v)} />
                 <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                  <div style={{ padding: "12px 14px", borderRadius: 12, background: form.tel_drone_certif ? "rgba(14,165,233,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${form.tel_drone_certif ? "rgba(14,165,233,.3)" : C.border}`, transition: "all .2s" }}>
+                  <div style={{ padding: "12px 14px", borderRadius: 12, background: form.tel_drone_certif ? "rgba(14,165,233,.08)" : "rgba(255,255,255,.03)", border: `1px solid ${form.tel_drone_certif ? "rgba(14,165,233,.3)" : C.border}` }}>
                     <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                       <input type="checkbox" checked={form.tel_drone_certif || false}
                         onChange={e => setForm(f => ({ ...f, tel_drone_certif: e.target.checked }))}
                         style={{ width: 16, height: 16, accentColor: "#0EA5E9" }} />
                       <div>
                         <div style={{ color: C.text, fontWeight: 600, fontSize: ".86rem" }}>Certification drone OFAC requise</div>
-                        <div style={{ color: C.subtle, fontSize: ".72rem" }}>A1/A2/A3 — prend 3 mois à obtenir</div>
+                        <div style={{ color: C.subtle, fontSize: ".72rem" }}>A1/A2/A3 — prendre en compte dans sélection</div>
                       </div>
                     </label>
                   </div>
-                  <Input label="Habilitations requises" value={form.tel_habilitations || ""} onChange={setF("tel_habilitations")} placeholder="Ex: NATEL Securité, accès sites militaires" />
+                  <Input label="Habilitations / accréditations requises" value={form.tel_habilitations || ""} onChange={setF("tel_habilitations")} placeholder="Ex: accès sites CFF, badge Swisscom…" />
                 </div>
               </div>
-            )}
-
+              );
+            })()}
             {/* ══ MATRICE DE PRIORITÉS DYNAMIQUE ══ */}
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
               <div style={{ marginBottom: 14 }}>
