@@ -192,6 +192,17 @@ export default function CandidatureForm({ secteur, theme, labels }) {
     // Transmission
     tel_tech_transmission:[],
 
+    // ── PHARMA & BIOTECH ────────────────────────────────
+    pha_role:"", pha_domaine:[], pha_normes_gmp:[],
+    pha_normes_reg:[], pha_outils:[], pha_industries:[],
+    pha_certifications:[], pha_nb_audits:"",
+    pha_budget_proj_mchf:"", pha_equipe_max:"",
+
+    // ── PHARMA & LIFE SCIENCES ─────────────────────────
+    ph_type_poste:"", ph_reglementation:[], ph_logiciels:[],
+    ph_expertise_process:[], ph_validation:[], ph_salles_blanches:[],
+    ph_industries:[], ph_certifications:[],
+
     // Motivations
     motif_changement:"", succes:"",
     // CV + RGPD
@@ -227,7 +238,9 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       const isFin = secteur==="Finance";
       const isIng = secteur==="Ingénierie";
       const isPay = secteur==="Paysagisme";
-      const isTel = secteur==="Télécommunications";
+      const isTel   = secteur==="Télécommunications";
+      const isPharma = secteur==="Pharma & Life Sciences";
+      const isPha = secteur==="Pharma & Biotech";
 
       const payload = {
         prenom:form.prenom.trim(), nom:form.nom.trim(),
@@ -328,6 +341,19 @@ export default function CandidatureForm({ secteur, theme, labels }) {
           tel_voip_stack:           form.tel_voip_stack,
           tel_protocols_uc:         form.tel_protocols_uc,
           tel_tech_transmission:    form.tel_tech_transmission,
+        }),
+        // ── PHARMA & BIOTECH (migration_pharma.sql requis) ───────────
+        ...(isPha && {
+          pha_role:               form.pha_role||null,
+          pha_domaine:            form.pha_domaine,
+          pha_normes_gmp:         form.pha_normes_gmp,
+          pha_normes_reg:         form.pha_normes_reg,
+          pha_outils:             form.pha_outils,
+          pha_industries:         form.pha_industries,
+          pha_certifications:     form.pha_certifications,
+          pha_nb_audits:          parseInt(form.pha_nb_audits)||null,
+          pha_budget_proj_mchf:   parseFloat(form.pha_budget_proj_mchf)||null,
+          pha_equipe_managee_max: parseInt(form.pha_equipe_max)||null,
         }),
       };
 
@@ -689,6 +715,270 @@ export default function CandidatureForm({ secteur, theme, labels }) {
           <CheckboxGroup label="Cantons d'intervention habituels" accentColor={ac}
             options={["Vaud (VD)","Genève (GE)","Fribourg (FR)","Valais (VS)","Neuchâtel (NE)","Berne (BE)","Zürich (ZH)","Argovie (AG)","Suisse romande entière","Suisse entière"]}
             values={form.tel_cantons} onChange={setArr("tel_cantons")} />
+        </Section>
+      )}
+
+
+      {/* ══════════════════════════════════════════════════
+          4-F. COMPÉTENCES PHARMA & LIFE SCIENCES
+      ══════════════════════════════════════════════════ */}
+      {secteur==="Pharma & Life Sciences" && (
+        <Section title="Compétences Pharma & Life Sciences" icon="🔬" accentColor={ac}>
+          <SelectField label="Poste / rôle visé" value={form.ph_type_poste} onChange={set("ph_type_poste")} required accentColor={ac}
+            options={[
+              {value:"",label:"Sélectionnez..."},
+              {value:"QA Manager",label:"🛡️ QA Manager / QA Director"},
+              {value:"Responsible Person",label:"📋 Responsible Person (RP) / QP"},
+              {value:"Affaires Réglementaires",label:"📄 Affaires Réglementaires (AR)"},
+              {value:"QC",label:"🧪 QC / Contrôle qualité / Analyste"},
+              {value:"Ingénieur Validation",label:"✅ Ingénieur Validation (IQ/OQ/PQ / CSV)"},
+              {value:"Responsable Production",label:"🏭 Responsable Production GMP"},
+              {value:"Pharmacovigilance",label:"💊 Pharmacovigilance / QPPV"},
+              {value:"R&D / Formulation",label:"🔬 R&D / Formulation / Développement"},
+              {value:"Data Integrity",label:"💾 Data Integrity / CSV Senior"},
+              {value:"HSE",label:"⚠️ HSE / EHS (santé, sécurité, environnement)"},
+              {value:"Supply Chain",label:"📦 Supply Chain / Logistique GDP"},
+              {value:"Consultant GMP",label:"🎯 Consultant GMP / Freelance"},
+            ]} />
+          <CheckboxGroup label="Référentiels & réglementations maîtrisés" accentColor={ac} hint="Ceux que vous appliquez opérationnellement"
+            options={[
+              "GMP / BPF (Bonnes Pratiques de Fabrication)",
+              "GDP / BPD (Bonnes Pratiques de Distribution)",
+              "GLP (Bonnes Pratiques de Laboratoire)",
+              "GCP (Bonnes Pratiques Cliniques)",
+              "ICH Q9 (gestion des risques qualité)",
+              "ICH Q10 (système pharmaceutique qualité)",
+              "ICH Q12 (gestion du cycle de vie)",
+              "FDA 21 CFR Part 11 (systèmes informatisés)",
+              "Annex 1 GMP (produits stériles)",
+              "Annex 11 GMP (systèmes informatisés)",
+              "Swissmedic (autorité suisse)",
+              "EMA / CHMP (autorité européenne)",
+              "ANSM / TGA / PMDA (autres pays)",
+              "ISO 13485 (dispositifs médicaux)",
+              "ISO 15189 / ISO 17025 (laboratoires)",
+            ]}
+            values={form.ph_reglementation} onChange={setArr("ph_reglementation")} />
+          <CheckboxGroup label="Logiciels & systèmes qualité maîtrisés" accentColor={ac}
+            options={[
+              "TrackWise (Sparta Systems)",
+              "Veeva Vault QMS",
+              "Veeva Vault RIM (Regulatory)",
+              "MAXIMO (gestion maintenance)",
+              "SAP QM / SAP MM",
+              "Oracle Agile PLM",
+              "Documentum (OpenText)",
+              "LabWare LIMS",
+              "STARLIMS",
+              "Waters Empower (HPLC)",
+              "MES (Manufacturing Execution System)",
+              "SAP EWM / WM (gestion entrepôt)",
+              "Excel / MiniTab (statistiques)",
+            ]}
+            values={form.ph_logiciels} onChange={setArr("ph_logiciels")} />
+          <CheckboxGroup label="Expertise processus / formes pharmaceutiques" accentColor={ac} hint="Types de production maîtrisés"
+            options={[
+              "Solide oral (comprimés, gélules, granules)",
+              "Injectable stérile (petits volumes)",
+              "Injectable stérile (grands volumes — perfusables)",
+              "Lyophilisation",
+              "Biotech / Biologique (anticorps monoclonaux, vaccins)",
+              "Médecine cellulaire & génique (ATMPs)",
+              "API (principe actif — chimie fine)",
+              "Topique / Semi-solide (crèmes, pommades)",
+              "Dispositif médical (DM / DMIA)",
+              "Nutraceutique / Complément alimentaire",
+              "Cosmétique / dermo-cosmétique",
+            ]}
+            values={form.ph_expertise_process} onChange={setArr("ph_expertise_process")} />
+          <CheckboxGroup label="Types de validation réalisées" accentColor={ac}
+            options={[
+              "Qualification installation (IQ)",
+              "Qualification opérationnelle (OQ)",
+              "Qualification performance (PQ)",
+              "Validation procédés (PV — process validation)",
+              "Validation nettoyage (cleaning validation)",
+              "Validation méthodes analytiques (AMV)",
+              "CSV (Computer System Validation — GAMP 5)",
+              "Validation transport / chaîne du froid",
+              "Re-validation / réexamen périodique",
+            ]}
+            values={form.ph_validation} onChange={setArr("ph_validation")} />
+          <CheckboxGroup label="Classification salles blanches & environnements" accentColor={ac}
+            options={[
+              "Zone A (ISO 5 — flux laminaire)",
+              "Zone B (ISO 5 — background zone A)",
+              "Zone C (ISO 7)",
+              "Zone D (ISO 8)",
+              "Zone ATEX (atmosphère explosive)",
+              "BSL-2 (biosécurité niveau 2)",
+              "BSL-3 (biosécurité niveau 3)",
+              "Pas d'expérience salles blanches",
+            ]}
+            values={form.ph_salles_blanches} onChange={setArr("ph_salles_blanches")} />
+          <CheckboxGroup label="Industries & types d'entreprises" accentColor={ac} hint="Contextes dans lesquels vous avez travaillé"
+            options={[
+              "Pharma innovante (Big Pharma — Roche, Novartis...)",
+              "Génériques (Sandoz, Mepha...)",
+              "Biotech / Start-up biotech",
+              "CDMO (Contract Development & Mfg)",
+              "CRO (Contract Research Organisation)",
+              "CMO (Contract Manufacturing)",
+              "Dispositifs médicaux (DM / DMIA)",
+              "Nutraceutique / Compléments alimentaires",
+              "Cosmétique / dermo-cosmétique",
+            ]}
+            values={form.ph_industries} onChange={setArr("ph_industries")} />
+          <CheckboxGroup label="Certifications professionnelles" accentColor={ac}
+            options={[
+              "ASQ CQA (Certified Quality Auditor)",
+              "ASQ CQE (Certified Quality Engineer)",
+              "Lean Six Sigma Green Belt",
+              "Lean Six Sigma Black Belt",
+              "RAC (Regulatory Affairs Certification — RAPS)",
+              "TOPRA Certificate (affaires réglementaires)",
+              "GAMP 5 / CSV practitioner",
+              "PMP (Project Management Professional)",
+              "IPMA Level C / D",
+              "Aucune certification formelle",
+            ]}
+            values={form.ph_certifications} onChange={setArr("ph_certifications")} />
+        </Section>
+      )}
+
+
+      {/* ══════════════════════════════════════════════════
+          4-F. COMPÉTENCES PHARMA & BIOTECH
+      ══════════════════════════════════════════════════ */}
+      {secteur==="Pharma & Biotech" && (
+        <Section title="Compétences Pharma, Biotech & Réglementaire" icon="🧪" accentColor={ac}>
+          <SelectField label="Rôle / poste visé" value={form.pha_role} onChange={set("pha_role")} required accentColor={ac}
+            options={[
+              {value:"",label:"Sélectionnez..."},
+              {value:"Qualified Person (QP)",label:"⚖️ Qualified Person (QP) — Swissmedic / EMA"},
+              {value:"Head of QA / Quality Manager",label:"🛡️ Head of QA / Quality Manager"},
+              {value:"QA Engineer / Specialist",label:"🔍 QA Engineer / QA Specialist"},
+              {value:"QC Analyst / Scientist",label:"🧫 QC Analyst / Scientist"},
+              {value:"Regulatory Affairs Manager",label:"📋 Regulatory Affairs Manager"},
+              {value:"Regulatory Affairs Specialist",label:"📄 Regulatory Affairs Specialist"},
+              {value:"Validation Engineer",label:"⚙️ Validation Engineer (IQ/OQ/PQ/CSV)"},
+              {value:"Pharmacovigilance Officer",label:"💊 Pharmacovigilance / Drug Safety Officer"},
+              {value:"Medical Science Liaison (MSL)",label:"🩺 Medical Science Liaison (MSL)"},
+              {value:"Clinical Research Associate (CRA)",label:"🏥 Clinical Research Associate (CRA)"},
+              {value:"Clinical Trial Manager (CTM)",label:"📊 Clinical Trial Manager (CTM)"},
+              {value:"Bioprocess Engineer",label:"🔬 Bioprocess Engineer / Process Dev."},
+              {value:"Responsable Production",label:"🏭 Responsable Production / Manufacturing"},
+              {value:"Supply Chain / Logistique GDP",label:"🚚 Supply Chain / Logistique GDP"},
+              {value:"Autre",label:"Autre profil pharma / biotech"},
+            ]} />
+
+          <CheckboxGroup label="Domaine(s) de spécialité" accentColor={ac} hint="Cochez tous vos domaines d'expertise"
+            options={[
+              "Quality Assurance (QA)",
+              "Quality Control (QC)",
+              "Regulatory Affairs (RA)",
+              "Validation (IQ/OQ/PQ/CSV)",
+              "Pharmacovigilance / Drug Safety",
+              "Clinical Research / Trials",
+              "Bioprocess / Upstream / Downstream",
+              "Production solid dosage (comprimés, gélules)",
+              "Production sterile (injectables, lyophilisation)",
+              "Production biologics / biopharmaceutiques",
+              "Medical Affairs / MSL",
+              "Supply Chain / GDP",
+              "Automation / MES pharma",
+            ]}
+            values={form.pha_domaine} onChange={setArr("pha_domaine")} />
+
+          <CheckboxGroup label="Normes GMP maîtrisées opérationnellement" accentColor={ac}
+            options={[
+              "EU GMP (EudraLex Volume 4)",
+              "EU GMP Annex 1 (Stérile — révision 2022)",
+              "EU GMP Annex 2 (Biologics)",
+              "EU GMP Annex 11 (Computerised Systems / CSV)",
+              "EU GMP Annex 15 (Qualification & Validation)",
+              "EU GMP Annex 16 (QP & Batch Release)",
+              "ICH Q7 (API — Active Pharmaceutical Ingredients)",
+              "ICH Q10 (Pharmaceutical Quality System)",
+              "ICH Q11 (Development & Manufacture of Drug Substances)",
+              "FDA 21 CFR Part 210 / 211 (Current GMP)",
+              "FDA 21 CFR Part 11 (Electronic Records)",
+              "GMP Swissmedic (HMG / LPMéd / OMédV)",
+              "US Pharmacopeia (USP)",
+              "European Pharmacopeia (Ph. Eur.)",
+            ]}
+            values={form.pha_normes_gmp} onChange={setArr("pha_normes_gmp")} />
+
+          <CheckboxGroup label="Normes réglementaires maîtrisées (RA / Clinical / PV)" accentColor={ac}
+            options={[
+              "ICH E6 R2 / R3 (GCP — Bonnes Pratiques Cliniques)",
+              "ICH E8 (Clinical Study Design)",
+              "ICH E2A / E2B / E2C (Pharmacovigilance)",
+              "GVP (Good Pharmacovigilance Practice — EMA)",
+              "CTD / eCTD (Common Technical Document)",
+              "EMA Centralised Procedure (MAA)",
+              "Procédure nationale Swissmedic (AMM CH)",
+              "MRA EU-Suisse (accord de reconnaissance mutuelle)",
+              "Règlement UE 536/2014 (Essais cliniques)",
+              "IND / NDA / BLA (FDA)",
+              "GDP (Good Distribution Practice — EU)",
+            ]}
+            values={form.pha_normes_reg} onChange={setArr("pha_normes_reg")} />
+
+          <CheckboxGroup label="Outils & systèmes maîtrisés" accentColor={ac}
+            options={[
+              "Veeva Vault (QualityDocs / RegulatorySubmissions)",
+              "Documentum / D2 (EMC)",
+              "LIMS (LabWare, SampleManager, STARLIMS)",
+              "SAP QM / SAP MM",
+              "TrackWise Digital (CAPA / Deviation)",
+              "Pilgrim SmartSolve (QMS)",
+              "MES (WERUM PAS-X, Siemens Opcenter, SAP ME)",
+              "Medidata Rave / CTMS (Clinical)",
+              "eCTD publishing (Lorenz, Extedo, DocuBridge)",
+              "EudraVigilance (PV)",
+              "Argus Safety (PV)",
+              "Statistica / JMP / Minitab (statistiques QC)",
+              "Microsoft Excel VBA / Power BI",
+            ]}
+            values={form.pha_outils} onChange={setArr("pha_outils")} />
+
+          <CheckboxGroup label="Industries / types de produits" accentColor={ac} hint="Avec quel type de produit avez-vous travaillé ?"
+            options={[
+              "Médicaments chimiques (small molecules)",
+              "Biologics / Biosimilaires",
+              "Dispositifs médicaux (DM / MDR)",
+              "Diagnostics in vitro (IVDR)",
+              "Médicaments de thérapies innovantes (ATMP)",
+              "Vaccins",
+              "Radiopharmaceutiques",
+              "API (matières actives)",
+              "Nutraceutiques / Compléments alimentaires",
+              "OTC / Consumer Health",
+            ]}
+            values={form.pha_industries} onChange={setArr("pha_industries")} />
+
+          <CheckboxGroup label="Certifications & formations" accentColor={ac}
+            options={[
+              "Qualification QP (Swissmedic / EMA)",
+              "Certified Quality Auditor (ASQ CQA)",
+              "Certified Manager of Quality (ASQ CMQ/OE)",
+              "GCP Investigator Certificate (ICH E6)",
+              "Transcelerate GCP Training",
+              "Six Sigma Green Belt",
+              "Six Sigma Black Belt",
+              "PMP (PMI)",
+              "RQAP-GCP (RAPS)",
+              "RAC (RAPS Regulatory Affairs Certification)",
+              "GMP / GDP Training certifié (organisme agréé)",
+            ]}
+            values={form.pha_certifications} onChange={setArr("pha_certifications")} />
+
+          <G2>
+            <Field label="Nombre d'audits menés (ou participé)" type="number" placeholder="5" value={form.pha_nb_audits} onChange={set("pha_nb_audits")} accentColor={ac} hint="FDA, Swissmedic, EMA, internes, fournisseurs" />
+            <Field label="Budget projet géré max (MCHF)" type="number" placeholder="2.5" value={form.pha_budget_proj_mchf} onChange={set("pha_budget_proj_mchf")} accentColor={ac} hint="0 si pas de gestion budget" />
+            <Field label="Taille max équipe managée" type="number" placeholder="0" value={form.pha_equipe_max} onChange={set("pha_equipe_max")} accentColor={ac} hint="0 si pas de management" />
+          </G2>
         </Section>
       )}
 

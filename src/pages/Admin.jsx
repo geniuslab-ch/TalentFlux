@@ -228,7 +228,7 @@ function TabCandidats() {
     if (!error) { setLinkSuccess(true); setTimeout(() => { setLinkSuccess(false); setLinkMandat(""); }, 2000); }
   };
 
-  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8", "Paysagisme": "#22C55E", "Télécommunications": "#0EA5E9" };
+  const secteurColor = { IT: C.blue, Finance: C.gold, "Ingénierie": "#818CF8", "Paysagisme": "#22C55E", "Télécommunications": "#0EA5E9", "Pharma & Life Sciences": "#C026D3" };
 
   return (
     <div>
@@ -242,7 +242,7 @@ function TabCandidats() {
         <select value={filterSecteur} onChange={e => setFilterSecteur(e.target.value)}
           style={{ padding: "9px 14px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer" }}>
           <option value="">Tous secteurs</option>
-          {["IT","Finance","Ingénierie","Paysagisme","Télécommunications"].map(s => <option key={s} value={s}>{s}</option>)}
+          {["IT","Finance","Ingénierie","Paysagisme","Télécommunications","Pharma & Life Sciences"].map(s => <option key={s} value={s}>{s}</option>)}
         </select>
         <Btn onClick={load} variant="ghost" small><RefreshCw size={13} /> Actualiser</Btn>
       </div>
@@ -469,6 +469,10 @@ function TabMandats() {
     tel_voip_stack_requis: [], tel_protocols_uc_requis: [],
     // Télécom — Transmission
     tel_tech_transmission_requises: [],
+    // Pharma & Life Sciences
+    ph_type_poste_requis: "", ph_reglementation_requise: [], ph_logiciels_requis: [],
+    ph_expertise_process_requise: [], ph_validation_requise: [], ph_salles_blanches_requises: [],
+    ph_industries_cibles: [], ph_certifications_requises_ph: [],
     // Matrice dynamique JSONB
     prio_skills: { ...FIXED_DEFAULTS },
   });
@@ -585,6 +589,14 @@ function TabMandats() {
       tel_voip_stack_requis:        m.tel_voip_stack_requis || [],
       tel_protocols_uc_requis:      m.tel_protocols_uc_requis || [],
       tel_tech_transmission_requises: m.tel_tech_transmission_requises || [],
+      ph_type_poste_requis:         m.ph_type_poste_requis || "",
+      ph_reglementation_requise:    m.ph_reglementation_requise || [],
+      ph_logiciels_requis:          m.ph_logiciels_requis || [],
+      ph_expertise_process_requise: m.ph_expertise_process_requise || [],
+      ph_validation_requise:        m.ph_validation_requise || [],
+      ph_salles_blanches_requises:  m.ph_salles_blanches_requises || [],
+      ph_industries_cibles:         m.ph_industries_cibles || [],
+      ph_certifications_requises_ph:m.ph_certifications_requises_ph || [],
       prio_skills:          prio,
     });
     setShowForm(true);
@@ -654,6 +666,14 @@ function TabMandats() {
       tel_voip_stack_requis:        form.tel_voip_stack_requis,
       tel_protocols_uc_requis:      form.tel_protocols_uc_requis,
       tel_tech_transmission_requises: form.tel_tech_transmission_requises,
+      ph_type_poste_requis:         form.ph_type_poste_requis || null,
+      ph_reglementation_requise:    form.ph_reglementation_requise,
+      ph_logiciels_requis:          form.ph_logiciels_requis,
+      ph_expertise_process_requise: form.ph_expertise_process_requise,
+      ph_validation_requise:        form.ph_validation_requise,
+      ph_salles_blanches_requises:  form.ph_salles_blanches_requises,
+      ph_industries_cibles:         form.ph_industries_cibles,
+      ph_certifications_requises_ph:form.ph_certifications_requises_ph,
     };
     if (editing) {
       await supabase.from("mandats").update(payload).eq("id", editing.id);
@@ -684,7 +704,7 @@ function TabMandats() {
               <div>
                 <div style={{ color: C.text, fontWeight: 700, fontSize: ".92rem", marginBottom: 4 }}>{m.titre_poste}</div>
                 <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : m.secteur === "Paysagisme" ? "#22C55E" : m.secteur === "Télécommunications" ? "#0EA5E9" : C.purple} />
+                  <Badge label={m.secteur} color={m.secteur === "IT" ? C.blue : m.secteur === "Finance" ? C.gold : m.secteur === "Paysagisme" ? "#22C55E" : m.secteur === "Télécommunications" ? "#0EA5E9" : m.secteur === "Pharma & Life Sciences" ? "#C026D3" : C.purple} />
                   <Badge label={m.statut} color={statut_color[m.statut] || C.subtle} />
                   {m.budget_max_chf && <Badge label={`≤ ${m.budget_max_chf.toLocaleString()} CHF`} color={C.subtle} />}
                   {m.localisation && <Badge label={m.localisation} color={C.subtle} />}
@@ -712,7 +732,7 @@ function TabMandats() {
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
               <Input label="Titre du poste" value={form.titre_poste} onChange={setF("titre_poste")} placeholder="Lead Developer React" required />
               <Select label="Secteur" value={form.secteur} onChange={setF("secteur")} required
-                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"},{value:"Paysagisme",label:"🌿 Paysagisme"},{value:"Télécommunications",label:"📡 Télécommunications"}]} />
+                options={[{value:"",label:"Sélectionnez..."},{value:"IT",label:"💻 IT"},{value:"Finance",label:"💰 Finance"},{value:"Ingénierie",label:"⚙️ Ingénierie"},{value:"Paysagisme",label:"🌿 Paysagisme"},{value:"Télécommunications",label:"📡 Télécommunications"},{value:"Pharma & Life Sciences",label:"🔬 Pharma & Life Sciences"}]} />
               <Input label="Budget min (CHF)" type="number" value={form.budget_min_chf} onChange={setF("budget_min_chf")} placeholder="100000" />
               <Input label="Budget max (CHF)" type="number" value={form.budget_max_chf} onChange={setF("budget_max_chf")} placeholder="140000" />
               <Select label="Remote policy" value={form.remote_policy} onChange={setF("remote_policy")}
@@ -1024,6 +1044,47 @@ function TabMandats() {
               </div>
               );
             })()}
+
+            {/* Skills Pharma & Life Sciences */}
+            {form.secteur === "Pharma & Life Sciences" && (
+              <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 14, display: "flex", flexDirection: "column", gap: 12 }}>
+                <div style={{ color: "#C026D3", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".1em" }}>
+                  Compétences Pharma & Life Sciences requises
+                  <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>— chaque skill alimente la matrice</span>
+                </div>
+                <Select label="Rôle / poste visé" value={form.ph_type_poste_requis} onChange={setF("ph_type_poste_requis")}
+                  options={[{value:"",label:"Indifférent"},{value:"QA Manager",label:"🛡️ QA Manager / Director"},{value:"Responsible Person",label:"📋 Responsible Person (RP) / QP"},{value:"Affaires Réglementaires",label:"📄 Affaires Réglementaires"},{value:"QC",label:"🧪 QC / Contrôle qualité"},{value:"Ingénieur Validation",label:"✅ Ingénieur Validation (IQ/OQ/PQ / CSV)"},{value:"Responsable Production",label:"🏭 Responsable Production GMP"},{value:"Pharmacovigilance",label:"💊 Pharmacovigilance / QPPV"},{value:"R&D / Formulation",label:"🔬 R&D / Formulation"},{value:"Data Integrity",label:"💾 Data Integrity / CSV Senior"},{value:"HSE",label:"⚠️ HSE / EHS"},{value:"Consultant GMP",label:"🎯 Consultant GMP / Freelance"}]} />
+                <TagSelector label="Référentiels requis" color="#C026D3"
+                  options={["GMP / BPF","GDP / BPD","GLP","GCP","ICH Q9","ICH Q10","ICH Q12","FDA 21 CFR Part 11","Annex 1 GMP (stériles)","Annex 11 GMP (informatisé)","Swissmedic","EMA / CHMP","ISO 13485 (DM)"]}
+                  values={form.ph_reglementation_requise}
+                  onChange={v => handleSkillChange("ph_reglementation_requise", v)} />
+                <TagSelector label="Logiciels & systèmes qualité requis" color="#E879F9"
+                  options={["TrackWise","Veeva Vault QMS","Veeva Vault RIM","MAXIMO","SAP QM","Documentum","LabWare LIMS","STARLIMS","Waters Empower","MES","Oracle Agile PLM"]}
+                  values={form.ph_logiciels_requis}
+                  onChange={v => handleSkillChange("ph_logiciels_requis", v)} />
+                <TagSelector label="Expertise processus / formes requis" color="#A855F7"
+                  options={["Solide oral","Injectable stérile","Lyophilisation","Biotech / Biologique","ATMPs (cellulaire / génique)","API (chimie fine)","Topique / Semi-solide","Dispositif médical (DM)","Nutraceutique"]}
+                  values={form.ph_expertise_process_requise}
+                  onChange={v => handleSkillChange("ph_expertise_process_requise", v)} />
+                <TagSelector label="Types de validation requis" color="#7C3AED"
+                  options={["IQ / OQ / PQ","Validation procédés (PV)","Validation nettoyage","Validation méthodes analytiques","CSV (GAMP 5)","Validation transport / chaîne du froid"]}
+                  values={form.ph_validation_requise}
+                  onChange={v => handleSkillChange("ph_validation_requise", v)} />
+                <TagSelector label="Classification salles blanches" color="#C84BD4"
+                  options={["Zone A (ISO 5)","Zone B","Zone C (ISO 7)","Zone D (ISO 8)","Zone ATEX","BSL-2","BSL-3","Non requis"]}
+                  values={form.ph_salles_blanches_requises}
+                  onChange={v => handleSkillChange("ph_salles_blanches_requises", v)} />
+                <TagSelector label="Industries cibles" color="#F0ABFC"
+                  options={["Pharma innovante (Big Pharma)","Génériques","Biotech / Start-up biotech","CDMO","CRO","CMO","Dispositifs médicaux","Nutraceutique","Cosmétique"]}
+                  values={form.ph_industries_cibles}
+                  onChange={v => handleSkillChange("ph_industries_cibles", v)} />
+                <TagSelector label="Certifications requises" color="#E879F9"
+                  options={["ASQ CQA","ASQ CQE","Lean Six Sigma Green Belt","Lean Six Sigma Black Belt","RAC (RAPS)","TOPRA Certificate","GAMP 5 practitioner","PMP","Aucune exigée"]}
+                  values={form.ph_certifications_requises_ph}
+                  onChange={v => handleSkillChange("ph_certifications_requises_ph", v)} />
+              </div>
+            )}
+
             {/* ══ MATRICE DE PRIORITÉS DYNAMIQUE ══ */}
             <div style={{ borderTop: `1px solid ${C.border}`, paddingTop: 16 }}>
               <div style={{ marginBottom: 14 }}>
