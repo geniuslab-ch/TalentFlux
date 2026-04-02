@@ -109,6 +109,11 @@ export const PdfUpload = ({ label, hint, file, onFile, onRemove, accentColor, dr
   </div>
 );
 
+// G2 défini au niveau module — jamais recréé entre renders (évite perte de focus)
+const G2 = ({ children }) => (
+  <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>{children}</div>
+);
+
 export const Section = ({ title, icon, children, accentColor, defaultOpen=true }) => {
   const [open, setOpen] = useState(defaultOpen);
   return (
@@ -334,9 +339,6 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       </p>
     </div>
   );
-
-  // ── Helpers inline ──
-  const G2 = ({ children }) => <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:14 }}>{children}</div>;
 
   const hasTelDom = (...d) => d.some(x => form.tel_sous_domaine.includes(x));
 
