@@ -246,75 +246,89 @@ export default function CandidatureForm({ secteur, theme, labels }) {
         succes_professionnel:form.succes||null,
         cv_nom_fichier:cvFileName, cv_url:cvUrl,
         consentement_rgpd:form.consentement, consentement_opportunites:form.consentement_opportunites,
-        // IT
-        it_seniority:               isIT?form.it_seniority||null:null,
-        it_type_poste:              isIT?form.it_type_poste||null:null,
+        // ── IT ──────────────────────────────────────────────
+        // Colonnes existantes
         it_stack_principal:         isIT?form.it_stack.join(", ")||null:null,
         it_annees_stack_principal:  isIT?parseInt(form.it_annees_stack)||null:null,
         it_cloud:                   isIT?form.it_cloud||null:null,
         it_type_contrat_prefere:    isIT?form.it_contrat||null:null,
         it_env_prefere:             isIT?form.it_env||null:null,
-        it_methodologie:            isIT?form.it_methodologie:null,
-        it_bases_donnees:           isIT?form.it_bases_donnees:null,
-        it_certif_cloud:            isIT?form.it_certif_cloud:null,
-        it_url_github:              isIT?form.it_url_github||null:null,
-        // Finance
+        // Nouvelles colonnes (migration_candidats_v2.sql requis)
+        ...(isIT && {
+          it_seniority:             form.it_seniority||null,
+          it_type_poste:            form.it_type_poste||null,
+          it_methodologie:          form.it_methodologie,
+          it_bases_donnees:         form.it_bases_donnees,
+          it_certif_cloud:          form.it_certif_cloud,
+          it_url_github:            form.it_url_github||null,
+        }),
+        // ── FINANCE ──────────────────────────────────────────
+        // Colonnes existantes
         fin_specialite:             isFin?form.fin_specialite||null:null,
         fin_normes_maitrisees:      isFin?form.fin_normes:null,
         fin_erp_maitrise:           isFin?form.fin_erp:null,
         fin_perimetre_max_mchf:     isFin?parseFloat(form.fin_perimetre_mchf)||null:null,
         fin_equipe_managee_max:     isFin?parseInt(form.fin_equipe_max)||null:null,
-        fin_certifications:         isFin?form.fin_certifications:null,
-        fin_industries:             isFin?form.fin_industries:null,
-        fin_consolidation_entites:  isFin?parseInt(form.fin_consolidation_entites)||null:null,
-        fin_reporting_langues:      isFin?form.fin_reporting_langues:null,
-        // Ingénierie
+        // Nouvelles colonnes (migration_candidats_v2.sql requis)
+        ...(isFin && {
+          fin_certifications:       form.fin_certifications,
+          fin_industries:           form.fin_industries,
+          fin_consolidation_entites: parseInt(form.fin_consolidation_entites)||null,
+          fin_reporting_langues:    form.fin_reporting_langues,
+        }),
+        // ── INGÉNIERIE ───────────────────────────────────────
+        // Colonnes existantes
         ing_specialite:             isIng?form.ing_specialite||null:null,
         ing_cao_logiciels:          isIng?form.ing_cao:null,
         ing_normes_maitrisees:      isIng?form.ing_normes:null,
         ing_secteurs_experience:    isIng?form.ing_secteurs:null,
         ing_langages_automate:      isIng?form.ing_automates:null,
-        ing_budget_projet_mchf:     isIng?parseFloat(form.ing_budget_projet_mchf)||null:null,
-        ing_equipe_managee_max:     isIng?parseInt(form.ing_equipe_max)||null:null,
-        ing_certif_projet:          isIng?form.ing_certif_projet:null,
-        ing_habilitations_elec:     isIng?form.ing_habilitations_elec:null,
-        // Paysagisme
+        // Nouvelles colonnes (migration_candidats_v2.sql requis)
+        ...(isIng && {
+          ing_budget_projet_mchf:   parseFloat(form.ing_budget_projet_mchf)||null,
+          ing_equipe_managee_max:   parseInt(form.ing_equipe_max)||null,
+          ing_certif_projet:        form.ing_certif_projet,
+          ing_habilitations_elec:   form.ing_habilitations_elec,
+        }),
+        // ── PAYSAGISME ───────────────────────────────────────
+        // Colonnes existantes
         pay_specialite:             isPay?form.pay_specialite||null:null,
         pay_competences:            isPay?form.pay_competences:null,
         pay_certifications:         isPay?form.pay_certifications:null,
         pay_permis:                 isPay?(form.pay_permis?[form.pay_permis]:null):null,
         pay_engins:                 isPay?form.pay_engins:null,
-        pay_zone_intervention:      isPay?form.pay_zone_intervention:null,
-        pay_types_clients:          isPay?form.pay_types_clients:null,
-        // Télécommunications — tronc commun
+        // Nouvelles colonnes (migration_candidats_v2.sql requis)
+        ...(isPay && {
+          pay_zone_intervention:    form.pay_zone_intervention,
+          pay_types_clients:        form.pay_types_clients,
+        }),
+        // ── TÉLÉCOMMUNICATIONS ───────────────────────────────
+        // Colonnes existantes
         tel_specialite:             isTel?form.tel_specialite||null:null,
-        tel_sous_domaine:           isTel?form.tel_sous_domaine:null,
-        tel_exp_operateurs:         isTel?form.tel_exp_operateurs:null,
-        tel_permis:                 isTel?form.tel_permis||null:null,
-        tel_ofac_niveau:            isTel?form.tel_ofac_niveau||null:null,
-        tel_drone_certif:           isTel?form.tel_drone_certif:null,
-        tel_cantons:                isTel?form.tel_cantons:null,
-        // Réseau IP
-        tel_stack_reseau:           isTel?form.tel_stack_reseau:null,
-        tel_protocols:              isTel?form.tel_protocols:null,
-        tel_certif_reseau:          isTel?form.tel_certif_reseau:null,
-        tel_supervision:            isTel?form.tel_supervision:null,
-        // Radio
-        tel_tech_radio:             isTel?form.tel_tech_radio:null,
-        tel_outils_rf:              isTel?form.tel_outils_rf:null,
-        tel_constructeurs_ran:      isTel?form.tel_constructeurs_ran:null,
-        // RNI
         tel_normes:                 isTel?form.tel_normes:null,
         tel_outils_mesure:          isTel?form.tel_outils_mesure:null,
         tel_logiciels:              isTel?form.tel_logiciels_rnl:null,
-        tel_dossiers_permis:        isTel?form.tel_dossiers_permis:null,
-        // Fibre
-        tel_competences_fibre:      isTel?form.tel_competences_fibre:null,
-        // VoIP
-        tel_voip_stack:             isTel?form.tel_voip_stack:null,
-        tel_protocols_uc:           isTel?form.tel_protocols_uc:null,
-        // Transmission
-        tel_tech_transmission:      isTel?form.tel_tech_transmission:null,
+        tel_ofac_niveau:            isTel?form.tel_ofac_niveau||null:null,
+        tel_drone_certif:           isTel?form.tel_drone_certif:null,
+        // Nouvelles colonnes (migration_candidats_v2.sql requis)
+        ...(isTel && {
+          tel_sous_domaine:         form.tel_sous_domaine,
+          tel_exp_operateurs:       form.tel_exp_operateurs,
+          tel_permis:               form.tel_permis||null,
+          tel_cantons:              form.tel_cantons,
+          tel_stack_reseau:         form.tel_stack_reseau,
+          tel_protocols:            form.tel_protocols,
+          tel_certif_reseau:        form.tel_certif_reseau,
+          tel_supervision:          form.tel_supervision,
+          tel_tech_radio:           form.tel_tech_radio,
+          tel_outils_rf:            form.tel_outils_rf,
+          tel_constructeurs_ran:    form.tel_constructeurs_ran,
+          tel_dossiers_permis:      form.tel_dossiers_permis,
+          tel_competences_fibre:    form.tel_competences_fibre,
+          tel_voip_stack:           form.tel_voip_stack,
+          tel_protocols_uc:         form.tel_protocols_uc,
+          tel_tech_transmission:    form.tel_tech_transmission,
+        }),
       };
 
       const {error:insErr}=await supabase.from("candidats").insert(payload);
