@@ -7,7 +7,7 @@ const CandidaturePaysagismeClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Candidature Paysagiste Suisse romande | TalentFlux",
+  title: "Candidature Paysagiste Suisse romande",
   description: "Postulez pour un poste paysagisme en Suisse romande.",
   alternates: { canonical: "https://talentflux.ch/candidature/paysagisme" },
   robots: { index: false, follow: true },

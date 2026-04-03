@@ -319,7 +319,7 @@ export default function TalentFluxFinance() {
           </button>
         )}
                 <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
-          {["Approche","Méthodologie","Contact"].map(item => (
+          {["Approche","Méthodologie"].map(item => (
             <span key={item} onClick={() => scrollTo(item.toLowerCase())}
               style={{ color: C.muted, fontSize: ".86rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = C.text}
@@ -334,6 +334,27 @@ export default function TalentFluxFinance() {
           }}>
             Confier un mandat <ArrowRight size={15} />
           </button>
+        
+          
+          <a href="tel:+41765928806" style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "7px 14px", borderRadius: 10,
+            background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
+            color: "#D4AF5A", textDecoration: "none",
+            fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em",
+            transition: "all .2s",
+          }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.05)"}
+          >
+            📞 +41 76 592 88 06
+          </a>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)" }}>
+            <Link href="/finance" style={{ color: "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
+            <span style={{ color: "#334155", fontSize: ".7rem" }}>|</span>
+            <Link href="/en/finance" style={{ color: "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#F1F5F9"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>EN</Link>
+          </div>
         </div>
       </nav>
 
@@ -394,8 +415,8 @@ export default function TalentFluxFinance() {
             color: C.text, marginBottom: 24,
             animation: "fadeUp .7s ease .1s both",
           }}>
-            Ne recrutez plus vos talents<br />financiers au hasard.<br />
-            <GoldText>Exigez la précision mathématique.</GoldText>
+            Recrutement Finance & Comptabilité en Suisse :<br />
+            <GoldText>votre expert financier existe, il ne répond pas aux annonces.</GoldText>
           </h1>
 
           <p style={{
@@ -801,6 +822,64 @@ export default function TalentFluxFinance() {
         </div>
       </section>
 
+      
+      {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
+      <section style={{
+        padding: "48px 2rem",
+        background: "rgba(212,175,90,.06)",
+        borderTop: "1px solid rgba(212,175,90,.2)",
+        borderBottom: "1px solid rgba(212,175,90,.2)",
+      }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ color: "#D4AF5A", fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
+              ✦ Nos autres expertises
+            </div>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
+              Vous recrutez aussi dans...
+            </h2>
+            <p style={{ color: "#64748B", fontSize: ".88rem" }}>
+              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+            
+          <a href="/pharma" style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "14px 22px", borderRadius: 14,
+            background: "#C026D310", border: "1px solid #C026D330",
+            textDecoration: "none", transition: "all .25s",
+            flex: 1, minWidth: 180,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#C026D318"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#C026D310"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            <span style={{ fontSize: "1.1rem" }}>🔬</span>
+            <div>
+              <div style={{ color: "#C026D3", fontWeight: 700, fontSize: ".88rem" }}>Pharma & Life Sciences</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+            </div>
+          </a>
+          <a href="/ingenierie" style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "14px 22px", borderRadius: 14,
+            background: "#818CF810", border: "1px solid #818CF830",
+            textDecoration: "none", transition: "all .25s",
+            flex: 1, minWidth: 180,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#818CF818"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#818CF810"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            <span style={{ fontSize: "1.1rem" }}>⚙️</span>
+            <div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+            </div>
+          </a>
+          </div>
+        </div>
+      </section>
+
       {/* ── FOOTER ── */}
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "26px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
@@ -810,7 +889,7 @@ export default function TalentFluxFinance() {
           </div>
           <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
           <div style={{ display: "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["/contact"]].map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = C.muted}
                 onMouseLeave={e => e.target.style.color = C.subtle}

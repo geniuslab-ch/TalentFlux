@@ -7,7 +7,7 @@ const CandidatureITClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Candidature Développeur & IT en Suisse | TalentFlux",
+  title: "Candidature Développeur & IT en Suisse",
   description: "Déposez votre candidature IT en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/it" },
   robots: { index: false, follow: true },

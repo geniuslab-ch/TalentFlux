@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/it", "en": "https://talentflux.ch/en/it" },
   },
   openGraph: {
-    title: "IT Recruitment in Switzerland | Yverdon | TalentFlux",
+    title: "IT Recruitment in Switzerland | Yverdon",
     description: "Specialized IT recruitment agency in Switzerland. Developers, DevOps, Data Engineers, Cloud Architects, Tech Leads. Yverdon-les-Bains.",
     url: "https://talentflux.ch/en/it",
     type: "website",

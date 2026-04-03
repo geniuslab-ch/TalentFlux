@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Recrutement paysagistes, arboristes ISA/ECC et chefs de chantier en Suisse romande. CFC paysagiste, maçons paysagistes. Yverdon-les-Bains, Vaud.",
   alternates: { canonical: "https://talentflux.ch/paysagisme" },
   openGraph: {
-    title: "Recrutement Paysagisme Suisse romande | TalentFlux",
+    title: "Recrutement Paysagisme Suisse romande",
     description: "Recrutement paysagistes, arboristes ISA/ECC et chefs de chantier en Suisse romande. CFC paysagiste, maçons paysagistes. Yverdon-les-Bains, Vaud.",
     url: "https://talentflux.ch/paysagisme",
     type: "website",

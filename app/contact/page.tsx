@@ -7,7 +7,7 @@ const ContactClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Contact TalentFlux — Recrutement Spécialisé Suisse",
+  title: "Contact — Recrutement Spécialisé Suisse",
   description: "Contactez TalentFlux, agence de recrutement à Yverdon-les-Bains.",
   robots: { index: true, follow: true },
 };

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/ingenierie", "en": "https://talentflux.ch/en/ingenierie" },
   },
   openGraph: {
-    title: "Engineering Recruitment Switzerland | TalentFlux",
+    title: "Engineering Recruitment Switzerland",
     description: "Specialized engineering recruitment in Switzerland. Mechanical, Automation, MedTech, Electronics, R&D. ISO 13485, MDR certified experts. Yverdon-les-Bains.",
     url: "https://talentflux.ch/en/ingenierie",
     type: "website",

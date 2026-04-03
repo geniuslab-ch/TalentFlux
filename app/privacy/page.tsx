@@ -7,7 +7,7 @@ const PrivacyClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Politique de confidentialité | TalentFlux",
+  title: "Politique de confidentialité",
   description: "Politique de confidentialité TalentFlux — LPD suisse et RGPD.",
   robots: { index: true, follow: true },
 };

@@ -7,7 +7,7 @@ const CandidaturePharmaClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Candidature Pharma & Life Sciences Suisse | TalentFlux",
+  title: "Candidature Pharma & Life Sciences Suisse",
   description: "Postulez pour un poste pharma en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/pharma" },
   robots: { index: false, follow: true },

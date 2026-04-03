@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/paysagisme", "en": "https://talentflux.ch/en/paysagisme" },
   },
   openGraph: {
-    title: "Landscaping & Horticulture Recruitment Switzerland | TalentFlux",
+    title: "Landscaping & Horticulture Recruitment Switzerland",
     description: "Recruitment of landscape gardeners, ISA/ECC arborists and site managers in Switzerland. Yverdon-les-Bains.",
     url: "https://talentflux.ch/en/paysagisme",
     type: "website",

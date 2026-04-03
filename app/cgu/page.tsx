@@ -7,7 +7,7 @@ const CGUClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Conditions générales | TalentFlux",
+  title: "Conditions générales d'utilisation",
   description: "Conditions générales d'utilisation de TalentFlux.",
   robots: { index: true, follow: true },
 };

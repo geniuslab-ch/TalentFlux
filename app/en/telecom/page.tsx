@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/telecom", "en": "https://talentflux.ch/en/telecom" },
   },
   openGraph: {
-    title: "Telecom & Network Recruitment Switzerland | TalentFlux",
+    title: "Telecom & Network Recruitment Switzerland",
     description: "Specialized Telecommunications recruitment in Switzerland. NRI specialists, 5G RF Planners, IP network engineers (CCNP/CCIE), fibre technicians. Yverdon.",
     url: "https://talentflux.ch/en/telecom",
     type: "website",

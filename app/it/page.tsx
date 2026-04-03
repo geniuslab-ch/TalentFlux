@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Agence de recrutement IT spécialisée en Suisse romande. Développeurs, DevOps, Data Engineers, Cloud Architects, Tech Leads. Réseau 50+ clients tech. Yverdon-les-Bains, Vaud.",
   alternates: { canonical: "https://talentflux.ch/it" },
   openGraph: {
-    title: "Recrutement IT en Suisse romande | Yverdon | TalentFlux",
+    title: "Recrutement IT en Suisse romande | Yverdon",
     description: "Agence de recrutement IT spécialisée en Suisse romande. Développeurs, DevOps, Data Engineers, Cloud Architects, Tech Leads. Réseau 50+ clients tech. Yverdon-les-Bains, Vaud.",
     url: "https://talentflux.ch/it",
     type: "website",

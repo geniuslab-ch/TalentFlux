@@ -7,7 +7,7 @@ const AdminClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Admin TalentFlux",
+  title: "Administration",
   description: "Administration TalentFlux.",
   robots: { index: false, follow: false },
 };

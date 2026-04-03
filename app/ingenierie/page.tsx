@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Recrutement ingénieurs spécialisés en Suisse. Mécanique, Automation, MedTech, Électronique, R&D. Experts ISO 13485, MDR et IEC 62304. Yverdon-les-Bains.",
   alternates: { canonical: "https://talentflux.ch/ingenierie" },
   openGraph: {
-    title: "Recrutement Ingénieurs Suisse romande | TalentFlux",
+    title: "Recrutement Ingénieurs Suisse romande",
     description: "Recrutement ingénieurs spécialisés en Suisse. Mécanique, Automation, MedTech, Électronique, R&D. Experts ISO 13485, MDR et IEC 62304. Yverdon-les-Bains.",
     url: "https://talentflux.ch/ingenierie",
     type: "website",

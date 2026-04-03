@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Recrutement Pharma & Life Sciences en Suisse. QA Manager, Responsible Person, Affaires Réglementaires, Validation GMP. Experts Swissmedic & ICH Q9. Yverdon.",
   alternates: { canonical: "https://talentflux.ch/pharma" },
   openGraph: {
-    title: "Chasseur de têtes Pharma & Life Sciences Suisse | TalentFlux",
+    title: "Chasseur de têtes Pharma & Life Sciences Suisse",
     description: "Recrutement Pharma & Life Sciences en Suisse. QA Manager, Responsible Person, Affaires Réglementaires, Validation GMP. Experts Swissmedic & ICH Q9. Yverdon.",
     url: "https://talentflux.ch/pharma",
     type: "website",

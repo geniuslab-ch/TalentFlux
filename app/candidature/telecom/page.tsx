@@ -7,7 +7,7 @@ const CandidatureTelecomClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Candidature Télécom & Réseaux Suisse | TalentFlux",
+  title: "Candidature Télécom & Réseaux Suisse",
   description: "Déposez votre candidature télécom en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/telecom" },
   robots: { index: false, follow: true },

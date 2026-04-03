@@ -7,7 +7,7 @@ const CandidatureIngenierieClient = dynamic(
 );
 
 export const metadata: Metadata = {
-  title: "Candidature Ingénieur Suisse romande | TalentFlux",
+  title: "Candidature Ingénieur Suisse romande",
   description: "Déposez votre candidature ingénieur en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/ingenierie" },
   robots: { index: false, follow: true },

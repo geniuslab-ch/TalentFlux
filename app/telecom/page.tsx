@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Recrutement Télécommunications en Suisse. Spécialistes RNI/ORNI, RF Planners 5G, ingénieurs réseau IP (CCNP/CCIE), techniciens fibre. Yverdon.",
   alternates: { canonical: "https://talentflux.ch/telecom" },
   openGraph: {
-    title: "Recrutement Télécom & Réseaux Suisse | TalentFlux",
+    title: "Recrutement Télécom & Réseaux Suisse",
     description: "Recrutement Télécommunications en Suisse. Spécialistes RNI/ORNI, RF Planners 5G, ingénieurs réseau IP (CCNP/CCIE), techniciens fibre. Yverdon.",
     url: "https://talentflux.ch/telecom",
     type: "website",

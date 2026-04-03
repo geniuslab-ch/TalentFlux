@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/finance", "en": "https://talentflux.ch/en/finance" },
   },
   openGraph: {
-    title: "Finance & Accounting Recruitment Switzerland | TalentFlux",
+    title: "Finance & Accounting Recruitment Switzerland",
     description: "Specialized Finance recruitment in Switzerland. CFO, Management Control, Audit, Treasury, FINMA Compliance. Swiss GAAP & IFRS profiles. Yverdon-les-Bains.",
     url: "https://talentflux.ch/en/finance",
     type: "website",

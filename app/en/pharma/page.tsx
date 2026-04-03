@@ -15,7 +15,7 @@ export const metadata: Metadata = {
     languages: { "fr": "https://talentflux.ch/pharma", "en": "https://talentflux.ch/en/pharma" },
   },
   openGraph: {
-    title: "Pharma & Life Sciences Headhunter Switzerland | TalentFlux",
+    title: "Pharma & Life Sciences Headhunter Switzerland",
     description: "Pharma & Life Sciences recruitment in Switzerland. QA Manager, Responsible Person, Regulatory Affairs, GMP Validation. Swissmedic & ICH Q9 experts. Yverdon.",
     url: "https://talentflux.ch/en/pharma",
     type: "website",

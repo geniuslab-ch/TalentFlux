@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: "Recrutement Finance spécialisé en Suisse. CFO, Contrôle de gestion, Audit, Trésorerie, Compliance FINMA. Profils Swiss GAAP & IFRS. Yverdon-les-Bains.",
   alternates: { canonical: "https://talentflux.ch/finance" },
   openGraph: {
-    title: "Recrutement Finance & Comptabilité Suisse | TalentFlux",
+    title: "Recrutement Finance & Comptabilité Suisse",
     description: "Recrutement Finance spécialisé en Suisse. CFO, Contrôle de gestion, Audit, Trésorerie, Compliance FINMA. Profils Swiss GAAP & IFRS. Yverdon-les-Bains.",
     url: "https://talentflux.ch/finance",
     type: "website",

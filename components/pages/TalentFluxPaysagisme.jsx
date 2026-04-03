@@ -321,33 +321,37 @@ export default function TalentFluxPaysagisme() {
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: C.greenL, background: "rgba(34,197,94,.1)", border: `1px solid rgba(34,197,94,.3)`, borderRadius: 4, padding: "2px 7px" }}>PAYSAGE</span>
         </div>
 
-        {isMobile && (
-          <button onClick={() => scrollTo("contact")} style={{
-            background: C.grad, border: "none", color: "#fff",
-            padding: "8px 16px", borderRadius: 10, fontWeight: 700, fontSize: ".82rem",
-            cursor: "pointer", fontFamily: "'DM Sans',sans-serif",
-          }}>Recruter →</button>
-        )}
+        
 
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
-          {["Solution", "Métiers", "FAQ", "Contact"].map(item => (
+          {["Solution", "Métiers", "FAQ"].map(item => (
             <span key={item} onClick={() => scrollTo(item.toLowerCase())}
               style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = C.text}
               onMouseLeave={e => e.target.style.color = C.muted}
             >{item}</span>
           ))}
-          <button onClick={() => scrollTo("contact")} style={{
-            background: C.grad, border: "none", color: "#fff",
-            padding: "10px 22px", borderRadius: 12, fontWeight: 700, fontSize: ".85rem", cursor: "pointer",
-            boxShadow: "0 0 20px rgba(34,197,94,.3)", display: "flex", alignItems: "center", gap: 7,
-            transition: "all .3s", fontFamily: "'DM Sans',sans-serif",
+        
+          
+          <a href="tel:+41765928806" style={{
+            display: "flex", alignItems: "center", gap: 6,
+            padding: "7px 14px", borderRadius: 10,
+            background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
+            color: "#4ADE80", textDecoration: "none",
+            fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em",
+            transition: "all .2s",
           }}
-            onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 36px rgba(34,197,94,.55)"; }}
-            onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(34,197,94,.3)"; }}
+            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
+            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.05)"}
           >
-            Recruter <ArrowRight size={15} />
-          </button>
+            📞 +41 76 592 88 06
+          </a>
+
+          <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)" }}>
+            <Link href="/paysagisme" style={{ color: "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
+            <span style={{ color: "#334155", fontSize: ".7rem" }}>|</span>
+            <Link href="/en/paysagisme" style={{ color: "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#F1F5F9"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>EN</Link>
+          </div>
         </div>
       </nav>
 
@@ -392,8 +396,8 @@ export default function TalentFluxPaysagisme() {
           </p>
 
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-.02em", color: C.text, marginBottom: 22 }}>
-            Le bon profil ne pousse pas<br />
-            <GradientText>tout seul dans votre jardin.</GradientText>
+            Recrutement Paysagisme en Suisse romande :<br />
+            <GradientText>le bon profil ne pousse pas tout seul dans votre jardin.</GradientText>
           </h1>
 
           <p style={{ color: C.muted, fontSize: ".97rem", lineHeight: 1.8, maxWidth: 580, margin: "0 auto 36px" }}>
@@ -827,6 +831,64 @@ export default function TalentFluxPaysagisme() {
         </div>
       </section>
 
+      
+      {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
+      <section style={{
+        padding: "48px 2rem",
+        background: "rgba(34,197,94,.06)",
+        borderTop: "1px solid rgba(34,197,94,.2)",
+        borderBottom: "1px solid rgba(34,197,94,.2)",
+      }}>
+        <div style={{ maxWidth: 900, margin: "0 auto" }}>
+          <div style={{ textAlign: "center", marginBottom: 24 }}>
+            <div style={{ color: "#22C55E", fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
+              ✦ Nos autres expertises
+            </div>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
+              Vous recrutez aussi dans...
+            </h2>
+            <p style={{ color: "#64748B", fontSize: ".88rem" }}>
+              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+            </p>
+          </div>
+          <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
+            
+          <a href="/ingenierie" style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "14px 22px", borderRadius: 14,
+            background: "#818CF810", border: "1px solid #818CF830",
+            textDecoration: "none", transition: "all .25s",
+            flex: 1, minWidth: 180,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#818CF818"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#818CF810"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            <span style={{ fontSize: "1.1rem" }}>⚙️</span>
+            <div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie & Technique</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+            </div>
+          </a>
+          <a href="/it" style={{
+            display: "flex", alignItems: "center", gap: 10,
+            padding: "14px 22px", borderRadius: 14,
+            background: "#38BDF810", border: "1px solid #38BDF830",
+            textDecoration: "none", transition: "all .25s",
+            flex: 1, minWidth: 180,
+          }}
+            onMouseEnter={e => { e.currentTarget.style.background = "#38BDF818"; e.currentTarget.style.transform = "translateY(-2px)"; }}
+            onMouseLeave={e => { e.currentTarget.style.background = "#38BDF810"; e.currentTarget.style.transform = "translateY(0)"; }}
+          >
+            <span style={{ fontSize: "1.1rem" }}>💻</span>
+            <div>
+              <div style={{ color: "#38BDF8", fontWeight: 700, fontSize: ".88rem" }}>IT & Digital</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+            </div>
+          </a>
+          </div>
+        </div>
+      </section>
+
       {/* ═══ FOOTER ═══ */}
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "24px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
@@ -836,7 +898,7 @@ export default function TalentFluxPaysagisme() {
           </div>
           <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["/contact"]].map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = C.muted}
                 onMouseLeave={e => e.target.style.color = C.subtle}
