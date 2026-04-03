@@ -1,0 +1,11 @@
+# robots.txt — TalentFlux
+# Généré automatiquement par next-sitemap au build
+# Voir next-sitemap.config.js pour la configuration
+
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://talentflux.ch/sitemap.xml
