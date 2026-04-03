@@ -38,7 +38,7 @@ export default function CandidaturePaysagisme() {
           <ArrowLeft size={17}/><span style={{ fontSize:".88rem" }}>Retour</span>
         </Link>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height:36, objectFit:"contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height:36, objectFit:"contain" }} />
           <span style={{ fontSize:".58rem", fontWeight:700, letterSpacing:".12em", color:"#22C55E", background:"rgba(34,197,94,.1)", border:"1px solid rgba(34,197,94,.3)", borderRadius:4, padding:"2px 7px" }}>PAYSAGE</span>
         </div>
       </nav>

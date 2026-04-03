@@ -59,7 +59,7 @@ export default function CandidatureIngenierie() {
           <ArrowLeft size={17} /><span style={{ fontSize: ".88rem" }}>Retour</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: "#60A5FA", background: "rgba(59,130,246,.1)", border: "1px solid rgba(59,130,246,.3)", borderRadius: 4, padding: "2px 7px", fontFamily: "'DM Mono',monospace" }}>INGÉNIERIE</span>
         </div>
       </nav>

@@ -74,7 +74,7 @@ export default function Privacy() {
         <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 8, background: "none", border: "none", cursor: "pointer", color: "#94A3B8" }}>
           <ArrowLeft size={18} /> <span style={{ fontSize: "0.9rem" }}>Retour</span>
         </button>
-        <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
+        <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 
       {/* HERO */}

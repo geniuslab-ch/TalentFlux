@@ -59,7 +59,7 @@ export default function CandidatureIT() {
           <ArrowLeft size={17} /><span style={{ fontSize: ".88rem" }}>Retour</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: "#0EA5E9", background: "rgba(14,165,233,.1)", border: "1px solid rgba(14,165,233,.3)", borderRadius: 4, padding: "2px 7px" }}>IT</span>
         </div>
       </nav>

@@ -42,7 +42,7 @@ export default function CandidaturePharma() {
           <ArrowLeft size={17} /><span style={{ fontSize: ".88rem" }}>Retour</span>
         </Link>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: "#F0ABFC", background: "rgba(192,38,211,.1)", border: "1px solid rgba(232,121,249,.3)", borderRadius: 4, padding: "2px 7px" }}>PHARMA</span>
         </div>
       </nav>

@@ -160,7 +160,7 @@ function LoginScreen({ onLogin }) {
       `}</style>
       <div style={{ width: 380, animation: shake ? "shake .5s ease" : "none" }}>
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 44, objectFit: "contain", marginBottom: 16 }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 44, objectFit: "contain", marginBottom: 16 }} />
           <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}>
             <Shield size={14} style={{ color: C.red }} />
             <span style={{ color: C.subtle, fontSize: ".82rem", fontFamily: "'DM Mono',monospace" }}>Accès restreint · Équipe TalentFlux</span>
@@ -1561,7 +1561,7 @@ export default function Admin() {
       <div style={{ width: 220, background: C.sidebar, borderRight: `1px solid ${C.border}`, display: "flex", flexDirection: "column", flexShrink: 0, position: "sticky", top: 0, height: "100vh" }}>
         {/* Logo */}
         <div style={{ padding: "20px 18px 18px", borderBottom: `1px solid ${C.border}` }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 32, objectFit: "contain", marginBottom: 8 }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 32, objectFit: "contain", marginBottom: 8 }} />
           <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
             <Shield size={11} style={{ color: C.red }} />
             <span style={{ color: C.subtle, fontSize: ".65rem", fontFamily: "'DM Mono',monospace" }}>Interface Admin</span>

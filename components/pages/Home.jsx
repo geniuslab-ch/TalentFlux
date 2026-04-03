@@ -288,7 +288,7 @@ export default function Home() {
       {/* ══ NAV ══════════════════════════════════════════════ */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 66, background: scrolled ? "rgba(8,13,26,0.96)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(255,255,255,.06)" : "none", transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
         </div>
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.4rem", alignItems: "center" }}>
           {[["Verticales", "verticales"], ["Notre approche", "approche"]].map(([label, id]) => (
@@ -577,7 +577,7 @@ export default function Home() {
       <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "28px 2rem" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
+            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
             <span style={{ color: "#334155", fontSize: ".72rem" }}>Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse</span>
           </div>
           <p style={{ color: "#1E3A5F", fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. Tous droits réservés.</p>

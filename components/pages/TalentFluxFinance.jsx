@@ -303,7 +303,7 @@ export default function TalentFluxFinance() {
         transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
           <span style={{
             fontSize: ".6rem", fontWeight: 700, letterSpacing: ".12em",
             color: C.goldLight, background: "rgba(180,145,60,.1)",
@@ -884,7 +884,7 @@ export default function TalentFluxFinance() {
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "26px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/logo.png" alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
+            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
             <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Finance · Yverdon-les-Bains, Suisse</span>
           </div>
           <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>

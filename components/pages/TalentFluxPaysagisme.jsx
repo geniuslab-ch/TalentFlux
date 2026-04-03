@@ -317,7 +317,7 @@ export default function TalentFluxPaysagisme() {
         transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: C.greenL, background: "rgba(34,197,94,.1)", border: `1px solid rgba(34,197,94,.3)`, borderRadius: 4, padding: "2px 7px" }}>PAYSAGE</span>
         </div>
 
@@ -893,7 +893,7 @@ export default function TalentFluxPaysagisme() {
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "24px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
-            <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
+            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
             <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Paysagisme · Yverdon-les-Bains, VD</span>
           </div>
           <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>

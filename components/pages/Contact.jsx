@@ -119,7 +119,7 @@ export default function Contact() {
         <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8", background: "none", border: "none", cursor: "pointer" }}>
           <ArrowLeft size={18} /><span style={{ fontSize: "0.9rem" }}>Retour</span>
         </button>
-        <img src="/logo.png" alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
+        <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
 
       <div style={{ padding: "110px 2rem 50px", textAlign: "center", background: "radial-gradient(ellipse at top, rgba(37,99,235,0.1) 0%, transparent 55%)" }}>
