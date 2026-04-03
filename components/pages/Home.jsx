@@ -291,7 +291,7 @@ export default function Home() {
           <img src="/logo.png" alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
         </div>
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.4rem", alignItems: "center" }}>
-          {[["Verticales", "verticales"], ["Notre approche", "approche"], ["Contact", "contact"]].map(([label, id]) => (
+          {[["Verticales", "verticales"], ["Notre approche", "approche"]].map(([label, id]) => (
             <span key={id} onClick={() => scrollTo(id)} style={{ color: "#64748B", fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = "#F1F5F9"} onMouseLeave={e => e.target.style.color = "#64748B"}>{label}</span>
           ))}
