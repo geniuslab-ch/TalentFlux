@@ -1,4 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
 import TalentFluxIT from './pages/TalentFluxIT';
 import TalentFluxFinance from './pages/TalentFluxFinance';
 import TalentFluxEngineering from './pages/TalentFluxEngineering';
@@ -20,8 +21,9 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<Navigate to="/it" replace />} />
-        {/* Landing pages */}
+        {/* Homepage */}
+        <Route path="/"           element={<Home />} />
+        {/* Landing pages secteurs */}
         <Route path="/it"         element={<TalentFluxIT />} />
         <Route path="/finance"    element={<TalentFluxFinance />} />
         <Route path="/ingenierie" element={<TalentFluxEngineering />} />
