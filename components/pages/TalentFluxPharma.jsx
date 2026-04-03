@@ -237,33 +237,33 @@ export default function TalentFluxPharma() {
           <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: C.roseL, background: "rgba(192,38,211,.1)", border: `1px solid rgba(232,121,249,.3)`, borderRadius: 4, padding: "2px 7px" }}>PHARMA</span>
         </div>
         {isMobile ? (
+          <a href="tel:+41765928806" style={{ background: "rgba(192,38,211,.15)", border: "1px solid rgba(232,121,249,.3)", color: "#E879F9", padding: "7px 14px", borderRadius: 10, fontWeight: 700, fontSize: ".8rem", textDecoration: "none" }}>
+            📞 Appeler
+          </a>
         ) : (
           <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
             {["Solution", "Métiers", "FAQ"].map(item => (
               <span key={item} onClick={() => scrollTo(item.toLowerCase())} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{item}</span>
             ))}
-          
-          
-          <a href="tel:+41765928806" style={{
-            display: "flex", alignItems: "center", gap: 6,
-            padding: "7px 14px", borderRadius: 10,
-            background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
-            color: "#E879F9", textDecoration: "none",
-            fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em",
-            transition: "all .2s",
-          }}
-            onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
-            onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.05)"}
-          >
-            📞 +41 76 592 88 06
-          </a>
-
-          <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)" }}>
-            <Link href="/pharma" style={{ color: "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
-            <span style={{ color: "#334155", fontSize: ".7rem" }}>|</span>
-            <Link href="/en/pharma" style={{ color: "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#F1F5F9"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>EN</Link>
+            <a href="tel:+41765928806" style={{
+              display: "flex", alignItems: "center", gap: 6,
+              padding: "7px 14px", borderRadius: 10,
+              background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)",
+              color: "#E879F9", textDecoration: "none",
+              fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em",
+              transition: "all .2s",
+            }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(255,255,255,.05)"}
+            >
+              📞 +41 76 592 88 06
+            </a>
+            <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)" }}>
+              <Link href="/pharma" style={{ color: "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
+              <span style={{ color: "#334155", fontSize: ".7rem" }}>|</span>
+              <Link href="/en/pharma" style={{ color: "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color="#F1F5F9"} onMouseLeave={e => e.currentTarget.style.color="#64748B"}>EN</Link>
+            </div>
           </div>
-        </div>
         )}
       </nav>
 
