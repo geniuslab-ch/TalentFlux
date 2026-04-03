@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import JsonLd from "@/components/JsonLd";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const TalentFluxITClient = dynamic(
   () => import("@/components/pages/TalentFluxIT"),
@@ -28,7 +29,9 @@ export default function TalentFluxITPage() {
         sectorSlug="it"
         areaServed={["Suisse romande", "Lausanne", "Genève", "Zurich", "Suisse"]}
       />
-      <TalentFluxITClient />
+      <ErrorBoundary pageName="it">
+        <TalentFluxITClient />
+      </ErrorBoundary>
     </>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import dynamic from "next/dynamic";
 import JsonLd from "@/components/JsonLd";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const TalentFluxPharmaClient = dynamic(
   () => import("@/components/pages/TalentFluxPharma"),
@@ -28,7 +29,9 @@ export default function TalentFluxPharmaPage() {
         sectorSlug="pharma"
         areaServed={["Arc Lémanique", "Mittelland", "Suisse romande", "Suisse"]}
       />
-      <TalentFluxPharmaClient />
+      <ErrorBoundary pageName="pharma">
+        <TalentFluxPharmaClient />
+      </ErrorBoundary>
     </>
   );
 }
