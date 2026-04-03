@@ -1,12 +1,16 @@
+"use server";
 import type { Metadata } from "next";
-import CandidaturePaysagismeClient from "@/components/pages/CandidaturePaysagisme";
+import dynamic from "next/dynamic";
+
+const CandidaturePaysagismeClient = dynamic(
+  () => import("@/components/pages/CandidaturePaysagisme"),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Candidature Paysagiste Suisse romande | TalentFlux",
-  description: "Postulez pour un poste en paysagisme en Suisse romande. CFC paysagiste, arboriste ISA/ECC, chef de chantier. TalentFlux, spécialiste du recrutement paysage.",
+  description: "Postulez pour un poste paysagisme en Suisse romande.",
   alternates: { canonical: "https://talentflux.ch/candidature/paysagisme" },
-  // Les pages de candidature ne doivent pas être indexées par Google
-  // (formulaires, contenu dynamique) mais restent crawlables
   robots: { index: false, follow: true },
 };
 

@@ -1,12 +1,16 @@
+"use server";
 import type { Metadata } from "next";
-import CandidatureFinanceClient from "@/components/pages/CandidatureFinance";
+import dynamic from "next/dynamic";
+
+const CandidatureFinanceClient = dynamic(
+  () => import("@/components/pages/CandidatureFinance"),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Candidature Finance & Contrôle Suisse | TalentFlux",
-  description: "Postulez pour un poste en finance en Suisse. CFO, contrôle de gestion, audit, trésorerie. TalentFlux vous accompagne dans votre recherche d'emploi finance.",
+  description: "Postulez pour un poste finance en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/finance" },
-  // Les pages de candidature ne doivent pas être indexées par Google
-  // (formulaires, contenu dynamique) mais restent crawlables
   robots: { index: false, follow: true },
 };
 

@@ -1,12 +1,16 @@
+"use server";
 import type { Metadata } from "next";
-import CandidaturePharmaClient from "@/components/pages/CandidaturePharma";
+import dynamic from "next/dynamic";
+
+const CandidaturePharmaClient = dynamic(
+  () => import("@/components/pages/CandidaturePharma"),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Candidature Pharma & Life Sciences Suisse | TalentFlux",
-  description: "Postulez pour un poste pharma en Suisse. QA Manager, Responsible Person, affaires réglementaires, validation GMP. TalentFlux, expert du recrutement pharmaceutique suisse.",
+  description: "Postulez pour un poste pharma en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/pharma" },
-  // Les pages de candidature ne doivent pas être indexées par Google
-  // (formulaires, contenu dynamique) mais restent crawlables
   robots: { index: false, follow: true },
 };
 

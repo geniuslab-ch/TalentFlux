@@ -1,12 +1,16 @@
+"use server";
 import type { Metadata } from "next";
-import CandidatureITClient from "@/components/pages/CandidatureIT";
+import dynamic from "next/dynamic";
+
+const CandidatureITClient = dynamic(
+  () => import("@/components/pages/CandidatureIT"),
+  { ssr: false }
+);
 
 export const metadata: Metadata = {
   title: "Candidature Développeur & IT en Suisse | TalentFlux",
-  description: "Déposez votre candidature IT en Suisse. Développeurs, DevOps, Data Engineers. TalentFlux vous met en relation avec les meilleurs employeurs tech de Suisse romande.",
+  description: "Déposez votre candidature IT en Suisse.",
   alternates: { canonical: "https://talentflux.ch/candidature/it" },
-  // Les pages de candidature ne doivent pas être indexées par Google
-  // (formulaires, contenu dynamique) mais restent crawlables
   robots: { index: false, follow: true },
 };
 
