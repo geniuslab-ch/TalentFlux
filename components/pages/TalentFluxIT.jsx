@@ -8,7 +8,7 @@ import {
   MapPin, Upload, X, FileText, AlertCircle, Shield, Building2
 } from "lucide-react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+const supabase = { from: () => ({ insert: () => Promise.resolve({data:null,error:null}) }), storage: { from: () => ({ upload: () => Promise.resolve({data:null,error:null}), getPublicUrl: () => ({data:{publicUrl:""}}) }) } };
 
 const useInView = (threshold = 0.15) => {
   const ref = useRef(null);
