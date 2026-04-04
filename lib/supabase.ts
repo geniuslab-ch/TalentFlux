@@ -1,47 +1,11 @@
-let _supabase: any = null;
+import { createClient } from "@supabase/supabase-js";
 
-function getClient() {
-  if (_supabase) return _supabase;
+// URL hardcodée en fallback — visible dans les network requests de toute façon
+const url = (process.env.NEXT_PUBLIC_SUPABASE_URL || "https://aaknzniigmmrdjlakiry.supabase.co").trim();
 
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+// JWT minimal valide pour éviter le crash à l'init si la clé est vide
+// Supabase valide la signature uniquement sur les vrais appels API, pas à l'init
+const fallbackKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZha2UiLCJyb2xlIjoiYW5vbiIsImlhdCI6MTYwMDAwMDAwMCwiZXhwIjo5OTk5OTk5OTk5fQ.ok";
+const key = (process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || fallbackKey).trim();
 
-  if (url && key && url.startsWith("https://") && key.startsWith("eyJ")) {
-    try {
-      const { createClient } = require("@supabase/supabase-js");
-      _supabase = createClient(url, key);
-      return _supabase;
-    } catch (e) {
-      console.error("[TalentFlux] createClient failed:", e);
-    }
-  }
-
-  const noop = () => Promise.resolve({ data: null, error: { message: "Supabase non configuré" } });
-  const chain: any = new Proxy({}, {
-    get: (_t, prop) => {
-      if (prop === "then") return undefined;
-      return () => chain;
-    },
-  });
-  _supabase = {
-    from: () => chain,
-    rpc: noop,
-    storage: { from: () => ({ upload: noop, getPublicUrl: () => ({ data: { publicUrl: "" } }) }) },
-    auth: {
-      getUser: () => Promise.resolve({ data: { user: null }, error: null }),
-      getSession: () => Promise.resolve({ data: { session: null }, error: null }),
-      signInWithPassword: noop,
-      signOut: noop,
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe: () => {} } } }),
-    },
-  };
-  return _supabase;
-}
-
-export const supabase = new Proxy({} as any, {
-  get: (_t, prop) => {
-    const client = getClient();
-    const val = client[prop];
-    return typeof val === "function" ? val.bind(client) : val;
-  },
-});
+export const supabase = createClient(url, key);
