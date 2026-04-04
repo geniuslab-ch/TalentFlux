@@ -1,11 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Mode Vercel natif — SSG automatique pour les pages sans getData*
-  // Server Components (layout, metadata, JSON-LD) rendus côté serveur ✓
-  // Client Components ("use client") hydratés côté client ✓
   reactStrictMode: true,
-
-  // Les images Supabase Storage sont sur un domaine externe
+  generateBuildId: async () => {
+    return 'build-' + Date.now();
+  },
   images: {
     remotePatterns: [
       {
@@ -15,5 +13,4 @@ const nextConfig = {
     ],
   },
 };
-
 module.exports = nextConfig;
