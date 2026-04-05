@@ -1,18 +1,13 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const CandidatureFinanceClient = dynamic(
-  () => import("@/components/pages/CandidatureFinance"),
-  { ssr: false }
-);
+import CandidatureFinance from "@/components/pages/CandidatureFinance";
 
 export const metadata: Metadata = {
   title: "Candidature Finance & Contrôle Suisse",
-  description: "Postulez pour un poste finance en Suisse.",
+  description: "Postulez pour un poste finance en Suisse. CFO, contrôle de gestion, audit, trésorerie.",
   alternates: { canonical: "https://talentflux.ch/candidature/finance" },
   robots: { index: false, follow: true },
 };
 
 export default function CandidatureFinancePage() {
-  return <CandidatureFinanceClient />;
+  return <CandidatureFinance />;
 }

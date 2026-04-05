@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const PrivacyClient = dynamic(
-  () => import("@/components/pages/Privacy"),
-  { ssr: false }
-);
+import Privacy from "@/components/pages/Privacy";
 
 export const metadata: Metadata = {
   title: "Politique de confidentialité",
@@ -13,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  return <PrivacyClient />;
+  return <Privacy />;
 }

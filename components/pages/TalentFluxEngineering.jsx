@@ -353,7 +353,7 @@ export default function TalentFluxEngineering() {
         transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between",
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
+          <img src="/logo.png" alt="TalentFlux" style={{ height: 38, width: "auto", objectFit: "contain" }} />
           <span style={{
             fontSize: ".58rem", fontWeight: 700, letterSpacing: ".14em",
             color: E.blueLight, background: "rgba(59,130,246,.1)",
@@ -878,7 +878,7 @@ export default function TalentFluxEngineering() {
       <footer style={{ borderTop: `1px solid ${E.border}`, padding: "24px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
+            <img src="/logo.png" alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
             <span style={{ color: E.subtle, fontSize: ".68rem", fontFamily: "'DM Mono', monospace" }}>· INGÉNIERIE · Yverdon-les-Bains</span>
           </div>
           <p style={{ color: E.subtle, fontSize: ".7rem", fontFamily: "'DM Mono', monospace" }}>© 2025 TalentFlux</p>

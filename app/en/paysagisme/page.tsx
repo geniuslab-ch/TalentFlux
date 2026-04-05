@@ -1,22 +1,15 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import JsonLd from "@/components/JsonLd";
-
-const TalentFluxPaysagismeClient = dynamic(
-  () => import("@/components/pages/TalentFluxPaysagisme"),
-  { ssr: false }
-);
+import TalentFluxPaysagisme from "@/components/pages/TalentFluxPaysagisme";
 
 export const metadata: Metadata = {
   title: "Landscaping & Horticulture Recruitment Switzerland",
-  description: "Recruitment of landscape gardeners, ISA/ECC arborists and site managers in Switzerland. Yverdon-les-Bains.",
   alternates: {
     canonical: "https://talentflux.ch/en/paysagisme",
     languages: { "fr": "https://talentflux.ch/paysagisme", "en": "https://talentflux.ch/en/paysagisme" },
   },
   openGraph: {
-    title: "Landscaping & Horticulture Recruitment Switzerland",
-    description: "Recruitment of landscape gardeners, ISA/ECC arborists and site managers in Switzerland. Yverdon-les-Bains.",
+    title: "Landscaping & Horticulture Recruitment Switzerland | TalentFlux",
     url: "https://talentflux.ch/en/paysagisme",
     type: "website",
     locale: "en_CH",
@@ -26,12 +19,8 @@ export const metadata: Metadata = {
 export default function TalentFluxPaysagismeEnPage() {
   return (
     <>
-      <JsonLd
-        serviceType="Landscaping, arborists and site manager recruitment"
-        sectorSlug="en/paysagisme"
-        areaServed={["French-speaking Switzerland", "Vaud", "Geneva", "Fribourg", "Valais"]}
-      />
-      <TalentFluxPaysagismeClient />
+      <JsonLd serviceType="Landscaping, arborists and site manager recruitment" sectorSlug="en/paysagisme" areaServed={["French-speaking Switzerland","Vaud","Geneva","Fribourg","Valais"]} />
+      <TalentFluxPaysagisme />
     </>
   );
 }

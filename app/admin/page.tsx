@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const AdminClient = dynamic(
-  () => import("@/components/pages/Admin"),
-  { ssr: false }
-);
+import Admin from "@/components/pages/Admin";
 
 export const metadata: Metadata = {
   title: "Administration",
@@ -13,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function AdminPage() {
-  return <AdminClient />;
+  return <Admin />;
 }

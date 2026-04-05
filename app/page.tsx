@@ -1,10 +1,5 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const HomeClient = dynamic(
-  () => import("@/components/pages/Home"),
-  { ssr: false }
-);
+import Home from "@/components/pages/Home";
 
 export const metadata: Metadata = {
   title: "TalentFlux — Recrutement Spécialisé en Suisse",
@@ -12,7 +7,7 @@ export const metadata: Metadata = {
   alternates: { canonical: "https://talentflux.ch" },
   openGraph: {
     title: "TalentFlux — Recrutement Spécialisé en Suisse",
-    description: "Agence de recrutement spécialisée en Suisse : IT, Finance, Ingénierie, Paysagisme, Télécommunications, Pharma & Life Sciences. Yverdon-les-Bains.",
+    description: "Agence de recrutement spécialisée en Suisse : IT, Finance, Ingénierie, Paysagisme, Télécommunications, Pharma & Life Sciences.",
     url: "https://talentflux.ch",
     type: "website",
     locale: "fr_CH",
@@ -21,5 +16,5 @@ export const metadata: Metadata = {
 };
 
 export default function HomePage() {
-  return <HomeClient />;
+  return <Home />;
 }

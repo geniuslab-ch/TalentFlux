@@ -231,7 +231,7 @@ export default function TalentFluxTelecom() {
       {/* NAV */}
       <nav style={{ position:"fixed", top:0, left:0, right:0, zIndex:100, padding:"0 2rem", height:66, background:scrolled?"rgba(8,13,26,0.96)":"transparent", backdropFilter:scrolled?"blur(20px)":"none", borderBottom:scrolled?`1px solid ${C.border}`:"none", transition:"all .3s", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
         <div style={{ display:"flex", alignItems:"center", gap:10 }}>
-          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height:36, objectFit:"contain" }} />
+          <img src="/logo.png" alt="TalentFlux" style={{ height:36, objectFit:"contain" }} />
           <span style={{ fontSize:".58rem", fontWeight:700, letterSpacing:".12em", color:C.skyL, background:"rgba(14,165,233,.1)", border:`1px solid rgba(14,165,233,.3)`, borderRadius:4, padding:"2px 7px" }}>TÉLÉCOM</span>
         </div>
         
@@ -681,7 +681,7 @@ export default function TalentFluxTelecom() {
       <footer style={{ borderTop:`1px solid ${C.border}`, padding:"24px 2rem" }}>
         <div style={{ maxWidth:1060, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <div style={{ display:"flex", alignItems:"center", gap:11 }}>
-            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height:30, objectFit:"contain" }} />
+            <img src="/logo.png" alt="TalentFlux" style={{ height:30, objectFit:"contain" }} />
             <span style={{ color:C.subtle, fontSize:".7rem" }}>· Télécommunications · Yverdon-les-Bains, VD</span>
           </div>
           <p style={{ color:C.subtle, fontSize:".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>

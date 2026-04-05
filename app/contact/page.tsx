@@ -1,17 +1,12 @@
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
-
-const ContactClient = dynamic(
-  () => import("@/components/pages/Contact"),
-  { ssr: false }
-);
+import Contact from "@/components/pages/Contact";
 
 export const metadata: Metadata = {
-  title: "Contact — Recrutement Spécialisé Suisse",
-  description: "Contactez TalentFlux, agence de recrutement à Yverdon-les-Bains.",
+  title: "Contact — Recrutement Suisse",
+  description: "Contactez TalentFlux, agence de recrutement spécialisée à Yverdon-les-Bains.",
   robots: { index: true, follow: true },
 };
 
 export default function ContactPage() {
-  return <ContactClient />;
+  return <Contact />;
 }

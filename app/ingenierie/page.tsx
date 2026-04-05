@@ -1,12 +1,8 @@
+// Server Component — PAS de "use client", PAS de dynamic(ssr:false)
+// Next.js SSR-rend automatiquement les Client Components importés ici
 import type { Metadata } from "next";
-import dynamic from "next/dynamic";
 import JsonLd from "@/components/JsonLd";
-import ErrorBoundary from "@/components/ErrorBoundary";
-
-const TalentFluxEngineeringClient = dynamic(
-  () => import("@/components/pages/TalentFluxEngineering"),
-  { ssr: false }
-);
+import TalentFluxEngineering from "@/components/pages/TalentFluxEngineering";
 
 export const metadata: Metadata = {
   title: "Recrutement Ingénieurs Suisse romande",
@@ -21,17 +17,18 @@ export const metadata: Metadata = {
   },
 };
 
+// Next.js rend ce Server Component côté serveur.
+// TalentFluxEngineering a "use client" → il est SSR-rendu ET hydraté côté client.
+// window/document sont dans useEffect → safe côté serveur.
 export default function TalentFluxEngineeringPage() {
   return (
     <>
       <JsonLd
         serviceType="Recrutement ingénieurs spécialisés, MedTech et automation"
         sectorSlug="ingenierie"
-        areaServed={["Suisse romande", "Arc Lémanique", "Mittelland", "Suisse"]}
+        areaServed={["Suisse romande","Arc Lémanique","Mittelland","Suisse"]}
       />
-      <ErrorBoundary pageName="ingenierie">
-        <TalentFluxEngineeringClient />
-      </ErrorBoundary>
+      <TalentFluxEngineering />
     </>
   );
 }
