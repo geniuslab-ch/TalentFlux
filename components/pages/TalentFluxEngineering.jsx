@@ -883,7 +883,7 @@ export default function TalentFluxEngineering() {
           </div>
           <p style={{ color: E.subtle, fontSize: ".7rem", fontFamily: "'DM Mono', monospace" }}>© 2025 TalentFlux</p>
           <div style={{ display: "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["/contact"]].map(([label, to]) => (
+            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
               <Link key={to} href={to} style={{ color: E.subtle, fontSize: ".7rem", textDecoration: "none", fontFamily: "'DM Mono', monospace", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = E.muted}
                 onMouseLeave={e => e.target.style.color = E.subtle}

@@ -686,7 +686,7 @@ export default function TalentFluxTelecom() {
           </div>
           <p style={{ color:C.subtle, fontSize:".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
           <div style={{ display:isMobile?"none":"flex", gap:16 }}>
-            {[["Confidentialité","/privacy"],["CGU","/cgu"],["/contact"]].map(([label,to]) => (
+            {[["Confidentialité","/privacy"],["CGU","/cgu"],["Contact", "/contact"]].map(([label,to]) => (
               <Link key={to} href={to} style={{ color:C.subtle, fontSize:".72rem", textDecoration:"none", transition:"color .2s" }} onMouseEnter={e=>e.target.style.color=C.muted} onMouseLeave={e=>e.target.style.color=C.subtle}>{label}</Link>
             ))}
           </div>

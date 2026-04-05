@@ -802,7 +802,7 @@ export default function TalentFluxIT() {
           </div>
           <p style={{ color: "#334155", fontSize: ".73rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité","/privacy"],["CGU","/cgu"],["/contact"]].map(([label, to]) => (
+            {[["Confidentialité","/privacy"],["CGU","/cgu"],["Contact", "/contact"]].map(([label, to]) => (
               <Link key={to} href={to} style={{ color: "#475569", fontSize: ".73rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e=>e.target.style.color="#94A3B8"} onMouseLeave={e=>e.target.style.color="#475569"}
               >{label}</Link>
