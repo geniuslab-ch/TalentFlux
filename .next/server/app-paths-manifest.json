@@ -1,0 +1,23 @@
+{
+  "/_not-found/page": "app/_not-found/page.js",
+  "/candidature/it/page": "app/candidature/it/page.js",
+  "/candidature/finance/page": "app/candidature/finance/page.js",
+  "/admin/page": "app/admin/page.js",
+  "/candidature/pharma/page": "app/candidature/pharma/page.js",
+  "/candidature/telecom/page": "app/candidature/telecom/page.js",
+  "/cgu/page": "app/cgu/page.js",
+  "/candidature/ingenierie/page": "app/candidature/ingenierie/page.js",
+  "/candidature/juridique/page": "app/candidature/juridique/page.js",
+  "/candidature/paysagisme/page": "app/candidature/paysagisme/page.js",
+  "/contact/page": "app/contact/page.js",
+  "/juridique/page": "app/juridique/page.js",
+  "/privacy/page": "app/privacy/page.js",
+  "/en/page": "app/en/page.js",
+  "/en/ingenierie/page": "app/en/ingenierie/page.js",
+  "/en/finance/page": "app/en/finance/page.js",
+  "/en/paysagisme/page": "app/en/paysagisme/page.js",
+  "/en/it/page": "app/en/it/page.js",
+  "/en/juridique/page": "app/en/juridique/page.js",
+  "/en/pharma/page": "app/en/pharma/page.js",
+  "/en/telecom/page": "app/en/telecom/page.js"
+}
