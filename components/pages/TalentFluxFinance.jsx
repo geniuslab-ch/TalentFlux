@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/contexts/LangContext";
 import { useMobile } from "@/utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -192,6 +193,7 @@ const StatBar = ({ label, value, pct, color, delay }) => {
 };
 
 export default function TalentFluxFinance() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [submitted, setSubmitted] = useState(false);

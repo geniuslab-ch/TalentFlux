@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/contexts/LangContext";
 import { useMobile } from "@/utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -152,6 +153,7 @@ const TelecomFeatureCard = ({ icon: Icon, accent, sub, title, desc, delay }) => 
 };
 
 export default function TalentFluxTelecom() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState("recruiter");
@@ -465,7 +467,7 @@ export default function TalentFluxTelecom() {
             {/* FORM */}
             <div style={{ background:"rgba(6,12,26,.95)", border:`1px solid ${C.border}`, borderRadius:22, overflow:"hidden" }}>
               <div style={{ display:"flex", borderBottom:`1px solid ${C.border}` }}>
-                {[{key:"recruiter",label:"🏢 Je recrute"},{key:"candidate",label:"📡 Je suis candidat"}].map(({ key, label }) => (
+                {[{key:"recruiter",label: lang === "en" ? "🏢 I'm hiring" : "🏢 Je recrute"},{key:"candidate",label: lang === "en" ? "📡 I'm a candidate" : "📡 Je suis candidat"}].map(({ key, label }) => (
                   <button key={key} onClick={() => setActiveTab(key)} style={{ flex:1, padding:"15px", border:"none", cursor:"pointer", background:activeTab===key?"linear-gradient(135deg,rgba(14,165,233,.15),rgba(56,189,248,.08))":"transparent", borderBottom:`2px solid ${activeTab===key?C.skyL:"transparent"}`, color:activeTab===key?C.text:C.subtle, fontWeight:700, fontSize:".84rem", transition:"all .25s", fontFamily:"'DM Sans',sans-serif" }}>{label}</button>
                 ))}
               </div>
@@ -562,7 +564,7 @@ export default function TalentFluxTelecom() {
                   <button onClick={handleSubmit} disabled={loading} style={{ width:"100%", padding:"14px 22px", borderRadius:13, border:"none", background:loading?"rgba(14,165,233,.4)":C.grad, color:"#fff", fontWeight:700, fontSize:".92rem", cursor:loading?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:9, boxShadow:loading?"none":"0 4px 22px rgba(14,165,233,.3)", transition:"all .3s", fontFamily:"'DM Sans',sans-serif" }}
                     onMouseEnter={e=>{if(!loading){e.currentTarget.style.boxShadow="0 8px 36px rgba(56,189,248,.55)"; e.currentTarget.style.transform="translateY(-2px)";}}}
                     onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 22px rgba(14,165,233,.3)"; e.currentTarget.style.transform="translateY(0)";}}>
-                    {loading ? <><div style={{ width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi...</> : <><Send size={16}/>{activeTab==="recruiter"?"Trouver mon expert télécom":"Envoyer ma candidature"}</>}
+                    {loading ? <><div style={{ width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi...</> : <><Send size={16}/>{lang === "en" ? (activeTab==="recruiter" ? "Find my telecom expert" : "Send my application") : (activeTab==="recruiter" ? "Trouver mon expert télécom" : "Envoyer ma candidature")}</>}
                   </button>
                   <p style={{ color:C.subtle, fontSize:".7rem", textAlign:"center", marginTop:9 }}>🔒 Données sécurisées · RGPD conforme</p>
                 </div>

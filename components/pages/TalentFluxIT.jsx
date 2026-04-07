@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/contexts/LangContext";
 import { useState, useEffect, useRef } from "react";
 import { useMobile } from "@/utils/responsive";
 import {
@@ -191,24 +192,25 @@ const FAQItem = ({ item, index }) => {
 // ── HERO TOGGLE ──────────────────────────
 const heroContent = {
   company: {
-    supertitle: "Pour les CTO et DRH",
+    supertitle: lang === "en" ? "For CTOs and HRDs" : "Pour les CTO et DRH",
     supColor: "#38BDF8",
     h1: <>Recrutement IT en Suisse romande :<br /><GradientText>votre filtre est obsolète, pas le talent.</GradientText></>,
     para: <>Accédez à un flux continu d'experts <strong style={{ color: "#CBD5E1" }}>validés par leurs pairs</strong>. Réduisez votre time-to-hire avec notre matching algorithmique.</>,
-    ctaLabel: "Recruter un Expert",
+    ctaLabel: lang === "en" ? "Hire an Expert" : "Recruter un Expert",
     ctaStyle: "primary",
   },
   candidate: {
-    supertitle: "Pour les Développeurs et Tech Leads",
+    supertitle: lang === "en" ? "For Developers and Tech Leads" : "Pour les Développeurs et Tech Leads",
     supColor: "#2DD4BF",
     h1: <>Développeur IT en Suisse romande :<br /><span style={{ background: "linear-gradient(135deg,#2DD4BF,#38BDF8,#A78BFA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>prouvez votre valeur en condition réelle.</span></>,
     para: <>Passez un test <strong style={{ color: "#CBD5E1" }}>pensé par des devs, pour des devs</strong>. Pair-programming, accès à Google autorisé, et vraie Code Review garantie.</>,
-    ctaLabel: "Rejoindre le Flux",
+    ctaLabel: lang === "en" ? "Join the Flow" : "Rejoindre le Flux",
     ctaStyle: "outline",
   },
 };
 
 export default function TalentFluxIT() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [isCandidate, setIsCandidate] = useState(false);
@@ -676,7 +678,7 @@ export default function TalentFluxIT() {
                     onMouseEnter={e=>{if(!loading){e.currentTarget.style.boxShadow="0 8px 36px rgba(14,165,233,.58)";e.currentTarget.style.transform="translateY(-2px)"}}}
                     onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 22px rgba(14,165,233,.38)";e.currentTarget.style.transform="translateY(0)"}}
                   >
-                    {loading?<><div style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>Envoi...</>:<><Send size={16}/>{activeTab==="recruiter"?"Lancer mon Recrutement IT":"Envoyer mon profil"}</>}
+                    {loading?<><div style={{width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite"}}/>Envoi...</>:<><Send size={16}/>{lang === "en" ? (activeTab==="recruiter" ? "Start IT Recruitment" : "Send my profile") : (activeTab==="recruiter" ? "Lancer mon Recrutement IT" : "Envoyer mon profil")}</>}
                   </button>
                   <p style={{ color: "#334155", fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données stockées sur Supabase · RGPD conforme</p>
                 </div>

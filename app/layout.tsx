@@ -4,25 +4,20 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://talentflux.ch"),
   title: {
     default: "TalentFlux — Recrutement Spécialisé en Suisse",
-    // Le template ajoute "| TalentFlux" automatiquement.
-    // Les pages ne doivent JAMAIS inclure "TalentFlux" dans leur title string.
     template: "%s | TalentFlux",
   },
   description:
     "Agence de recrutement spécialisée en Suisse : IT, Finance, Ingénierie, " +
     "Paysagisme, Télécommunications, Pharma & Life Sciences. Yverdon-les-Bains.",
-  openGraph: {
-    siteName: "TalentFlux",
-    locale: "fr_CH",
-    type: "website",
-  },
+  openGraph: { siteName: "TalentFlux", locale: "fr_CH", type: "website" },
   robots: { index: true, follow: true },
   alternates: { canonical: "https://talentflux.ch" },
 };
 
+// lang="fr" sur les pages FR (root)
+// lang="en" sur les pages EN via app/en/layout.tsx qui override <html>
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    // lang="fr" — obligatoire pour l'accessibilité et le SEO
     <html lang="fr">
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />

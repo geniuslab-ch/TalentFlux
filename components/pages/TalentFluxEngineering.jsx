@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/contexts/LangContext";
 import { useMobile } from "@/utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -203,6 +204,7 @@ const SelectField = ({ label, value, onChange, options, required }) => (
 );
 
 export default function TalentFluxEngineering() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [submitted, setSubmitted] = useState(false);

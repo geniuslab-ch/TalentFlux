@@ -1,4 +1,5 @@
 "use client";
+import { useLang } from "@/contexts/LangContext";
 import { useMobile } from "@/utils/responsive";
 import { useState, useEffect, useRef } from "react";
 import {
@@ -215,6 +216,7 @@ const FAQItem = ({ item, index }) => {
 
 // ── MAIN COMPONENT ──────────────────────────────────────
 export default function TalentFluxPaysagisme() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState("recruiter");
@@ -631,8 +633,8 @@ export default function TalentFluxPaysagisme() {
             <div style={{ background: "rgba(8,15,10,.95)", border: `1px solid ${C.border}`, borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: `1px solid ${C.border}` }}>
                 {[
-                  { key: "recruiter", label: "🏢 Je recrute" },
-                  { key: "candidate", label: "🌿 Je suis candidat" },
+                  { key: "recruiter", label: lang === "en" ? "🏢 I'm hiring" : "🏢 Je recrute" },
+                  { key: "candidate", label: lang === "en" ? "🌿 I'm a candidate" : "🌿 Je suis candidat" },
                 ].map(({ key, label }) => (
                   <button key={key} onClick={() => setActiveTab(key)} style={{
                     flex: 1, padding: "15px", border: "none", cursor: "pointer",
