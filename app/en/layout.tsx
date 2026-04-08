@@ -13,19 +13,8 @@ export const metadata: Metadata = {
   robots: { index: true, follow: true },
 };
 
-// Note: In Next.js App Router, nested layouts cannot override <html>.
-// The lang attribute is set via the hreflang alternates in metadata above.
-// For full lang="en" support, we inject it via a script on mount.
+// Layout simple sans script inline — évite les problèmes d'hydratation
+// lang="en" est signalé via les alternates hreflang dans metadata
 export default function EnLayout({ children }: { children: React.ReactNode }) {
-  return (
-    <>
-      {/* Switch html lang to "en" for this subtree */}
-      <script
-        dangerouslySetInnerHTML={{
-          __html: `document.documentElement.lang = "en";`,
-        }}
-      />
-      {children}
-    </>
-  );
+  return <>{children}</>;
 }
