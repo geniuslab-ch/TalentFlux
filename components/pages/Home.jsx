@@ -5,7 +5,8 @@ import Link from "next/link";
 import {
   ArrowRight, CheckCircle, ChevronDown, Star,
   Phone, Mail, MapPin, Users, Shield, Clock,
-  Terminal, FlaskConical, Cpu, Leaf, Signal, Landmark
+  Terminal, FlaskConical, Cpu, Leaf, Signal, Landmark,
+  Scale, HardHat
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -21,7 +22,7 @@ const useInView = (t = 0.12) => {
   return [ref, v];
 };
 
-// ── 6 verticales ────────────────────────────────────────────
+// ── 8 verticales — classées par cluster ──────────────────────
 const VERTICALS = [
   {
     key: "it",
@@ -124,6 +125,65 @@ const VERTICALS = [
     detail: "QA Managers, Responsible Person, experts AR, ingénieurs validation IQ/OQ/PQ — profils maîtrisant Swissmedic, ICH Q9 et les Annex GMP.",
     stats: [["Swissmedic","& EMA"],["6-10 jours","délai RP / Head QA"],["CDMO & Biotech","tous contextes"]],
     metiers: ["QA Manager / Director","Responsible Person","Affaires Réglementaires","Ingénieur Validation","Pharmacovigilance","R&D / Formulation"],
+  },
+  {
+    key: "juridique",
+    icon: Scale,
+    label: "Droit & Compliance",
+    tag: "Juridique",
+    accent: "#748FFC",
+    accentD: "#3B5BDB",
+    grad: "linear-gradient(135deg,#1B2A52,#2C3E80,#3B5BDB)",
+    bg: "rgba(116,143,252,.06)",
+    border: "rgba(116,143,252,.25)",
+    path: "/juridique",
+    candidature: "/candidature/juridique",
+    pitch: "GC, Avocats brevetés, Compliance FINMA, DPO nLPD",
+    detail: "General Counsel, avocats d'affaires, compliance officers FINMA, DPO certifiés nLPD/RGPD — profils soumis au secret professionnel, approchés par le réseau uniquement.",
+    stats: [["Brevet", "& barreau vérifié"],["6-10 jours","délai GC / Head Legal"],["NDA","si requis"]],
+    metiers: ["General Counsel","Avocat d'affaires","Compliance Officer FINMA","DPO / Data Privacy","Contract Manager","Médiateur accrédité"],
+  },
+  {
+    key: "btp",
+    icon: HardHat,
+    label: "BTP & Architecture",
+    tag: "BTP",
+    accent: "#FB923C",
+    accentD: "#C2410C",
+    grad: "linear-gradient(135deg,#92400E,#C2410C,#F97316)",
+    bg: "rgba(249,115,22,.06)",
+    border: "rgba(251,146,60,.25)",
+    path: "/btp",
+    candidature: "/candidature/btp",
+    pitch: "Chefs de chantier, Architectes SIA, Ingénieurs civils, CVSE",
+    detail: "Chefs de chantier seniors, architectes SIA, ingénieurs civils, spécialistes Minergie et responsables HSE OTConst — profils retenus avant même d'être disponibles.",
+    stats: [["SIA 118","& OTConst"],["48h","premiers profils"],["Minergie","& CECB"]],
+    metiers: ["Chef de chantier","Directeur de travaux","Architecte SIA","Ingénieur civil / structure","Ingénieur CVSE","Responsable HSE"],
+  },
+];
+
+// ── Clusters SEO — groupement par affinité métier ─────────────
+const CLUSTERS = [
+  {
+    key: "tech",
+    label: "Tech & Numérique",
+    color: "#38BDF8",
+    desc: "Profils techniques & digitaux",
+    verticals: ["it", "telecom", "ingenierie"],
+  },
+  {
+    key: "corporate",
+    label: "Corporate & Compliance",
+    color: "#D4AF5A",
+    desc: "Finance, droit et réglementation",
+    verticals: ["finance", "juridique", "pharma"],
+  },
+  {
+    key: "terrain",
+    label: "Terrain & Construction",
+    color: "#22C55E",
+    desc: "Métiers du chantier et de l'extérieur",
+    verticals: ["btp", "paysagisme"],
   },
 ];
 
@@ -288,7 +348,7 @@ export default function Home() {
       {/* ══ NAV ══════════════════════════════════════════════ */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 66, background: scrolled ? "rgba(8,13,26,0.96)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(255,255,255,.06)" : "none", transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
+          <img src="/logo.png" alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
         </div>
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.4rem", alignItems: "center" }}>
           {[["Verticales", "verticales"], ["Notre approche", "approche"]].map(([label, id]) => (
@@ -364,7 +424,7 @@ export default function Home() {
 
           {/* Chiffres clés */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 20 : 36, paddingTop: 36, borderTop: "1px solid rgba(255,255,255,.06)" }}>
-            {[["6","Secteurs spécialisés"],["100%","Au succès"],["3 mois","Garantie remplacement"],["CH","Suisse romande & alémanique"]].map(([v, l], i) => (
+            {[["8","Secteurs spécialisés"],["100%","Au succès"],["3 mois","Garantie remplacement"],["CH","Suisse romande & alémanique"]].map(([v, l], i) => (
               <StatCard key={i} value={v} label={l} delay={i * 100} />
             ))}
           </div>
@@ -378,7 +438,7 @@ export default function Home() {
       <section id="verticales" style={{ padding: isMobile ? "64px 1.4rem" : "100px 2rem", background: "rgba(6,10,20,.6)", borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Nos 6 verticales</div>
+            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Nos 8 verticales</div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.7rem,4vw,2.8rem)", fontWeight: 800, lineHeight: 1.2, color: "#F1F5F9", marginBottom: 14 }}>
               Un recruteur expert<br />dans chaque secteur
             </h2>
@@ -387,12 +447,27 @@ export default function Home() {
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "260px 1fr", gap: isMobile ? 20 : 24, alignItems: "start" }}>
-            {/* Onglets */}
-            <div style={{ display: "flex", flexDirection: isMobile ? "row" : "column", gap: isMobile ? 8 : 6, overflowX: isMobile ? "auto" : "unset", paddingBottom: isMobile ? 4 : 0 }}>
-              {VERTICALS.map(v => (
-                <VerticalCard key={v.key} v={v} active={activeTab} onClick={setActiveTab} isMobile={isMobile} />
-              ))}
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "300px 1fr", gap: isMobile ? 20 : 24, alignItems: "start" }}>
+            {/* Navigation groupée par cluster */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+              {CLUSTERS.map(cluster => {
+                const clusterVerticals = VERTICALS.filter(v => cluster.verticals.includes(v.key));
+                return (
+                  <div key={cluster.key}>
+                    {/* Header cluster */}
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 8, paddingLeft: 4 }}>
+                      <div style={{ width: 3, height: 16, borderRadius: 2, background: cluster.color, flexShrink: 0 }} />
+                      <span style={{ color: cluster.color, fontSize: ".65rem", fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>{cluster.label}</span>
+                    </div>
+                    {/* Cartes du cluster */}
+                    <div style={{ display: "flex", flexDirection: isMobile ? "row" : "column", gap: isMobile ? 8 : 5, overflowX: isMobile ? "auto" : "unset" }}>
+                      {clusterVerticals.map(v => (
+                        <VerticalCard key={v.key} v={v} active={activeTab} onClick={setActiveTab} isMobile={isMobile} />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
             </div>
 
             {/* Panneau détail */}
@@ -401,17 +476,31 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Grille rapide toutes verticales */}
-          <div style={{ marginTop: 52, display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : isTablet ? "repeat(3,1fr)" : "repeat(6,1fr)", gap: 12 }}>
-            {VERTICALS.map(v => {
-              const Icon = v.icon;
+          {/* Grille rapide toutes verticales — groupées par cluster */}
+          <div style={{ marginTop: 52 }}>
+            {CLUSTERS.map(cluster => {
+              const clusterVerticals = VERTICALS.filter(v => cluster.verticals.includes(v.key));
               return (
-                <Link key={v.key} href={v.path} style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "18px 12px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", transition: "all .25s" }}
-                  onMouseEnter={e => { e.currentTarget.style.background = v.bg; e.currentTarget.style.borderColor = v.border; e.currentTarget.style.transform = "translateY(-3px)"; }}
-                  onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.02)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                  <Icon size={20} style={{ color: v.accent }} strokeWidth={1.5} />
-                  <span style={{ color: "#94A3B8", fontSize: ".78rem", fontWeight: 600, textAlign: "center" }}>{v.label}</span>
-                </Link>
+                <div key={cluster.key} style={{ marginBottom: 32 }}>
+                  <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
+                    <div style={{ width: 3, height: 18, borderRadius: 2, background: cluster.color }} />
+                    <span style={{ color: cluster.color, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase" }}>{cluster.label}</span>
+                    <span style={{ color: "#334155", fontSize: ".68rem" }}>— {cluster.desc}</span>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : `repeat(${clusterVerticals.length},1fr)`, gap: 12 }}>
+                    {clusterVerticals.map(v => {
+                      const Icon = v.icon;
+                      return (
+                        <Link key={v.key} href={v.path} style={{ textDecoration: "none", display: "flex", flexDirection: "column", alignItems: "center", gap: 8, padding: "18px 12px", borderRadius: 16, background: "rgba(255,255,255,.02)", border: "1px solid rgba(255,255,255,.06)", transition: "all .25s" }}
+                          onMouseEnter={e => { e.currentTarget.style.background = v.bg; e.currentTarget.style.borderColor = v.border; e.currentTarget.style.transform = "translateY(-3px)"; }}
+                          onMouseLeave={e => { e.currentTarget.style.background = "rgba(255,255,255,.02)"; e.currentTarget.style.borderColor = "rgba(255,255,255,.06)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+                          <Icon size={20} style={{ color: v.accent }} strokeWidth={1.5} />
+                          <span style={{ color: "#94A3B8", fontSize: ".78rem", fontWeight: 600, textAlign: "center" }}>{v.label}</span>
+                        </Link>
+                      );
+                    })}
+                  </div>
+                </div>
               );
             })}
           </div>
@@ -577,7 +666,7 @@ export default function Home() {
       <footer style={{ borderTop: "1px solid rgba(255,255,255,.06)", padding: "28px 2rem" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
+            <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
             <span style={{ color: "#334155", fontSize: ".72rem" }}>Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse</span>
           </div>
           <p style={{ color: "#1E3A5F", fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. Tous droits réservés.</p>
