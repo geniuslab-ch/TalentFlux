@@ -231,8 +231,9 @@ export default function CandidatureForm({ secteur, theme, labels }) {
       if (form.cv_file) {
         const san=s=>s.normalize("NFD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-zA-Z0-9_-]/g,"_");
         const fn=`${Date.now()}_${san(form.prenom)}_${san(form.nom)}.pdf`;
-        const {error:upErr}=await supabase.storage.from("contact-pdfs").upload(`cv/${fn}`,form.cv_file,{contentType:"application/pdf"});
-        if (!upErr){cvFileName=fn;cvUrl=`cv/${fn}`;}
+        const {error:upErr}=await supabase.storage.from("contact-pdfs").upload(`submissions/${fn}`,form.cv_file,{contentType:"application/pdf"});
+        if (upErr) throw new Error("Erreur lors de l'envoi du CV : " + upErr.message);
+        cvFileName=fn; cvUrl=`submissions/${fn}`;
       }
 
       const isIT  = secteur==="IT";
