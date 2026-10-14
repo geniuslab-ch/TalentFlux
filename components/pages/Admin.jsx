@@ -4,7 +4,7 @@ import { supabase } from "@/lib/supabase";
 import {
   Users, Briefcase, Star, Trophy, LogOut, Plus, X,
   ChevronDown, ChevronUp, Search, RefreshCw, AlertTriangle,
-  CheckCircle, Clock, Link2, Eye, Save, Shield, Zap, Sparkles, Bot
+  CheckCircle, Clock, Link2, Eye, Save, Shield, Zap, Sparkles, Bot, Inbox, ArrowRight
 } from "lucide-react";
 
 // ── Design tokens ─────────────────────────────────────────
@@ -1529,8 +1529,127 @@ function TabShortlist() {
   );
 }
 
+// ── TAB DEMANDES (contact_submissions type=recruiter) ─────
+function TabDemandes() {
+  const [rows, setRows]       = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [converting, setConverting] = useState(null);
+  const [done, setDone]       = useState({});
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("contact_submissions")
+        .select("*")
+        .eq("type", "recruiter")
+        .order("created_at", { ascending: false });
+      setRows(data || []);
+      setLoading(false);
+    })();
+  }, []);
+
+  const convertToMandat = async (row) => {
+    setConverting(row.id);
+    try {
+      const { error } = await supabase.from("mandats").insert({
+        titre_poste:  row.role || "Poste à définir",
+        secteur:      row.sector || row.secteur || "Non spécifié",
+        statut:       "Ouvert",
+        localisation: "Suisse",
+        remote_policy:"Hybride",
+        // On stocke les infos contact dans description
+        description:  [
+          row.company ? `Entreprise : ${row.company}` : null,
+          `Contact : ${row.first_name || ""} ${row.last_name || ""} <${row.email}>`,
+          row.phone ? `Tél : ${row.phone}` : null,
+          row.message ? `\nMessage :\n${row.message}` : null,
+        ].filter(Boolean).join("\n"),
+      });
+      if (error) throw error;
+      // Mark as processed
+      await supabase.from("contact_submissions").update({ status: "processed" }).eq("id", row.id);
+      setDone(d => ({ ...d, [row.id]: true }));
+    } catch (e) {
+      alert("Erreur : " + e.message);
+    } finally {
+      setConverting(null);
+    }
+  };
+
+  const SECTOR_COLOR = {
+    it: C.blue, finance: C.gold, ingenierie: C.teal,
+    juridique: "#748FFC", btp: "#F97316", pharma: "#A78BFA",
+    paysagisme: "#22C55E", telecom: C.teal,
+  };
+
+  if (loading) return <div style={{ color: C.subtle, padding: 40, textAlign: "center" }}>Chargement…</div>;
+  if (!rows.length) return (
+    <div style={{ textAlign: "center", padding: 60, color: C.subtle }}>
+      <Inbox size={32} style={{ marginBottom: 12, opacity: .4 }} />
+      <p>Aucune demande entrante</p>
+    </div>
+  );
+
+  return (
+    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+      <p style={{ color: C.subtle, fontSize: ".82rem", marginBottom: 4 }}>
+        {rows.length} demande{rows.length > 1 ? "s" : ""} reçue{rows.length > 1 ? "s" : ""} via les formulaires du site
+      </p>
+      {rows.map(row => {
+        const isConverted = done[row.id] || row.status === "processed";
+        const sColor = SECTOR_COLOR[row.sector] || C.subtle;
+        return (
+          <div key={row.id} style={{ background: C.card, border: `1px solid ${isConverted ? "rgba(34,197,94,.3)" : C.border}`, borderRadius: 14, padding: "18px 22px" }}>
+            <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, flexWrap: "wrap" }}>
+              <div style={{ flex: 1 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
+                  <span style={{ background: `${sColor}20`, color: sColor, border: `1px solid ${sColor}40`, borderRadius: 6, padding: "2px 8px", fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em" }}>
+                    {row.sector || "—"}
+                  </span>
+                  <span style={{ color: C.subtle, fontSize: ".75rem" }}>
+                    {new Date(row.created_at).toLocaleDateString("fr-CH", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" })}
+                  </span>
+                  {isConverted && <span style={{ color: "#22C55E", fontSize: ".72rem", fontWeight: 700 }}>✓ Converti</span>}
+                </div>
+                <p style={{ color: C.text, fontWeight: 700, fontSize: ".95rem", marginBottom: 4 }}>
+                  {row.first_name} {row.last_name}
+                  {row.company && <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 8 }}>· {row.company}</span>}
+                </p>
+                {row.role && <p style={{ color: C.blue, fontSize: ".85rem", marginBottom: 6 }}>Poste : {row.role}</p>}
+                <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
+                  <a href={`mailto:${row.email}`} style={{ color: C.subtle, fontSize: ".8rem", textDecoration: "none" }}>{row.email}</a>
+                  {row.phone && <span style={{ color: C.subtle, fontSize: ".8rem" }}>{row.phone}</span>}
+                </div>
+                {row.message && (
+                  <p style={{ color: C.subtle, fontSize: ".82rem", marginTop: 10, lineHeight: 1.6, borderLeft: `2px solid ${C.border}`, paddingLeft: 10 }}>
+                    {row.message}
+                  </p>
+                )}
+              </div>
+              <div style={{ flexShrink: 0 }}>
+                {!isConverted ? (
+                  <button
+                    onClick={() => convertToMandat(row)}
+                    disabled={converting === row.id}
+                    style={{ display: "flex", alignItems: "center", gap: 7, padding: "9px 16px", borderRadius: 9, border: "none", cursor: converting === row.id ? "wait" : "pointer", background: C.gold, color: "#0B0F1A", fontWeight: 700, fontSize: ".82rem", fontFamily: "'DM Sans',sans-serif", opacity: converting === row.id ? .6 : 1 }}>
+                    <ArrowRight size={14} />
+                    {converting === row.id ? "En cours…" : "→ Créer mandat"}
+                  </button>
+                ) : (
+                  <span style={{ color: "#22C55E", fontSize: ".82rem", fontWeight: 700 }}>✓ Dans Mandats</span>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
 // ── ADMIN MAIN ────────────────────────────────────────────
 const TABS = [
+  { id: "demandes",    label: "Demandes",    icon: Inbox,     color: "#F97316" },
   { id: "candidats",   label: "Candidats",   icon: Users,     color: C.blue },
   { id: "mandats",     label: "Mandats",     icon: Briefcase, color: C.gold },
   { id: "evaluations", label: "Évaluations", icon: Star,      color: C.teal },
@@ -1609,6 +1728,7 @@ export default function Admin() {
 
         {/* Content */}
         <div style={{ padding: 28 }}>
+          {tab === "demandes"    && <TabDemandes />}
           {tab === "candidats"   && <TabCandidats />}
           {tab === "mandats"     && <TabMandats />}
           {tab === "evaluations" && <TabEvaluations />}
