@@ -1551,9 +1551,18 @@ function TabDemandes() {
   const convertToMandat = async (row) => {
     setConverting(row.id);
     try {
+      const SECTOR_MAP = {
+        it: "IT", finance: "Finance", ingenierie: "Ingénierie",
+        paysagisme: "Paysagisme", telecom: "Télécommunications",
+        "télécommunications": "Télécommunications",
+        pharma: "Pharma & Life Sciences", juridique: "Juridique", btp: "BTP",
+      };
+      const rawSector = (row.sector || row.secteur || "").toLowerCase();
+      const secteur = SECTOR_MAP[rawSector] || row.sector || "IT";
+
       const { error } = await supabase.from("mandats").insert({
         titre_poste:  row.role || "Poste à définir",
-        secteur:      row.sector || row.secteur || "Non spécifié",
+        secteur,
         statut:       "Ouvert",
         localisation: "Suisse",
         remote_policy:"Hybride",
