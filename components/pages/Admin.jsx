@@ -1557,13 +1557,6 @@ function TabDemandes() {
         statut:       "Ouvert",
         localisation: "Suisse",
         remote_policy:"Hybride",
-        // On stocke les infos contact dans description
-        description:  [
-          row.company ? `Entreprise : ${row.company}` : null,
-          `Contact : ${row.first_name || ""} ${row.last_name || ""} <${row.email}>`,
-          row.phone ? `Tél : ${row.phone}` : null,
-          row.message ? `\nMessage :\n${row.message}` : null,
-        ].filter(Boolean).join("\n"),
       });
       if (error) throw error;
       // Mark as processed
