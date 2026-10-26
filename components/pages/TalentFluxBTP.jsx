@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import CandidatureBTP from "@/components/pages/CandidatureBTP";
 
 // ── useInView défini HORS du composant ────────────────────────
 const useInView = (t = 0.12) => {
@@ -453,7 +454,9 @@ export default function TalentFluxBTP() {
                 ))}
               </div>
 
-              {!submitted ? (
+              {activeTab === "candidate" ? (
+                <CandidatureBTP embedded />
+              ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
                     {[["Prénom *", "firstName", "Jean"], ["Nom *", "lastName", "Dupont"]].map(([label, key, ph]) => (
@@ -479,48 +482,31 @@ export default function TalentFluxBTP() {
                         onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
                         onBlur={e => { e.target.style.borderColor = C.border; }} />
                     </div>
-                    {activeTab === "recruiter" ? (
-                      <>
-                        <div>
-                          <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Entreprise *</label>
-                          <input placeholder="BTP Construct SA" value={form.company} onChange={set("company")}
-                            style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-                            onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
-                            onBlur={e => { e.target.style.borderColor = C.border; }} />
-                        </div>
-                        <div>
-                          <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Profil recherché</label>
-                          <select value={form.specialite} onChange={set("specialite")}
-                            style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: `1px solid ${C.border}`, color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
-                            <option value="">Sélectionner...</option>
-                            {["Chef de chantier (GC / Spécialisé)", "Directeur de travaux / Conducteur de travaux", "Architecte (SIA / HEIA)", "Ingénieur civil / structure", "Ingénieur CVSE", "Responsable HSE / Sécurité chantier", "Géomètre-expert / Géomaticien", "BIM Manager / Coordinateur BIM", "Responsable développement durable / Minergie", "Autre profil BTP"].map(o => (
-                              <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-                            ))}
-                          </select>
-                        </div>
-                      </>
-                    ) : (
-                      <div>
-                        <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Ma spécialité</label>
-                        <select value={form.specialite} onChange={set("specialite")}
-                          style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: `1px solid ${C.border}`, color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
-                          <option value="">Sélectionner...</option>
-                          {["Chef de chantier", "Directeur / Conducteur de travaux", "Architecte", "Ingénieur civil / structure", "Ingénieur CVSE", "Responsable HSE", "Géomètre", "BIM Manager", "Technicien / Dessinateur", "Autre"].map(o => (
-                            <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-                          ))}
-                        </select>
-                      </div>
-                    )}
+                    <div>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Entreprise *</label>
+                      <input placeholder="BTP Construct SA" value={form.company} onChange={set("company")}
+                        style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
+                        onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
+                        onBlur={e => { e.target.style.borderColor = C.border; }} />
+                    </div>
+                    <div>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Profil recherché</label>
+                      <select value={form.specialite} onChange={set("specialite")}
+                        style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: `1px solid ${C.border}`, color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
+                        <option value="">Sélectionner...</option>
+                        {["Chef de chantier (GC / Spécialisé)", "Directeur de travaux / Conducteur de travaux", "Architecte (SIA / HEIA)", "Ingénieur civil / structure", "Ingénieur CVSE", "Responsable HSE / Sécurité chantier", "Géomètre-expert / Géomaticien", "BIM Manager / Coordinateur BIM", "Responsable développement durable / Minergie", "Autre profil BTP"].map(o => (
+                          <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
+                        ))}
+                      </select>
+                    </div>
                   </div>
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      {activeTab === "recruiter" ? "Description du poste & contexte chantier" : "Expériences clés & disponibilité"}
+                      Description du poste & contexte chantier
                     </label>
                     <textarea
-                      placeholder={activeTab === "recruiter"
-                        ? "Ex: Chef de chantier béton armé, chantier logements collectifs 8M CHF, Vaud, maîtrise SIA 118, expérience Minergie souhaitée, disponible dans 2 mois..."
-                        : "Ex: Chef de chantier 12 ans, structure béton et bois, chantiers jusqu'à 15M CHF, bilingue FR/DE, brevet fédéral, Minergie P, disponible sous 3 mois..."}
+                      placeholder="Ex: Chef de chantier béton armé, chantier logements collectifs 8M CHF, Vaud, maîtrise SIA 118, expérience Minergie souhaitée, disponible dans 2 mois..."
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
@@ -529,7 +515,7 @@ export default function TalentFluxBTP() {
 
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      {activeTab === "recruiter" ? "Cahier des charges (optionnel)" : "CV (optionnel)"} <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
+                      Cahier des charges (optionnel) <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -570,7 +556,7 @@ export default function TalentFluxBTP() {
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(249,115,22,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                     {loading
                       ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
-                      : <><Send size={16} />{activeTab === "recruiter" ? (lang === "en" ? "Send my brief" : "Envoyer mon brief") : (lang === "en" ? "Send my application" : "Envoyer ma candidature")}</>}
+                      : <><Send size={16} />{lang === "en" ? "Send my brief" : "Envoyer mon brief"}</>}
                   </button>
                   <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données protégées · LPD suisse & RGPD conformes</p>
                 </div>

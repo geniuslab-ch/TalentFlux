@@ -5,7 +5,7 @@ import { Scale, Send, Upload, X, FileText, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
-export default function CandidatureJuridique() {
+export default function CandidatureJuridique({ embedded = false }) {
   const { isMobile } = useMobile();
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -87,33 +87,25 @@ export default function CandidatureJuridique() {
     </div>
   );
 
-  if (submitted) return (
-    <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif", padding: "2rem" }}>
-      <div style={{ textAlign: "center", maxWidth: 480 }}>
+  if (submitted) {
+    const successContent = (
+      <div style={{ textAlign: "center", padding: embedded ? "40px 26px" : undefined, maxWidth: embedded ? undefined : 480 }}>
         <div style={{ fontSize: 48, marginBottom: 20 }}>⚖️</div>
-        <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: "1.8rem", marginBottom: 12 }}>Dossier transmis</h1>
+        <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: embedded ? "1.25rem" : "1.8rem", marginBottom: 12 }}>Dossier transmis</h1>
         <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: 24 }}>Merci <strong style={{ color: C.text }}>{form.firstName}</strong>. Un consultant TalentFlux examine votre profil et vous répond sous <strong style={{ color: C.blueL }}>2h ouvrées</strong>.</p>
-        <Link href="/juridique" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", borderRadius: 13, background: C.grad, color: "#fff", textDecoration: "none", fontWeight: 700, fontSize: ".9rem" }}>← Retour</Link>
+        {!embedded && <Link href="/juridique" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", borderRadius: 13, background: C.grad, color: "#fff", textDecoration: "none", fontWeight: 700, fontSize: ".9rem" }}>← Retour</Link>}
       </div>
-    </div>
-  );
+    );
+    if (embedded) return successContent;
+    return (
+      <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif", padding: "2rem" }}>
+        {successContent}
+      </div>
+    );
+  }
 
-  return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", padding: isMobile ? "80px 1.4rem 40px" : "100px 2rem 60px" }}>
-      <div style={{ maxWidth: 640, margin: "0 auto" }}>
-        <Link href="/juridique" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: C.muted, fontSize: ".84rem", textDecoration: "none", marginBottom: 32 }}>← Retour à la verticale juridique</Link>
-
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(59,91,219,.15)", border: "1px solid rgba(116,143,252,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Scale size={20} style={{ color: C.blueL }} strokeWidth={1.5} />
-          </div>
-          <div>
-            <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: "1.4rem", margin: 0 }}>Déposer mon dossier juridique</h1>
-            <p style={{ color: C.muted, fontSize: ".82rem", margin: 0 }}>Confidentiel · Sans diffusion publique · LPD suisse conforme</p>
-          </div>
-        </div>
-
-        <div style={{ background: "rgba(10,14,30,.92)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 22, padding: isMobile ? 20 : 32 }}>
+  const formContent = (
+    <div style={{ background: "rgba(10,14,30,.92)", border: "1px solid rgba(255,255,255,.07)", borderRadius: embedded ? 0 : 22, padding: isMobile ? 20 : 32 }}>
 
           {/* — Informations personnelles — */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
@@ -272,6 +264,24 @@ export default function CandidatureJuridique() {
           </button>
           <p style={{ color: C.muted, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Traitement confidentiel · LPD suisse & RGPD conformes</p>
         </div>
+  );
+
+  if (embedded) return formContent;
+
+  return (
+    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", padding: isMobile ? "80px 1.4rem 40px" : "100px 2rem 60px" }}>
+      <div style={{ maxWidth: 640, margin: "0 auto" }}>
+        <Link href="/juridique" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: C.muted, fontSize: ".84rem", textDecoration: "none", marginBottom: 32 }}>← Retour à la verticale juridique</Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
+          <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(59,91,219,.15)", border: "1px solid rgba(116,143,252,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
+            <Scale size={20} style={{ color: C.blueL }} strokeWidth={1.5} />
+          </div>
+          <div>
+            <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: "1.4rem", margin: 0 }}>Déposer mon dossier juridique</h1>
+            <p style={{ color: C.muted, fontSize: ".82rem", margin: 0 }}>Confidentiel · Sans diffusion publique · LPD suisse conforme</p>
+          </div>
+        </div>
+        {formContent}
       </div>
     </div>
   );

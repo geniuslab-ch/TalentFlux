@@ -10,6 +10,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import CandidatureForm from "@/components/CandidatureForm";
+
+const THEME_PHA = { accent: "#C026D3", btnGradient: "linear-gradient(135deg, #7C3AED, #C026D3, #E879F9)", btnShadow: "0 4px 24px rgba(192,38,211,0.4)", btnTextColor: "#fff" };
+const LABELS_PHA = { submitBtn: "Soumettre ma candidature Pharma & Life Sciences" };
 
 // ── Intersection observer hook ──────────────────────────────
 const useInView = (t = 0.12) => {
@@ -477,48 +481,37 @@ export default function TalentFluxPharma() {
                 ))}
               </div>
 
-              {!submitted ? (
+              {activeTab === "candidate" ? (
+                <div style={{ padding: 24 }}>
+                  <CandidatureForm secteur="Pharma & Life Sciences" theme={THEME_PHA} labels={LABELS_PHA} />
+                </div>
+              ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
                     <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
                     <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="s.martin@pharma.ch" value={form.email} onChange={set("email")} required />
                     <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    {activeTab === "recruiter" ? <>
-                      <InputField label="Entreprise" placeholder="Roche / Lonza / biotech..." value={form.company} onChange={set("company")} required />
-                      <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
-                        { value: "", label: "Sélectionner" },
-                        { value: "QA Manager", label: "QA Manager / Director" },
-                        { value: "Affaires Réglementaires", label: "Affaires Réglementaires (AR)" },
-                        { value: "QC", label: "QC / Contrôle qualité" },
-                        { value: "Production GMP", label: "Responsable Production GMP" },
-                        { value: "Validation", label: "Ingénieur Validation (IQ/OQ/PQ / CSV)" },
-                        { value: "Pharmacovigilance", label: "Pharmacovigilance / QPPV" },
-                        { value: "R&D", label: "R&D / Formulation" },
-                        { value: "HSE", label: "HSE / EHS" },
-                        { value: "Responsible Person", label: "Responsible Person (RP)" },
-                      ]} />
-                    </> : <>
-                      <SelectField label="Ma spécialité" value={form.specialite} onChange={set("specialite")} options={[
-                        { value: "", label: "Sélectionner" },
-                        { value: "QA Manager", label: "QA / Assurance qualité" },
-                        { value: "Affaires Réglementaires", label: "Affaires Réglementaires" },
-                        { value: "QC", label: "QC / Contrôle qualité" },
-                        { value: "Production GMP", label: "Production GMP" },
-                        { value: "Validation", label: "Validation / CSV" },
-                        { value: "Pharmacovigilance", label: "Pharmacovigilance" },
-                        { value: "R&D", label: "R&D / Formulation" },
-                        { value: "HSE", label: "HSE / EHS" },
-                        { value: "Autre", label: "Autre profil pharma / biotech" },
-                      ]} />
-                    </>}
+                    <InputField label="Entreprise" placeholder="Roche / Lonza / biotech..." value={form.company} onChange={set("company")} required />
+                    <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
+                      { value: "", label: "Sélectionner" },
+                      { value: "QA Manager", label: "QA Manager / Director" },
+                      { value: "Affaires Réglementaires", label: "Affaires Réglementaires (AR)" },
+                      { value: "QC", label: "QC / Contrôle qualité" },
+                      { value: "Production GMP", label: "Responsable Production GMP" },
+                      { value: "Validation", label: "Ingénieur Validation (IQ/OQ/PQ / CSV)" },
+                      { value: "Pharmacovigilance", label: "Pharmacovigilance / QPPV" },
+                      { value: "R&D", label: "R&D / Formulation" },
+                      { value: "HSE", label: "HSE / EHS" },
+                      { value: "Responsible Person", label: "Responsible Person (RP)" },
+                    ]} />
                   </div>
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      {activeTab === "recruiter" ? "Description du besoin" : "Parcours et certifications"}
+                      Description du besoin
                     </label>
-                    <textarea placeholder={activeTab === "recruiter" ? "Ex: QA Manager avec expérience audits Swissmedic, maîtrise ICH Q9/Q10, contexte CDMO, canton VD, anglais C1..." : "Ex: 8 ans QA industrie pharma solide orale, expertise CAPA et change control, bilingue FR/DE, maîtrise TrackWise, disponible dans 3 mois..."}
+                    <textarea placeholder="Ex: QA Manager avec expérience audits Swissmedic, maîtrise ICH Q9/Q10, contexte CDMO, canton VD, anglais C1..."
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "12px 15px", borderRadius: 12, background: "rgba(8,2,16,.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", transition: "all .25s", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(232,121,249,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(192,38,211,.06)"; }}
@@ -528,7 +521,7 @@ export default function TalentFluxPharma() {
 
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      {activeTab === "recruiter" ? "Cahier des charges" : "CV"} <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      Cahier des charges <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -566,7 +559,7 @@ export default function TalentFluxPharma() {
                   <button onClick={handleSubmit} disabled={loading} style={{ width: "100%", padding: "14px 22px", borderRadius: 13, border: "none", background: loading ? "rgba(192,38,211,.4)" : C.grad, color: "#fff", fontWeight: 700, fontSize: ".92rem", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, boxShadow: loading ? "none" : "0 4px 22px rgba(192,38,211,.3)", transition: "all .3s", fontFamily: "'DM Sans',sans-serif" }}
                     onMouseEnter={e => { if (!loading) { e.currentTarget.style.boxShadow = "0 8px 36px rgba(232,121,249,.55)"; e.currentTarget.style.transform = "translateY(-2px)"; } }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(192,38,211,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-                    {loading ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</> : <><Send size={16} />{lang === "en" ? (activeTab === "recruiter" ? "Find my pharma expert" : "Send my application") : (activeTab === "recruiter" ? "Trouver mon expert pharma" : "Envoyer ma candidature")}</>}
+                    {loading ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</> : <><Send size={16} />{lang === "en" ? "Find my pharma expert" : "Trouver mon expert pharma"}</>}
                   </button>
                   <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données sécurisées · RGPD conforme</p>
                 </div>

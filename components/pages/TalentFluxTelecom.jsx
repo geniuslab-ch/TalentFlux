@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import CandidatureForm from "@/components/CandidatureForm";
+
+const THEME_TEL = { accent:"#0EA5E9", btnGradient:"linear-gradient(135deg,#0369A1,#0EA5E9,#38BDF8)", btnShadow:"0 4px 24px rgba(14,165,233,0.4)", btnTextColor:"#fff" };
+const LABELS_TEL = { submitBtn:"Soumettre ma candidature Télécom" };
 
 const useInView = (t = 0.12) => {
   const ref = useRef(null);
@@ -472,50 +476,35 @@ export default function TalentFluxTelecom() {
                 ))}
               </div>
 
-              {!submitted ? (
+              {activeTab === "candidate" ? (
+                <div style={{ padding:24 }}>
+                  <CandidatureForm secteur="Télécommunications" theme={THEME_TEL} labels={LABELS_TEL} />
+                </div>
+              ) : !submitted ? (
                 <div style={{ padding:24 }}>
                   <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12, marginBottom:12 }}>
                     <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
                     <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="s.martin@telco.ch" value={form.email} onChange={set("email")} required />
                     <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    {activeTab === "recruiter" ? <>
-                      <InputField label="Entreprise" placeholder="Opérateur / Bureau télécom" value={form.company} onChange={set("company")} required />
-                      <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
-                        {value:"",label:"Sélectionner"},
-                        {value:"Spécialiste RNI",label:"Spécialiste RNI"},
-                        {value:"RF Planner",label:"RF Planner"},
-                        {value:"Géomaticien télécom",label:"Géomaticien télécom"},
-                        {value:"Technicien fibre",label:"Technicien fibre"},
-                        {value:"Ingénieur transmission",label:"Ingénieur transmission"},
-                        {value:"Pilote drone certifié",label:"Pilote drone certifié OFAC"},
-                        {value:"Expert conformité",label:"Expert conformité OFCOM/ORNI"},
-                      ]} />
-                    </> : <>
-                      <SelectField label="Ma spécialité" value={form.specialite} onChange={set("specialite")} options={[
-                        {value:"",label:"Sélectionner"},
-                        {value:"Spécialiste RNI",label:"Spécialiste RNI"},
-                        {value:"RF Planner",label:"RF Planner"},
-                        {value:"Géomaticien",label:"Géomaticien"},
-                        {value:"Technicien fibre",label:"Technicien fibre"},
-                        {value:"Pilote drone",label:"Pilote drone OFAC"},
-                        {value:"Autre",label:"Autre profil télécom"},
-                      ]} />
-                      <div style={{ display:"flex", alignItems:"center", gap:10, padding:"12px 14px", borderRadius:12, background:"rgba(14,165,233,.05)", border:`1px solid ${C.border}` }}>
-                        <input type="checkbox" checked={form.certif_drone} onChange={e => setForm(f => ({...f, certif_drone:e.target.checked}))} style={{ width:16, height:16, accentColor:C.sky }} />
-                        <div>
-                          <div style={{ color:C.text, fontWeight:600, fontSize:".84rem" }}>Certification drone OFAC</div>
-                          <div style={{ color:C.subtle, fontSize:".72rem" }}>A1/A2/A3 en cours de validité</div>
-                        </div>
-                      </div>
-                    </>}
+                    <InputField label="Entreprise" placeholder="Opérateur / Bureau télécom" value={form.company} onChange={set("company")} required />
+                    <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
+                      {value:"",label:"Sélectionner"},
+                      {value:"Spécialiste RNI",label:"Spécialiste RNI"},
+                      {value:"RF Planner",label:"RF Planner"},
+                      {value:"Géomaticien télécom",label:"Géomaticien télécom"},
+                      {value:"Technicien fibre",label:"Technicien fibre"},
+                      {value:"Ingénieur transmission",label:"Ingénieur transmission"},
+                      {value:"Pilote drone certifié",label:"Pilote drone certifié OFAC"},
+                      {value:"Expert conformité",label:"Expert conformité OFCOM/ORNI"},
+                    ]} />
                   </div>
 
                   <div style={{ marginBottom:12 }}>
                     <label style={{ display:"block", color:C.subtle, fontSize:".7rem", fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", marginBottom:7 }}>
-                      {activeTab==="recruiter"?"Description du besoin":"Parcours et certifications"}
+                      Description du besoin
                     </label>
-                    <textarea placeholder={activeTab==="recruiter"?"Ex: Spécialiste RNI autonome pour constituer les fiches ORNI et dossiers de permis, canton VD/GE, certification drone souhaitée...":"Ex: CFC géomaticien, 5 ans expérience RNI, certifié Narda SRM-3006, OFAC A2 valide, bilingue FR/DE, disponible mai..."}
+                    <textarea placeholder="Ex: Spécialiste RNI autonome pour constituer les fiches ORNI et dossiers de permis, canton VD/GE, certification drone souhaitée..."
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width:"100%", padding:"12px 15px", borderRadius:12, background:"rgba(4,10,24,.8)", border:`1px solid ${C.border}`, color:C.text, fontSize:".88rem", outline:"none", resize:"vertical", transition:"all .25s", fontFamily:"'DM Sans',sans-serif", lineHeight:1.6 }}
                       onFocus={e=>{e.target.style.borderColor="rgba(56,189,248,.5)"; e.target.style.boxShadow="0 0 0 3px rgba(14,165,233,.06)";}}
@@ -523,10 +512,10 @@ export default function TalentFluxTelecom() {
                     />
                   </div>
 
-                  {/* Upload */}
+                  {/* Upload cahier des charges */}
                   <div style={{ marginBottom:16 }}>
                     <label style={{ display:"block", color:C.subtle, fontSize:".7rem", fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", marginBottom:7 }}>
-                      {activeTab==="recruiter"?"Cahier des charges":"CV"} <span style={{ color:C.subtle, fontWeight:400, marginLeft:6, textTransform:"none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      Cahier des charges <span style={{ color:C.subtle, fontWeight:400, marginLeft:6, textTransform:"none" }}>— PDF · Max 10 MB · Optionnel</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -564,7 +553,7 @@ export default function TalentFluxTelecom() {
                   <button onClick={handleSubmit} disabled={loading} style={{ width:"100%", padding:"14px 22px", borderRadius:13, border:"none", background:loading?"rgba(14,165,233,.4)":C.grad, color:"#fff", fontWeight:700, fontSize:".92rem", cursor:loading?"not-allowed":"pointer", display:"flex", alignItems:"center", justifyContent:"center", gap:9, boxShadow:loading?"none":"0 4px 22px rgba(14,165,233,.3)", transition:"all .3s", fontFamily:"'DM Sans',sans-serif" }}
                     onMouseEnter={e=>{if(!loading){e.currentTarget.style.boxShadow="0 8px 36px rgba(56,189,248,.55)"; e.currentTarget.style.transform="translateY(-2px)";}}}
                     onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 22px rgba(14,165,233,.3)"; e.currentTarget.style.transform="translateY(0)";}}>
-                    {loading ? <><div style={{ width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi...</> : <><Send size={16}/>{lang === "en" ? (activeTab==="recruiter" ? "Find my telecom expert" : "Send my application") : (activeTab==="recruiter" ? "Trouver mon expert télécom" : "Envoyer ma candidature")}</>}
+                    {loading ? <><div style={{ width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi...</> : <><Send size={16}/>{lang === "en" ? "Find my telecom expert" : "Trouver mon expert télécom"}</>}
                   </button>
                   <p style={{ color:C.subtle, fontSize:".7rem", textAlign:"center", marginTop:9 }}>🔒 Données sécurisées · RGPD conforme</p>
                 </div>

@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import CandidatureForm from "@/components/CandidatureForm";
+
+const THEME_PAY = { accent:"#22C55E", btnGradient:"linear-gradient(135deg,#15803D,#16A34A,#22C55E)", btnShadow:"0 4px 24px rgba(34,197,94,0.35)", btnTextColor:"#fff" };
+const LABELS_PAY = { submitBtn:"Soumettre ma candidature Paysagisme" };
 
 const useInView = (threshold = 0.12) => {
   const ref = useRef(null);
@@ -646,66 +650,41 @@ export default function TalentFluxPaysagisme() {
                 ))}
               </div>
 
-              {!submitted ? (
+              {activeTab === "candidate" ? (
+                <div style={{ padding: 24 }}>
+                  <CandidatureForm secteur="Paysagisme" theme={THEME_PAY} labels={LABELS_PAY} />
+                </div>
+              ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
                     <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
                     <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="sophie@paysage.ch" value={form.email} onChange={set("email")} required />
                     <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    {activeTab === "recruiter"
-                      ? <>
-                          <InputField label="Entreprise" placeholder="Paysage Vaud SA" value={form.company} onChange={set("company")} required />
-                          <InputField label="Profil recherché" placeholder="Chef de chantier paysagiste CFC" value={form.role} onChange={set("role")} />
-                          <SelectField label="Type de contrat" value={form.contrat || ""} onChange={set("contrat")} options={[
-                            {value:"", label:"Indifférent"},
-                            {value:"CDI", label:"CDI — poste fixe"},
-                            {value:"CDD saison", label:"CDD saisonnier (mars–oct.)"},
-                            {value:"Temporaire", label:"Renfort temporaire"},
-                          ]} />
-                          <SelectField label="Zone d'intervention" value={form.zone || ""} onChange={set("zone")} options={[
-                            {value:"", label:"Indifférent"},
-                            {value:"Vaud", label:"Canton de Vaud"},
-                            {value:"Genève", label:"Canton de Genève"},
-                            {value:"Fribourg", label:"Canton de Fribourg"},
-                            {value:"Valais", label:"Canton du Valais"},
-                            {value:"Suisse romande", label:"Suisse romande"},
-                          ]} />
-                        </>
-                      : <>
-                          <InputField label="Poste actuel" placeholder="Maçon paysagiste CFC" value={form.role} onChange={set("role")} />
-                          <SelectField label="Spécialité" value={form.sector} onChange={set("sector")} options={[
-                            { value: "paysagisme", label: "🌱 Paysagisme / Jardins" },
-                            { value: "amenagement", label: "🏗️ Aménagements extérieurs" },
-                            { value: "arboriculture", label: "🌳 Arboriculture / Élagage" },
-                            { value: "terrain-sport", label: "⚽ Terrains de sport" },
-                            { value: "espaces-publics", label: "🏛️ Espaces publics" },
-                            { value: "irrigation", label: "💧 Irrigation / Arrosage" },
-                          ]} />
-                          <SelectField label="Permis de conduire" value={form.permis || ""} onChange={set("permis")} options={[
-                            {value:"", label:"Sélectionner"},
-                            {value:"B", label:"Permis B"},
-                            {value:"BE", label:"Permis B+E (remorque)"},
-                            {value:"C", label:"Permis C (camion)"},
-                            {value:"Engins", label:"Permis engins (mini-pelle...)"},
-                          ]} />
-                          <SelectField label="Disponibilité" value={form.dispo || ""} onChange={set("dispo")} options={[
-                            {value:"", label:"Sélectionner"},
-                            {value:"Immédiate", label:"Immédiate"},
-                            {value:"1 mois", label:"Sous 1 mois"},
-                            {value:"2-3 mois", label:"2 à 3 mois"},
-                            {value:"Saison prochaine", label:"Saison prochaine"},
-                          ]} />
-                        </>
-                    }
+                    <InputField label="Entreprise" placeholder="Paysage Vaud SA" value={form.company} onChange={set("company")} required />
+                    <InputField label="Profil recherché" placeholder="Chef de chantier paysagiste CFC" value={form.role} onChange={set("role")} />
+                    <SelectField label="Type de contrat" value={form.contrat || ""} onChange={set("contrat")} options={[
+                      {value:"", label:"Indifférent"},
+                      {value:"CDI", label:"CDI — poste fixe"},
+                      {value:"CDD saison", label:"CDD saisonnier (mars–oct.)"},
+                      {value:"Temporaire", label:"Renfort temporaire"},
+                    ]} />
+                    <SelectField label="Zone d'intervention" value={form.zone || ""} onChange={set("zone")} options={[
+                      {value:"", label:"Indifférent"},
+                      {value:"Vaud", label:"Canton de Vaud"},
+                      {value:"Genève", label:"Canton de Genève"},
+                      {value:"Fribourg", label:"Canton de Fribourg"},
+                      {value:"Valais", label:"Canton du Valais"},
+                      {value:"Suisse romande", label:"Suisse romande"},
+                    ]} />
                   </div>
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      {activeTab === "recruiter" ? "Description du besoin" : "Parlez-nous de vous"}
+                      Description du besoin
                     </label>
                     <textarea
-                      placeholder={activeTab === "recruiter" ? "Ex: Chef de chantier CFC pour chantiers privés + collectivités, équipe de 4, permis B+E requis, disponible mai, Vaud/Genève..." : "Ex: Maçon paysagiste CFC, 8 ans exp., permis B+E, conduite mini-pelle, dispo immédiate, canton Vaud..."}
+                      placeholder="Ex: Chef de chantier CFC pour chantiers privés + collectivités, équipe de 4, permis B+E requis, disponible mai, Vaud/Genève..."
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "12px 15px", borderRadius: 12, background: "rgba(5,12,7,0.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", transition: "all .25s", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(74,222,128,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(74,222,128,.06)"; }}
@@ -713,10 +692,10 @@ export default function TalentFluxPaysagisme() {
                     />
                   </div>
 
-                  {/* Upload CV / JD */}
+                  {/* Upload fiche de poste */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      {activeTab === "recruiter" ? "Fiche de poste" : "CV"} <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      Fiche de poste <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -766,7 +745,7 @@ export default function TalentFluxPaysagisme() {
                   >
                     {loading
                       ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
-                      : <><Send size={16} />{activeTab === "recruiter" ? "Trouver mon profil paysagiste" : "Envoyer ma candidature"}</>
+                      : <><Send size={16} />Trouver mon profil paysagiste</>
                     }
                   </button>
                   <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données sécurisées · RGPD conforme</p>
