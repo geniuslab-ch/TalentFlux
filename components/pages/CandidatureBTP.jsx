@@ -14,9 +14,13 @@ export default function CandidatureBTP() {
   const fileRef = useRef(null);
   const [form, setForm] = useState({
     firstName: "", lastName: "", email: "", phone: "",
-    specialite: "", certifications: "", disponibilite: "", message: "", file: null
+    specialite: "", typeChantier: "", logiciels: "", engins: "",
+    normes: [], certifications: "", disponibilite: "", message: "", file: null
   });
   const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
+  const toggleNorme = v => setForm(f => ({
+    ...f, normes: f.normes.includes(v) ? f.normes.filter(n => n !== v) : [...f.normes, v]
+  }));
 
   const handleFile = file => {
     if (!file) return;
@@ -36,16 +40,27 @@ export default function CandidatureBTP() {
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const san = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const san = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fn = `${Date.now()}_${san(form.firstName)}_${san(form.lastName)}.pdf`;
         const { error: ue } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fn}`, form.file, { contentType: "application/pdf" });
-        if (!ue) { pdfFileName = fn; pdfFileUrl = `submissions/${fn}`; }
+        if (ue) throw new Error("Erreur lors de l'envoi du CV : " + ue.message);
+        pdfFileName = fn; pdfFileUrl = `submissions/${fn}`;
       }
+      const competences = [
+        form.typeChantier && `Type chantier: ${form.typeChantier}`,
+        form.logiciels && `Logiciels: ${form.logiciels}`,
+        form.engins && `Permis engins: ${form.engins}`,
+        form.normes.length && `Normes: ${form.normes.join(", ")}`,
+        form.certifications && `Certifications: ${form.certifications}`,
+        form.disponibilite && `Dispo: ${form.disponibilite}`,
+        form.message,
+      ].filter(Boolean).join(" | ");
+
       const { error: ie } = await supabase.from("contact_submissions").insert([{
         type: "candidate", first_name: form.firstName.trim(), last_name: form.lastName.trim(),
         email: form.email.trim().toLowerCase(), phone: form.phone.trim() || null,
         sector: "btp", role: form.specialite.trim() || null,
-        message: `Certifications: ${form.certifications} | Dispo: ${form.disponibilite} | ${form.message}`.trim(),
+        message: competences,
         pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
       if (ie) throw new Error(ie.message);
@@ -56,6 +71,20 @@ export default function CandidatureBTP() {
   };
 
   const C = { bg: "#07090C", text: "#F1F5F9", muted: "#8899B4", subtle: "#1E2D42", border: "rgba(255,255,255,0.07)", orangeL: "#FB923C", gradO: "linear-gradient(135deg,#92400E,#C2410C,#F97316)" };
+
+  const inputStyle = { width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" };
+  const selectStyle = { ...inputStyle, background: "rgba(7,9,12,.9)", cursor: "pointer", appearance: "none" };
+  const labelStyle = { display: "block", color: C.muted, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 };
+  const focusO = e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; };
+  const blurO = e => { e.target.style.borderColor = "rgba(255,255,255,.07)"; };
+
+  const SectionHeader = ({ children }) => (
+    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "22px 0 14px" }}>
+      <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.07)" }} />
+      <span style={{ color: C.orangeL, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{children}</span>
+      <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.07)" }} />
+    </div>
+  );
 
   if (submitted) return (
     <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif", padding: "2rem" }}>
@@ -84,36 +113,92 @@ export default function CandidatureBTP() {
         </div>
 
         <div style={{ background: "rgba(12,16,22,.92)", border: "1px solid rgba(255,255,255,.07)", borderRadius: 22, padding: isMobile ? 20 : 32 }}>
+
+          {/* — Informations personnelles — */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
             {[["Prénom *", "firstName", "Jean"], ["Nom *", "lastName", "Dupont"],
               ["Email *", "email", "j.dupont@mail.ch"], ["Téléphone", "phone", "+41 79 000 00 00"]
             ].map(([label, key, ph]) => (
               <div key={key}>
-                <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{label}</label>
+                <label style={labelStyle}>{label}</label>
                 <input type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
                   placeholder={ph} value={form[key]} onChange={set(key)}
-                  style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-                  onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
-                  onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,.07)"; }} />
+                  style={inputStyle} onFocus={focusO} onBlur={blurO} />
               </div>
             ))}
           </div>
 
+          {/* — Profil & Spécialité — */}
+          <SectionHeader>Profil & spécialité</SectionHeader>
+
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
             <div>
-              <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Spécialité</label>
-              <select value={form.specialite} onChange={set("specialite")}
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: "1px solid rgba(255,255,255,.07)", color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
+              <label style={labelStyle}>Fonction / Spécialité</label>
+              <select value={form.specialite} onChange={set("specialite")} style={{ ...selectStyle, color: form.specialite ? C.text : C.muted }}>
                 <option value="">Sélectionner...</option>
-                {["Chef de chantier", "Directeur / Conducteur de travaux", "Architecte", "Ingénieur civil / structure", "Ingénieur CVSE", "Responsable HSE", "Géomètre", "BIM Manager", "Technicien / Dessinateur", "Autre"].map(o => (
+                {["Chef de chantier", "Directeur / Conducteur de travaux", "Architecte", "Ingénieur civil / structure",
+                  "Ingénieur CVSE", "Responsable HSE / MSST", "Géomètre", "BIM Manager / Coordinateur BIM",
+                  "Technicien / Dessinateur DAO", "Économiste de la construction", "Maître d'état (électricité, plomberie, etc.)", "Autre"].map(o => (
                   <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
                 ))}
               </select>
             </div>
             <div>
-              <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Disponibilité</label>
-              <select value={form.disponibilite} onChange={set("disponibilite")}
-                style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: "1px solid rgba(255,255,255,.07)", color: form.disponibilite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
+              <label style={labelStyle}>Type de chantier</label>
+              <select value={form.typeChantier} onChange={set("typeChantier")} style={{ ...selectStyle, color: form.typeChantier ? C.text : C.muted }}>
+                <option value="">Sélectionner...</option>
+                {["Neuf (gros œuvre)", "Rénovation / transformation", "Mixte neuf & rénovation",
+                  "Infrastructure / génie civil", "Aménagement intérieur", "Industrie / EPI"].map(o => (
+                  <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          {/* — Compétences techniques — */}
+          <SectionHeader>Compétences techniques</SectionHeader>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>Logiciels & outils maîtrisés</label>
+            <select value={form.logiciels} onChange={set("logiciels")} style={{ ...selectStyle, color: form.logiciels ? C.text : C.muted }}>
+              <option value="">Sélectionner le principal outil...</option>
+              {["AutoCAD", "Revit / BIM 360", "Allplan", "ArchiCAD", "Tekla Structures",
+                "MS Project / Planification", "SAP PM / ERP chantier", "Navisworks (coordination BIM)",
+                "Adobe Acrobat (plans PDF)", "Autre / sans outil principal"].map(o => (
+                <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
+              ))}
+            </select>
+          </div>
+
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>Permis d'engins & habilitations</label>
+            <input placeholder="Ex: Grue à tour, pelle hydraulique, chariot élévateur, travaux en hauteur, SUVA..." value={form.engins} onChange={set("engins")} style={inputStyle} onFocus={focusO} onBlur={blurO} />
+          </div>
+
+          {/* — Normes & réglementations — */}
+          <div style={{ marginBottom: 14 }}>
+            <label style={labelStyle}>Normes & réglementations connues</label>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
+              {["SIA 118", "OTConst", "LCA / CCT", "SUVA / OPA", "Minergie", "SNBS", "MOP", "SIA 102 / 103", "SIA 416", "Loi sur les marchés publics"].map(v => (
+                <button key={v} type="button" onClick={() => toggleNorme(v)}
+                  style={{ padding: "6px 12px", borderRadius: 8, fontSize: ".78rem", fontWeight: 600, cursor: "pointer", transition: "all .2s", fontFamily: "'DM Sans',sans-serif", border: form.normes.includes(v) ? "1px solid rgba(249,115,22,.6)" : "1px solid rgba(255,255,255,.1)", background: form.normes.includes(v) ? "rgba(249,115,22,.15)" : "rgba(255,255,255,.03)", color: form.normes.includes(v) ? C.orangeL : C.muted }}>
+                  {v}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* — Certifications & disponibilité — */}
+          <SectionHeader>Certifications & disponibilité</SectionHeader>
+
+          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
+            <div>
+              <label style={labelStyle}>Certifications & agréments</label>
+              <input placeholder="Ex: Brevet fédéral chef de chantier, CAS Construction, MSST niv.2..." value={form.certifications} onChange={set("certifications")} style={inputStyle} onFocus={focusO} onBlur={blurO} />
+            </div>
+            <div>
+              <label style={labelStyle}>Disponibilité</label>
+              <select value={form.disponibilite} onChange={set("disponibilite")} style={{ ...selectStyle, color: form.disponibilite ? C.text : C.muted }}>
                 <option value="">Délai...</option>
                 {["Immédiatement", "1 mois", "2 mois", "3 mois", "Plus de 3 mois"].map(o => (
                   <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
@@ -123,31 +208,22 @@ export default function CandidatureBTP() {
           </div>
 
           <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Certifications & agréments</label>
-            <input placeholder="Ex: Brevet fédéral chef de chantier, Minergie P, CAS Construction, MSST niveau 2..." value={form.certifications} onChange={set("certifications")}
-              style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
-              onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
-              onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,.07)"; }} />
-          </div>
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Chantiers de référence & expérience</label>
-            <textarea placeholder="Ex: Chef de chantier 12 ans, structure béton et bois, chantiers jusqu'à 15M CHF, bilingue FR/DE, Minergie P, maîtrise SIA 118, référence MO disponible..."
+            <label style={labelStyle}>Chantiers de référence & expérience</label>
+            <textarea placeholder="Ex: Chef de chantier 12 ans, structure béton et bois, chantiers jusqu'à 15M CHF, bilingue FR/DE, maîtrise SIA 118, référence MO disponible..."
               value={form.message} onChange={set("message")} rows={4}
-              style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
-              onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
-              onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,.07)"; }} />
+              style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
+              onFocus={focusO} onBlur={blurO} />
           </div>
 
           <div style={{ marginBottom: 18 }}>
-            <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>CV <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span></label>
+            <label style={labelStyle}>CV <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span></label>
             {!form.file ? (
               <div onClick={() => fileRef.current?.click()}
                 onDragOver={e => { e.preventDefault(); setDragOver(true); }}
                 onDragLeave={() => setDragOver(false)}
                 onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
                 style={{ border: dragOver ? "2px dashed #FB923C" : "2px dashed rgba(255,255,255,.07)", borderRadius: 11, padding: 18, textAlign: "center", cursor: "pointer", transition: "all .25s" }}>
-                <Upload size={20} style={{ color: C.subtle, margin: "0 auto 8px" }} />
+                <Upload size={20} style={{ color: C.muted, margin: "0 auto 8px" }} />
                 <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.orangeL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
                 <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
               </div>
@@ -175,7 +251,7 @@ export default function CandidatureBTP() {
               ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
               : <><Send size={16} />Envoyer ma candidature</>}
           </button>
-          <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Traitement confidentiel · LPD suisse & RGPD conformes</p>
+          <p style={{ color: C.muted, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Traitement confidentiel · LPD suisse & RGPD conformes</p>
         </div>
       </div>
     </div>

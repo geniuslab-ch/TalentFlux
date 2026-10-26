@@ -9,7 +9,7 @@ import { Send, Upload, X, FileText, AlertCircle, CheckCircle, ChevronDown, Chevr
 const L = ({ label, required, accentColor, hint }) => (
   <label style={{ display:"block", fontSize:".68rem", fontWeight:700, letterSpacing:".1em", textTransform:"uppercase", marginBottom:7, color:"#64748B" }}>
     {label} {required && <span style={{ color:accentColor }}>*</span>}
-    {hint && <span style={{ fontWeight:400, textTransform:"none", marginLeft:6, color:"#475569" }}>— {hint}</span>}
+    {hint && <span style={{ fontWeight:400, textTransform:"none", marginLeft:6, color:"#64748B" }}>— {hint}</span>}
   </label>
 );
 
@@ -29,7 +29,7 @@ export const SelectField = ({ label, value, onChange, options, required, accentC
   <div>
     <L label={label} required={required} accentColor={accentColor} hint={hint} />
     <select value={value} onChange={onChange} required={required}
-      style={{ ...inputStyle, color:value?"#F1F5F9":"#475569", cursor:"pointer", appearance:"none" }}
+      style={{ ...inputStyle, color:value?"#F1F5F9":"#64748B", cursor:"pointer", appearance:"none" }}
       onFocus={e=>focusIn(e,accentColor)} onBlur={focusOut}>
       {options.map(o=><option key={o.value} value={o.value} style={{ background:"#080D1A" }}>{o.label}</option>)}
     </select>
@@ -90,9 +90,9 @@ export const PdfUpload = ({ label, hint, file, onFile, onRemove, accentColor, dr
         style={{ border:`2px dashed ${dragOver?accentColor:"rgba(255,255,255,0.12)"}`, borderRadius:12, padding:"22px 20px", textAlign:"center", cursor:"pointer", transition:"all .25s", background:dragOver?`${accentColor}08`:"rgba(11,15,26,0.4)" }}
         onMouseEnter={e=>{e.currentTarget.style.borderColor=accentColor+"60";}}
         onMouseLeave={e=>{if(!dragOver)e.currentTarget.style.borderColor="rgba(255,255,255,0.12)";}}>
-        <Upload size={22} style={{ color:"#334155", margin:"0 auto 10px" }} />
-        <p style={{ color:"#475569", fontSize:".86rem" }}><span style={{ color:accentColor, fontWeight:600 }}>Cliquez</span> ou glissez votre CV</p>
-        <p style={{ color:"#334155", fontSize:".75rem", marginTop:4 }}>PDF uniquement · Max 10 MB</p>
+        <Upload size={22} style={{ color:"#64748B", margin:"0 auto 10px" }} />
+        <p style={{ color:"#94A3B8", fontSize:".86rem" }}><span style={{ color:accentColor, fontWeight:600 }}>Cliquez</span> ou glissez votre CV</p>
+        <p style={{ color:"#64748B", fontSize:".75rem", marginTop:4 }}>PDF uniquement · Max 10 MB</p>
         <input ref={fileRef} type="file" accept=".pdf" style={{ display:"none" }} onChange={e=>onFile(e.target.files[0])} />
       </div>
     ) : (
@@ -125,7 +125,7 @@ export const Section = ({ title, icon, children, accentColor, defaultOpen=true }
           <span style={{ color:accentColor, fontSize:"1rem" }}>{icon}</span>
           <span style={{ color:"#F1F5F9", fontWeight:700, fontSize:".9rem" }}>{title}</span>
         </div>
-        {open?<ChevronUp size={15} style={{ color:"#475569" }}/>:<ChevronDown size={15} style={{ color:"#475569" }}/>}
+        {open?<ChevronUp size={15} style={{ color:"#64748B" }}/>:<ChevronDown size={15} style={{ color:"#64748B" }}/>}
       </button>
       {open && <div style={{ padding:"18px 18px 22px", display:"flex", flexDirection:"column", gap:14 }}>{children}</div>}
     </div>
@@ -1036,7 +1036,7 @@ export default function CandidatureForm({ secteur, theme, labels }) {
           ?<><div style={{ width:17,height:17,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi en cours...</>
           :<><Send size={17}/>{labels.submitBtn}</>}
       </button>
-      <p style={{ color:"#334155", fontSize:".68rem", textAlign:"center", marginTop:8 }}>🔒 Données chiffrées · Supabase · LPD & RGPD conformes</p>
+      <p style={{ color:"#64748B", fontSize:".68rem", textAlign:"center", marginTop:8 }}>🔒 Données chiffrées · Supabase · LPD & RGPD conformes</p>
     </form>
   );
 }
