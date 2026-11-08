@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef } from "react";
 import { Send, Phone, Mail, MapPin, Upload, CheckCircle, ArrowLeft, Zap, X, FileText, Clock, AlertCircle } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useLang } from "@/contexts/LangContext";
 
 const GradientText = ({ children }) => (
   <span style={{
@@ -39,6 +40,7 @@ const SelectField = ({ label, value, onChange, options, required }) => (
 );
 
 export default function Contact() {
+  const lang = useLang();
   const navigate = useNavigate();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState("recruiter");
@@ -59,15 +61,15 @@ export default function Contact() {
 
   const handleFile = (file) => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Le fichier ne doit pas dépasser 10 MB."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "File must not exceed 10 MB." : "Le fichier ne doit pas dépasser 10 MB."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
@@ -75,7 +77,7 @@ export default function Contact() {
         const sanitize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fileName = `${Date.now()}_${sanitize(form.firstName)}_${sanitize(form.lastName)}.pdf`;
         const { error: uploadError } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fileName}`, form.file, { contentType: "application/pdf" });
-        if (uploadError) throw new Error("Erreur upload PDF : " + uploadError.message);
+        if (uploadError) throw new Error((lang === "en" ? "PDF upload error: " : "Erreur upload PDF : ") + uploadError.message);
         pdfFileName = fileName;
         pdfFileUrl = `submissions/${fileName}`;
       }
@@ -87,10 +89,10 @@ export default function Contact() {
         role: form.role.trim() || null, message: form.message.trim() || null,
         pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
-      if (insertError) throw new Error("Erreur base de données : " + insertError.message);
+      if (insertError) throw new Error((lang === "en" ? "Database error: " : "Erreur base de données : ") + insertError.message);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue. Veuillez réessayer.");
+      setError(err.message || (lang === "en" ? "An error occurred. Please try again." : "Une erreur est survenue. Veuillez réessayer."));
     } finally {
       setLoading(false);
     }
@@ -98,7 +100,12 @@ export default function Contact() {
 
   const resetForm = () => { setSubmitted(false); setError(null); setForm({ firstName: "", lastName: "", email: "", phone: "", company: "", sector: "", role: "", message: "", file: null }); };
 
-  const sectors = [
+  const sectors = lang === "en" ? [
+    { value: "", label: "Select a sector..." },
+    { value: "it", label: "💻 IT & Technology" }, { value: "finance", label: "💰 Finance & Accounting" },
+    { value: "sante", label: "🏥 Health & Medical" }, { value: "ingenierie", label: "⚙️ Engineering & Industry" },
+    { value: "rh", label: "👥 HR & Management" }, { value: "autre", label: "Other" },
+  ] : [
     { value: "", label: "Sélectionnez un secteur..." },
     { value: "it", label: "💻 IT & Technologie" }, { value: "finance", label: "💰 Finance & Comptabilité" },
     { value: "sante", label: "🏥 Santé & Médical" }, { value: "ingenierie", label: "⚙️ Ingénierie & Industrie" },
@@ -117,7 +124,7 @@ export default function Contact() {
 
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 70, background: scrolled ? "rgba(11,15,26,0.95)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none", transition: "all 0.3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <button onClick={() => navigate(-1)} style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8", background: "none", border: "none", cursor: "pointer" }}>
-          <ArrowLeft size={18} /><span style={{ fontSize: "0.9rem" }}>Retour</span>
+          <ArrowLeft size={18} /><span style={{ fontSize: "0.9rem" }}>{lang === "en" ? "Back" : "Retour"}</span>
         </button>
         <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, width: "auto", objectFit: "contain" }} />
       </nav>
@@ -125,12 +132,12 @@ export default function Contact() {
       <div style={{ padding: "110px 2rem 50px", textAlign: "center", background: "radial-gradient(ellipse at top, rgba(37,99,235,0.1) 0%, transparent 55%)" }}>
         <div style={{ display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 20, background: "rgba(14,165,233,0.08)", border: "1px solid rgba(14,165,233,0.2)", borderRadius: 100, padding: "6px 18px" }}>
           <div style={{ width: 7, height: 7, borderRadius: "50%", background: "#14B8A6", boxShadow: "0 0 8px #14B8A6" }} />
-          <span style={{ color: "#94A3B8", fontSize: "0.8rem", fontWeight: 500 }}>Réponse sous 24h · Suisse</span>
+          <span style={{ color: "#94A3B8", fontSize: "0.8rem", fontWeight: 500 }}>{lang === "en" ? "Reply within 24h · Switzerland" : "Réponse sous 24h · Suisse"}</span>
         </div>
         <h1 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(2rem, 5vw, 3.5rem)", fontWeight: 800, marginBottom: 14 }}>
-          Parlons de votre <GradientText>prochain recrutement</GradientText>
+          {lang === "en" ? <>Let's talk about your <GradientText>next hire</GradientText></> : <>Parlons de votre <GradientText>prochain recrutement</GradientText></>}
         </h1>
-        <p style={{ color: "#94A3B8", maxWidth: 520, margin: "0 auto", lineHeight: 1.75 }}>Entreprise en recherche d'un expert ou talent en quête d'opportunités — nous sommes là.</p>
+        <p style={{ color: "#94A3B8", maxWidth: 520, margin: "0 auto", lineHeight: 1.75 }}>{lang === "en" ? "Company looking for an expert or talent seeking opportunities — we're here." : "Entreprise en recherche d'un expert ou talent en quête d'opportunités — nous sommes là."}</p>
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 2rem 80px", display: "grid", gridTemplateColumns: "1fr 360px", gap: 28 }}>
@@ -138,7 +145,7 @@ export default function Contact() {
         {/* FORM */}
         <div style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 28, overflow: "hidden", boxShadow: "0 0 80px rgba(37,99,235,0.07)" }}>
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.07)" }}>
-            {[{ key: "recruiter", label: "🏢 Je recrute" }, { key: "candidate", label: "👤 Je cherche un poste" }].map(({ key, label }) => (
+            {(lang === "en" ? [{ key: "recruiter", label: "🏢 I'm hiring" }, { key: "candidate", label: "👤 I'm looking for a job" }] : [{ key: "recruiter", label: "🏢 Je recrute" }, { key: "candidate", label: "👤 Je cherche un poste" }]).map(({ key, label }) => (
               <button key={key} onClick={() => { setActiveTab(key); setError(null); }}
                 style={{ flex: 1, padding: "18px 20px", border: "none", cursor: "pointer", background: activeTab === key ? "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(20,184,166,0.1))" : "transparent", color: activeTab === key ? "#fff" : "#475569", fontWeight: 700, fontSize: "0.9rem", borderBottom: activeTab === key ? "2px solid #0EA5E9" : "2px solid transparent", transition: "all 0.25s", fontFamily: "'DM Sans', sans-serif" }}>
                 {label}
@@ -149,22 +156,22 @@ export default function Contact() {
           {!submitted ? (
             <div style={{ padding: 36 }}>
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 18, marginBottom: 18 }}>
-                <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
-                <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
-                <InputField label="Email professionnel" type="email" placeholder="sophie@acme.com" value={form.email} onChange={set("email")} required />
-                <InputField label="Téléphone" type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")} />
+                <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
+                <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
+                <InputField label={lang === "en" ? "Professional email" : "Email professionnel"} type="email" placeholder="sophie@acme.com" value={form.email} onChange={set("email")} required />
+                <InputField label={lang === "en" ? "Phone" : "Téléphone"} type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")} />
                 {activeTab === "recruiter" ? (
-                  <><InputField label="Entreprise" placeholder="Acme Corp SA" value={form.company} onChange={set("company")} required /><SelectField label="Secteur" value={form.sector} onChange={set("sector")} options={sectors} required /></>
+                  <><InputField label={lang === "en" ? "Company" : "Entreprise"} placeholder="Acme Corp SA" value={form.company} onChange={set("company")} required /><SelectField label={lang === "en" ? "Sector" : "Secteur"} value={form.sector} onChange={set("sector")} options={sectors} required /></>
                 ) : (
-                  <><InputField label="Poste actuel" placeholder="Lead Developer" value={form.role} onChange={set("role")} /><SelectField label="Secteur visé" value={form.sector} onChange={set("sector")} options={sectors} /></>
+                  <><InputField label={lang === "en" ? "Current role" : "Poste actuel"} placeholder="Lead Developer" value={form.role} onChange={set("role")} /><SelectField label={lang === "en" ? "Target sector" : "Secteur visé"} value={form.sector} onChange={set("sector")} options={sectors} /></>
                 )}
               </div>
 
               <div style={{ marginBottom: 18 }}>
                 <label style={{ display: "block", color: "#64748B", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>
-                  {activeTab === "recruiter" ? "Décrivez le poste à pourvoir" : "Parlez-nous de vous"}
+                  {lang === "en" ? (activeTab === "recruiter" ? "Describe the position to fill" : "Tell us about yourself") : (activeTab === "recruiter" ? "Décrivez le poste à pourvoir" : "Parlez-nous de vous")}
                 </label>
-                <textarea placeholder={activeTab === "recruiter" ? "Stack technique, niveau d'expérience, urgence..." : "Votre profil, attentes, disponibilité..."} value={form.message} onChange={set("message")} rows={4}
+                <textarea placeholder={lang === "en" ? (activeTab === "recruiter" ? "Tech stack, experience level, urgency..." : "Your profile, expectations, availability...") : (activeTab === "recruiter" ? "Stack technique, niveau d'expérience, urgence..." : "Votre profil, attentes, disponibilité...")} value={form.message} onChange={set("message")} rows={4}
                   style={{ width: "100%", padding: "14px 18px", borderRadius: 14, background: "rgba(11,15,26,0.8)", border: "1px solid rgba(255,255,255,0.09)", color: "#fff", fontSize: "0.92rem", outline: "none", resize: "vertical", transition: "all 0.25s", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}
                   onFocus={e => { e.target.style.borderColor = "rgba(14,165,233,0.6)"; e.target.style.boxShadow = "0 0 0 3px rgba(14,165,233,0.08)"; }}
                   onBlur={e => { e.target.style.borderColor = "rgba(255,255,255,0.09)"; e.target.style.boxShadow = "none"; }}
@@ -175,7 +182,7 @@ export default function Contact() {
               <div style={{ marginBottom: 28 }}>
                 <label style={{ display: "block", color: "#64748B", fontSize: "0.75rem", fontWeight: 700, letterSpacing: "0.08em", textTransform: "uppercase", marginBottom: 8 }}>
                   {activeTab === "recruiter" ? "Job Description" : "CV"}
-                  <span style={{ color: "#334155", fontWeight: 400, marginLeft: 8, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                  <span style={{ color: "#334155", fontWeight: 400, marginLeft: 8, textTransform: "none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                 </label>
                 {!form.file ? (
                   <div onClick={() => fileRef.current?.click()}
@@ -187,7 +194,7 @@ export default function Contact() {
                     onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                   >
                     <Upload size={28} style={{ color: "#334155", margin: "0 auto 10px" }} />
-                    <p style={{ color: "#475569", fontSize: "0.88rem" }}><span style={{ color: "#0EA5E9", fontWeight: 600 }}>Cliquez</span> ou glissez-déposez votre PDF</p>
+                    <p style={{ color: "#475569", fontSize: "0.88rem" }}><span style={{ color: "#0EA5E9", fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag and drop your PDF" : "ou glissez-déposez votre PDF"}</p>
                     <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                   </div>
                 ) : (
@@ -219,20 +226,25 @@ export default function Contact() {
                 onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 24px rgba(14,165,233,0.4)"; e.currentTarget.style.transform = "translateY(0)"; }}
               >
                 {loading
-                  ? <><div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />Envoi en cours...</>
-                  : <><Send size={18} />{activeTab === "recruiter" ? "Envoyer ma demande de recrutement" : "Envoyer mon profil"}</>
+                  ? <><div style={{ width: 18, height: 18, border: "2px solid rgba(255,255,255,0.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin 0.8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi en cours..."}</>
+                  : <><Send size={18} />{lang === "en" ? (activeTab === "recruiter" ? "Send my recruitment request" : "Send my profile") : (activeTab === "recruiter" ? "Envoyer ma demande de recrutement" : "Envoyer mon profil")}</>
                 }
               </button>
-              <p style={{ color: "#334155", fontSize: "0.75rem", textAlign: "center", marginTop: 14 }}>🔒 Données stockées sur Supabase · RGPD conforme</p>
+              <p style={{ color: "#334155", fontSize: "0.75rem", textAlign: "center", marginTop: 14 }}>🔒 {lang === "en" ? "Data stored on Supabase · GDPR compliant" : "Données stockées sur Supabase · RGPD conforme"}</p>
             </div>
           ) : (
             <div style={{ padding: "60px 36px", textAlign: "center", animation: "slide-up 0.5s ease" }}>
               <div style={{ width: 72, height: 72, borderRadius: "50%", margin: "0 auto 24px", background: "linear-gradient(135deg, rgba(20,184,166,0.2), rgba(37,99,235,0.2))", border: "1px solid rgba(20,184,166,0.4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <CheckCircle size={36} style={{ color: "#14B8A6" }} />
               </div>
-              <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 12 }}>Demande enregistrée <GradientText>✓</GradientText></h3>
-              <p style={{ color: "#94A3B8", lineHeight: 1.7, marginBottom: 28 }}>Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong> !<br />Votre demande est enregistrée dans notre système.<br />Un expert vous contacte sous <strong style={{ color: "#0EA5E9" }}>24 heures</strong>.</p>
-              <button onClick={resetForm} style={{ padding: "12px 28px", borderRadius: 12, border: "1px solid rgba(14,165,233,0.3)", background: "rgba(14,165,233,0.08)", color: "#0EA5E9", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" }}>Nouvelle demande</button>
+              <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "1.6rem", marginBottom: 12 }}>{lang === "en" ? "Request registered" : "Demande enregistrée"} <GradientText>✓</GradientText></h3>
+              <p style={{ color: "#94A3B8", lineHeight: 1.7, marginBottom: 28 }}>
+                {lang === "en"
+                  ? <>{`Thank you `}<strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>!<br />Your request has been recorded in our system.<br />An expert will contact you within <strong style={{ color: "#0EA5E9" }}>24 hours</strong>.</>
+                  : <>Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong> !<br />Votre demande est enregistrée dans notre système.<br />Un expert vous contacte sous <strong style={{ color: "#0EA5E9" }}>24 heures</strong>.</>
+                }
+              </p>
+              <button onClick={resetForm} style={{ padding: "12px 28px", borderRadius: 12, border: "1px solid rgba(14,165,233,0.3)", background: "rgba(14,165,233,0.08)", color: "#0EA5E9", fontWeight: 600, cursor: "pointer", fontSize: "0.9rem" }}>{lang === "en" ? "New request" : "Nouvelle demande"}</button>
             </div>
           )}
         </div>
@@ -240,11 +252,11 @@ export default function Contact() {
         {/* SIDEBAR */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
           <div style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(255,255,255,0.07)", borderRadius: 24, padding: 28 }}>
-            <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "1rem", marginBottom: 20 }}>Nous contacter</h3>
+            <h3 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 700, fontSize: "1rem", marginBottom: 20 }}>{lang === "en" ? "Contact us" : "Nous contacter"}</h3>
             {[
               { icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
-              { icon: Phone, label: "Téléphone", value: "+41 76 592 88 06", href: "tel:+41765928806" },
-              { icon: MapPin, label: "Adresse", value: "Yverdon-les-Bains, Suisse", href: null },
+              { icon: Phone, label: lang === "en" ? "Phone" : "Téléphone", value: "+41 76 592 88 06", href: "tel:+41765928806" },
+              { icon: MapPin, label: lang === "en" ? "Address" : "Adresse", value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, Suisse", href: null },
             ].map(({ icon: Icon, label, value, href }) => (
               <div key={label} style={{ display: "flex", alignItems: "center", gap: 14, padding: "14px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <div style={{ width: 38, height: 38, borderRadius: 10, flexShrink: 0, background: "linear-gradient(135deg, rgba(37,99,235,0.15), rgba(20,184,166,0.15))", border: "1px solid rgba(14,165,233,0.15)", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -261,9 +273,9 @@ export default function Contact() {
           <div style={{ background: "linear-gradient(135deg, rgba(37,99,235,0.1), rgba(20,184,166,0.08))", border: "1px solid rgba(14,165,233,0.2)", borderRadius: 24, padding: 24 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
               <Clock size={18} style={{ color: "#14B8A6" }} />
-              <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.9rem" }}>Délais de réponse</span>
+              <span style={{ color: "#fff", fontWeight: 700, fontSize: "0.9rem" }}>{lang === "en" ? "Response times" : "Délais de réponse"}</span>
             </div>
-            {[["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "< 48h"]].map(([l, d]) => (
+            {(lang === "en" ? [["Acknowledgement", "< 2h"], ["First brief", "< 24h"], ["First profiles", "< 48h"]] : [["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "< 48h"]]).map(([l, d]) => (
               <div key={l} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: "1px solid rgba(255,255,255,0.05)" }}>
                 <span style={{ color: "#94A3B8", fontSize: "0.82rem" }}>{l}</span>
                 <span style={{ color: "#14B8A6", fontSize: "0.8rem", fontWeight: 700, background: "rgba(20,184,166,0.1)", padding: "3px 10px", borderRadius: 6 }}>{d}</span>
@@ -272,7 +284,7 @@ export default function Contact() {
           </div>
 
           <div style={{ background: "rgba(15,23,42,0.8)", border: "1px solid rgba(255,255,255,0.06)", borderRadius: 24, padding: 24 }}>
-            {[["✓", "Aucun frais avant embauche"], ["✓", "Satisfaction garantie 3 mois"], ["✓", "Confidentialité totale"], ["✓", "500+ experts validés en réseau"]].map(([icon, text]) => (
+            {(lang === "en" ? [["✓", "No fees until hire"], ["✓", "3-month satisfaction guarantee"], ["✓", "Full confidentiality"], ["✓", "500+ validated experts in network"]] : [["✓", "Aucun frais avant embauche"], ["✓", "Satisfaction garantie 3 mois"], ["✓", "Confidentialité totale"], ["✓", "500+ experts validés en réseau"]]).map(([icon, text]) => (
               <div key={text} style={{ display: "flex", gap: 10, padding: "8px 0", alignItems: "center" }}>
                 <span style={{ color: "#14B8A6", fontWeight: 700 }}>{icon}</span>
                 <span style={{ color: "#94A3B8", fontSize: "0.85rem" }}>{text}</span>

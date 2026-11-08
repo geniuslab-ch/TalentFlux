@@ -178,14 +178,14 @@ export default function TalentFluxTelecom() {
 
   const handleFile = file => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10*1024*1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10*1024*1024) { setError(lang === "en" ? "File too large (max 10 MB)." : "Fichier trop lourd (max 10 MB)."); return; }
     setError(null); setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName=null, pdfFileUrl=null;
@@ -242,8 +242,12 @@ export default function TalentFluxTelecom() {
         </div>
         
         <div style={{ display:isMobile?"none":"flex", gap:"1.6rem", alignItems:"center" }}>
-          {["Solution","Métiers","FAQ"].map(item => (
-            <span key={item} onClick={() => scrollTo(item.toLowerCase())} style={{ color:C.muted, fontSize:".85rem", cursor:"pointer", transition:"color .2s" }} onMouseEnter={e=>e.target.style.color=C.text} onMouseLeave={e=>e.target.style.color=C.muted}>{item}</span>
+          {[
+            { label: lang === "en" ? "Solution" : "Solution", id: "solution" },
+            { label: lang === "en" ? "Trades" : "Métiers", id: "métiers" },
+            { label: "FAQ", id: "faq" },
+          ].map(({ label, id }) => (
+            <span key={id} onClick={() => scrollTo(id)} style={{ color:C.muted, fontSize:".85rem", cursor:"pointer", transition:"color .2s" }} onMouseEnter={e=>e.target.style.color=C.text} onMouseLeave={e=>e.target.style.color=C.muted}>{label}</span>
           ))}
         
           
@@ -275,13 +279,13 @@ export default function TalentFluxTelecom() {
         <div style={{ position:"absolute", bottom:"10%", right:"5%", width:350, height:350, borderRadius:"50%", background:"radial-gradient(circle,rgba(6,182,212,.07),transparent 70%)", animation:"pulseGlow 7s ease-in-out infinite 2s", pointerEvents:"none" }} />
 
         <div style={{ position:"absolute", left:"3%", top:"40%", display:isMobile?"none":"block", background:"rgba(8,18,40,.95)", border:`1px solid rgba(56,189,248,.2)`, borderRadius:14, padding:"12px 16px", animation:"float 5s ease-in-out infinite", pointerEvents:"none", zIndex:1, minWidth:165 }}>
-          <div style={{ color:C.subtle, fontSize:".62rem", fontWeight:700, textTransform:"uppercase", letterSpacing:".07em", marginBottom:5 }}>Pénurie CH</div>
+          <div style={{ color:C.subtle, fontSize:".62rem", fontWeight:700, textTransform:"uppercase", letterSpacing:".07em", marginBottom:5 }}>{lang === "en" ? "CH Shortage" : "Pénurie CH"}</div>
           <div style={{ color:C.text, fontSize:".82rem", fontWeight:600, display:"flex", alignItems:"center", gap:6 }}>
-            <span style={{ width:7, height:7, borderRadius:"50%", background:C.skyL, boxShadow:`0 0 6px ${C.skyL}`, flexShrink:0, display:"inline-block" }} /> Spécialistes RNI rares
+            <span style={{ width:7, height:7, borderRadius:"50%", background:C.skyL, boxShadow:`0 0 6px ${C.skyL}`, flexShrink:0, display:"inline-block" }} /> {lang === "en" ? "Rare RNI specialists" : "Spécialistes RNI rares"}
           </div>
         </div>
         <div style={{ position:"absolute", right:"3%", top:"44%", display:isMobile?"none":"block", background:"rgba(8,18,40,.95)", border:`1px solid rgba(212,175,90,.2)`, borderRadius:14, padding:"12px 16px", animation:"float 5s ease-in-out infinite 1.8s", pointerEvents:"none", zIndex:1, minWidth:165 }}>
-          <div style={{ color:C.subtle, fontSize:".62rem", fontWeight:700, textTransform:"uppercase", letterSpacing:".07em", marginBottom:5 }}>Secteur</div>
+          <div style={{ color:C.subtle, fontSize:".62rem", fontWeight:700, textTransform:"uppercase", letterSpacing:".07em", marginBottom:5 }}>{lang === "en" ? "Sector" : "Secteur"}</div>
           <div style={{ color:C.text, fontSize:".82rem", fontWeight:600, display:"flex", alignItems:"center", gap:6 }}>
             <span style={{ width:7, height:7, borderRadius:"50%", background:C.gold, boxShadow:`0 0 6px ${C.gold}`, flexShrink:0, display:"inline-block" }} /> Télécom · 5G · ORNI
           </div>
@@ -295,33 +299,32 @@ export default function TalentFluxTelecom() {
           </div>
 
           <p style={{ fontSize:".72rem", fontWeight:700, letterSpacing:".18em", textTransform:"uppercase", color:C.skyL, marginBottom:16 }}>
-            Recrutement · Télécommunications & Infrastructure télécom
+            {lang === "en" ? "Recruitment · Telecommunications & Telecom Infrastructure" : "Recrutement · Télécommunications & Infrastructure télécom"}
           </p>
 
           <h1 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.8rem,4.5vw,3.2rem)", fontWeight:800, lineHeight:1.15, letterSpacing:"-.02em", color:C.text, marginBottom:22 }}>
-            Recrutement Télécom & Réseaux en Suisse :<br />
-            <GradientText>les experts ORNI ne répondent pas aux offres génériques.</GradientText>
+            {lang === "en" ? <>Telecom & Network Recruitment in Switzerland:<br /><GradientText>ORNI experts don't respond to generic job offers.</GradientText></> : <>Recrutement Télécom & Réseaux en Suisse :<br /><GradientText>les experts ORNI ne répondent pas aux offres génériques.</GradientText></>}
           </h1>
 
           <p style={{ color:C.muted, fontSize:".97rem", lineHeight:1.8, maxWidth:580, margin:"0 auto 36px" }}>
-            Spécialistes RNI, RF planners, géomaticiens télécom, pilotes drone certifiés OFAC — des profils introuvables via une agence généraliste. TalentFlux les connaît par leur nom.
+            {lang === "en" ? "RNI specialists, RF planners, telecom geomatics engineers, OFAC-certified drone pilots — profiles impossible to find through a generalist agency. TalentFlux knows them by name." : "Spécialistes RNI, RF planners, géomaticiens télécom, pilotes drone certifiés OFAC — des profils introuvables via une agence généraliste. TalentFlux les connaît par leur nom."}
           </p>
 
           <div style={{ display:"flex", gap:14, justifyContent:"center", flexWrap:"wrap" }}>
             <button onClick={() => scrollTo("contact")} style={{ background:C.grad, border:"none", color:"#fff", padding:"15px 32px", borderRadius:14, fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:".95rem", cursor:"pointer", display:"flex", alignItems:"center", gap:9, boxShadow:"0 0 28px rgba(14,165,233,.35)", transition:"all .3s" }}
               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.boxShadow="0 0 50px rgba(56,189,248,.6)";}}
               onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.boxShadow="0 0 28px rgba(14,165,233,.35)";}}>
-              <Users size={17} /> Trouver mon expert <ArrowRight size={16} />
+              <Users size={17} /> {lang === "en" ? "Find my expert" : "Trouver mon expert"} <ArrowRight size={16} />
             </button>
             <Link href="/candidature/telecom" style={{ background:"rgba(14,165,233,.08)", border:"1.5px solid rgba(56,189,248,.4)", color:C.skyL, padding:"15px 32px", borderRadius:14, fontFamily:"'DM Sans',sans-serif", fontWeight:700, fontSize:".95rem", display:"flex", alignItems:"center", gap:9, textDecoration:"none", transition:"all .3s" }}
               onMouseEnter={e=>{e.currentTarget.style.transform="translateY(-2px)"; e.currentTarget.style.background="rgba(14,165,233,.14)";}}
               onMouseLeave={e=>{e.currentTarget.style.transform="translateY(0)"; e.currentTarget.style.background="rgba(14,165,233,.08)";}}>
-              <Signal size={17} /> Déposer ma candidature <ArrowRight size={16} />
+              <Signal size={17} /> {lang === "en" ? "Submit my application" : "Déposer ma candidature"} <ArrowRight size={16} />
             </Link>
           </div>
 
           <div style={{ display:isMobile?"grid":"flex", gridTemplateColumns:"1fr 1fr", gap:isMobile?18:32, justifyContent:"center", flexWrap:"wrap", marginTop:52, paddingTop:34, borderTop:`1px solid ${C.border}` }}>
-            {[{v:"5-8j",l:"Délai profil spécialisé"},{v:"100%",l:"Au succès"},{v:"3 mois",l:"Garantie remplacement"},{v:"CH",l:"Romande & Alémanique"}].map(({ v, l }, i) => (
+            {(lang === "en" ? [{v:"5-8d",l:"Specialised profile"},{v:"100%",l:"Success-based"},{v:"3 months",l:"Replacement guarantee"},{v:"CH",l:"French & German speaking"}] : [{v:"5-8j",l:"Délai profil spécialisé"},{v:"100%",l:"Au succès"},{v:"3 mois",l:"Garantie remplacement"},{v:"CH",l:"Romande & Alémanique"}]).map(({ v, l }, i) => (
               <div key={i} style={{ textAlign:"center" }}>
                 <div style={{ fontSize:"1.8rem", fontWeight:900, fontFamily:"'Sora',sans-serif", marginBottom:3 }}><GradientText>{v}</GradientText></div>
                 <div style={{ color:C.subtle, fontSize:".75rem" }}>{l}</div>
@@ -335,17 +338,21 @@ export default function TalentFluxTelecom() {
       {/* PROBLÈME */}
       <section style={{ padding:isMobile?"56px 1.2rem":"88px 2rem", maxWidth:1060, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:50 }}>
-          <div style={{ color:"#EF4444", fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>⚠ Le vrai problème</div>
+          <div style={{ color:"#EF4444", fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>⚠ {lang === "en" ? "The real problem" : "Le vrai problème"}</div>
           <h2 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.6rem,3.5vw,2.6rem)", fontWeight:800, lineHeight:1.2, color:C.text }}>
-            Un spécialiste RNI ou RF planner<br /><GradientText>ne se trouve pas sur un portail d'emploi.</GradientText>
+            {lang === "en" ? <>An RNI specialist or RF planner<br /><GradientText>cannot be found on a job portal.</GradientText></> : <>Un spécialiste RNI ou RF planner<br /><GradientText>ne se trouve pas sur un portail d'emploi.</GradientText></>}
           </h2>
         </div>
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":isTablet?"1fr 1fr":"repeat(3,1fr)", gap:20 }}>
-          {[
+          {(lang === "en" ? [
+            { icon:Signal, color:"#F97316", title:"Ultra-specialised profiles", desc:"An RNI specialist masters ORNI, Narda equipment, cantonal procedures, and OFAC drone certification. This profile can never be sourced through a generic job posting." },
+            { icon:Globe, color:"#EF4444", title:"Structural shortage", desc:"Switzerland is deploying 5G across 6,000+ sites. Qualified RNI and RF planning profiles are 3-4× fewer than demand. You are not alone in searching for them." },
+            { icon:Database, color:"#DC2626", title:"Invisible to generalist agencies", desc:"These experts don't respond to job offers. They are employed, known within a very closed network of operators, subcontractors and cantonal authorities." },
+          ] : [
             { icon:Signal, color:"#F97316", title:"Profils ultra-spécialisés", desc:"Un spécialiste RNI maîtrise l'ORNI, les appareils Narda, les procédures cantonales, et la certification drone OFAC. Ce profil ne se sourcera jamais via une annonce générique." },
             { icon:Globe, color:"#EF4444", title:"Pénurie structurelle", desc:"La Suisse déploie la 5G sur 6 000+ sites. Les profils RNI et RF planning qualifiés sont 3-4× moins nombreux que les besoins. Vous n'êtes pas seul à les chercher." },
             { icon:Database, color:"#DC2626", title:"Invisible aux agences classiques", desc:"Ces experts ne répondent pas aux offres. Ils sont en poste, connus dans un réseau très fermé d'opérateurs, de sous-traitants et d'autorités cantonales." },
-          ].map(({ icon:Icon, color, title, desc }, i) => (
+          ]).map(({ icon:Icon, color, title, desc }, i) => (
             <TelecomProblemCard key={i} icon={Icon} color={color} title={title} desc={desc} delay={i*100} />
           ))}
         </div>
@@ -355,13 +362,22 @@ export default function TalentFluxTelecom() {
       <section id="métiers" style={{ padding:isMobile?"56px 1.2rem":"88px 2rem", background:"rgba(8,18,40,.4)", borderTop:`1px solid ${C.border}` }}>
         <div style={{ maxWidth:1060, margin:"0 auto" }}>
           <div style={{ textAlign:"center", marginBottom:48 }}>
-            <div style={{ color:C.gold, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ Nos spécialités</div>
+            <div style={{ color:C.gold, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ {lang === "en" ? "Our specialties" : "Nos spécialités"}</div>
             <h2 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.6rem,3.5vw,2.5rem)", fontWeight:800, color:C.text }}>
-              Tous les métiers de <GradientText>l'infrastructure télécom suisse</GradientText>
+              {lang === "en" ? <>All trades in <GradientText>Swiss telecom infrastructure</GradientText></> : <>Tous les métiers de <GradientText>l'infrastructure télécom suisse</GradientText></>}
             </h2>
           </div>
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":isTablet?"repeat(3,1fr)":"repeat(4,1fr)", gap:14 }}>
-            {[
+            {(lang === "en" ? [
+              { icon:Waves,     label:"RNI Specialist",          lvl:"ORNI · EN 50492 · Narda" },
+              { icon:Signal,    label:"RF Planner",              lvl:"Atoll · iBWave · 5G NR" },
+              { icon:MapPin,    label:"Telecom Geomatics Eng.",  lvl:"ArcGIS · QGIS · CFC/HES" },
+              { icon:Building2, label:"Passive Infra.",          lvl:"Masts · Shelters · Civil" },
+              { icon:Globe,     label:"Transmission Engineer",   lvl:"IP/MPLS · SDH · microwave" },
+              { icon:Zap,       label:"Fibre Technician",        lvl:"FTTH · FTTB · splicing" },
+              { icon:Shield,    label:"Compliance Expert",       lvl:"OFCOM · LTC · permits" },
+              { icon:Satellite, label:"Certified Drone Pilot",   lvl:"OFAC A1/A2/A3 · DJI" },
+            ] : [
               { icon:Waves,     label:"Spécialiste RNI",        lvl:"ORNI · EN 50492 · Narda" },
               { icon:Signal,    label:"RF Planner",              lvl:"Atoll · iBWave · 5G NR" },
               { icon:MapPin,    label:"Géomaticien télécom",     lvl:"ArcGIS · QGIS · CFC/HES" },
@@ -370,7 +386,7 @@ export default function TalentFluxTelecom() {
               { icon:Zap,       label:"Technicien fibre",        lvl:"FTTH · FTTB · splicing" },
               { icon:Shield,    label:"Expert conformité",       lvl:"OFCOM · LTC · permis" },
               { icon:Satellite, label:"Pilote drone certifié",   lvl:"OFAC A1/A2/A3 · DJI" },
-            ].map(({ icon:Icon, label, lvl }, i) => (
+            ]).map(({ icon:Icon, label, lvl }, i) => (
               <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:14, padding:"18px 16px", textAlign:"center", transition:"all .3s" }}
                 onMouseEnter={e=>{e.currentTarget.style.borderColor="rgba(56,189,248,.3)"; e.currentTarget.style.background="rgba(14,165,233,.06)"; e.currentTarget.style.transform="translateY(-3px)";}}
                 onMouseLeave={e=>{e.currentTarget.style.borderColor=C.border; e.currentTarget.style.background=C.card; e.currentTarget.style.transform="translateY(0)";}}>
@@ -386,28 +402,33 @@ export default function TalentFluxTelecom() {
       {/* SOLUTION */}
       <section id="solution" style={{ padding:isMobile?"56px 1.2rem":"88px 2rem", maxWidth:1060, margin:"0 auto" }}>
         <div style={{ textAlign:"center", marginBottom:50 }}>
-          <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ Notre approche</div>
+          <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ {lang === "en" ? "Our approach" : "Notre approche"}</div>
           <h2 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.6rem,3.5vw,2.6rem)", fontWeight:800, lineHeight:1.2, color:C.text }}>
-            On connaît la valeur des VLI ORNI.<br /><GradientText>On valide les certifications avant vous.</GradientText>
+            {lang === "en" ? <>We know the value of ORNI limit values.<br /><GradientText>We validate certifications before you do.</GradientText></> : <>On connaît la valeur des VLI ORNI.<br /><GradientText>On valide les certifications avant vous.</GradientText></>}
           </h2>
         </div>
 
         <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"repeat(3,1fr)", gap:20, marginBottom:40 }}>
-          <TelecomFeatureCard icon={Shield} accent="#0EA5E9" sub="Vérification #1" title="Certifications validées" desc="Certification OFAC drone (A1/A2/A3) en cours de validité. Niveau ORNI testé avec les valeurs limites réelles par bande de fréquence. Références opérateurs vérifiées." delay={0} />
-            <TelecomFeatureCard icon={MapPin} accent={C.cyan} sub="Vérification #2" title="Réseau local suisse" desc="Notre réseau couvre Vaud, Genève, Berne, Zurich et la Suisse alémanique. Profils locaux connaissant les procédures cantonales — pas de formation ORNI depuis zéro." delay={100} />
-            <TelecomFeatureCard icon={Waves} accent={C.gold} sub="Vérification #3" title="Validation technique" desc="Un spécialiste RNI qui ne connaît pas 4 V/m (900 MHz) de mémoire n'est pas senior. On pose les questions que votre DRH ne pose pas." delay={200} />
+          <TelecomFeatureCard icon={Shield} accent="#0EA5E9" sub={lang === "en" ? "Check #1" : "Vérification #1"} title={lang === "en" ? "Validated certifications" : "Certifications validées"} desc={lang === "en" ? "OFAC drone certification (A1/A2/A3) currently valid. ORNI level tested with real limit values by frequency band. Operator references verified." : "Certification OFAC drone (A1/A2/A3) en cours de validité. Niveau ORNI testé avec les valeurs limites réelles par bande de fréquence. Références opérateurs vérifiées."} delay={0} />
+            <TelecomFeatureCard icon={MapPin} accent={C.cyan} sub={lang === "en" ? "Check #2" : "Vérification #2"} title={lang === "en" ? "Local Swiss network" : "Réseau local suisse"} desc={lang === "en" ? "Our network covers Vaud, Geneva, Bern, Zurich and German-speaking Switzerland. Local profiles who know cantonal procedures — no ORNI training from scratch." : "Notre réseau couvre Vaud, Genève, Berne, Zurich et la Suisse alémanique. Profils locaux connaissant les procédures cantonales — pas de formation ORNI depuis zéro."} delay={100} />
+            <TelecomFeatureCard icon={Waves} accent={C.gold} sub={lang === "en" ? "Check #3" : "Vérification #3"} title={lang === "en" ? "Technical validation" : "Validation technique"} desc={lang === "en" ? "An RNI specialist who doesn't know 4 V/m (900 MHz) off the top of their head is not senior. We ask the questions your HR department doesn't." : "Un spécialiste RNI qui ne connaît pas 4 V/m (900 MHz) de mémoire n'est pas senior. On pose les questions que votre DRH ne pose pas."} delay={200} />
         </div>
 
         {/* Étapes */}
         <div style={{ padding:isMobile?24:38, background:"rgba(8,13,26,.8)", borderRadius:22, border:`1px solid ${C.border}` }}>
-          <div style={{ color:C.muted, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:26, textAlign:"center" }}>Le processus en 4 étapes</div>
+          <div style={{ color:C.muted, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:26, textAlign:"center" }}>{lang === "en" ? "The 4-step process" : "Le processus en 4 étapes"}</div>
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr 1fr":"repeat(4,1fr)", gap:isMobile?20:14 }}>
-            {[
+            {(lang === "en" ? [
+              { n:"01", t:"Brief",      d:"30 min to define the profile and required standards", icon:Signal },
+              { n:"02", t:"Sourcing",   d:"Network activation within 24h — existing talent pool", icon:Globe },
+              { n:"03", t:"Validation", d:"Certifications verified + ORNI questions tested",     icon:CheckCircle },
+              { n:"04", t:"Follow-up",  d:"3-month post-hire support",                           icon:Shield },
+            ] : [
               { n:"01", t:"Brief",     d:"30 min pour cerner le profil et les normes requises", icon:Signal },
               { n:"02", t:"Sourcing",  d:"Activation réseau sous 24h — vivier existant",         icon:Globe },
               { n:"03", t:"Validation",d:"Certifications vérifiées + questions ORNI testées",    icon:CheckCircle },
               { n:"04", t:"Suivi",     d:"Accompagnement 3 mois post-embauche",                  icon:Shield },
-            ].map(({ n, t, d, icon:Icon }, i) => (
+            ]).map(({ n, t, d, icon:Icon }, i) => (
               <div key={i} style={{ textAlign:"center" }}>
                 <div style={{ width:46, height:46, borderRadius:"50%", margin:"0 auto 11px", background:"linear-gradient(135deg,rgba(14,165,233,.2),rgba(56,189,248,.1))", border:`1px solid rgba(56,189,248,.25)`, display:"flex", alignItems:"center", justifyContent:"center" }}>
                   <Icon size={18} style={{ color:C.skyL }} strokeWidth={1.5} />
@@ -424,11 +445,15 @@ export default function TalentFluxTelecom() {
       {/* TÉMOIGNAGES */}
       <section style={{ padding:isMobile?"48px 1.2rem":"72px 2rem", background:"rgba(8,18,40,.3)", borderTop:`1px solid ${C.border}` }}>
         <div style={{ maxWidth:1060, margin:"0 auto", display:"grid", gridTemplateColumns:isMobile?"1fr":isTablet?"1fr 1fr":"repeat(3,1fr)", gap:20 }}>
-          {[
+          {(lang === "en" ? [
+            { q:"We had been searching for an RNI specialist for 4 months through job postings. TalentFlux presented 2 qualified profiles within a week. Their ORNI knowledge was real, verified.", a:"HR Manager, telecom operator VD" },
+            { q:"What convinced us: they asked the right questions about measurement tools and intervention cantons on the very first call. No other agency had done that.", a:"Technical Director, telecom firm Lausanne" },
+            { q:"The candidate they presented already knew the procedures of Canton Vaud and had his OFAC certification up to date. Operational day one.", a:"Project Manager, ICT company Geneva" },
+          ] : [
             { q:"Nous cherchions un spécialiste RNI depuis 4 mois via des annonces. TalentFlux nous a proposé 2 profils qualifiés en une semaine. Leurs connaissances ORNI étaient réelles, vérifiées.", a:"Responsable RH, opérateur télécom VD" },
             { q:"Ce qui nous a convaincus : ils ont posé les bonnes questions sur les outils de mesure et les cantons d'intervention dès le premier appel. Aucune autre agence n'avait fait ça.", a:"Directeur Technique, bureau télécom Lausanne" },
             { q:"Le candidat qu'ils nous ont présenté connaissait déjà les procédures du canton de Vaud et avait sa certification OFAC à jour. Operational day one.", a:"Chef de projet, entreprise ICT Genève" },
-          ].map(({ q, a }, i) => (
+          ]).map(({ q, a }, i) => (
             <div key={i} style={{ background:C.card, border:`1px solid ${C.border}`, borderRadius:18, padding:24 }}>
               <div style={{ display:"flex", gap:3, marginBottom:13 }}>
                 {Array(5).fill(0).map((_,j) => <Star key={j} size={12} fill={C.gold} color={C.gold} />)}
@@ -444,9 +469,9 @@ export default function TalentFluxTelecom() {
       <section id="faq" style={{ padding:isMobile?"56px 1.2rem":"88px 2rem" }}>
         <div style={{ maxWidth:720, margin:"0 auto" }}>
           <div style={{ textAlign:"center", marginBottom:46 }}>
-            <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ Vos questions</div>
+            <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ {lang === "en" ? "Your questions" : "Vos questions"}</div>
             <h2 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.6rem,3.5vw,2.5rem)", fontWeight:800, lineHeight:1.2, color:C.text }}>
-              Tout ce que vous voulez savoir<br /><GradientText>avant de nous appeler</GradientText>
+              {lang === "en" ? <>Everything you want to know<br /><GradientText>before calling us</GradientText></> : <>Tout ce que vous voulez savoir<br /><GradientText>avant de nous appeler</GradientText></>}
             </h2>
           </div>
           <div style={{ display:"flex", flexDirection:"column", gap:10 }}>
@@ -460,11 +485,11 @@ export default function TalentFluxTelecom() {
         <div style={{ position:"absolute", inset:0, background:"radial-gradient(ellipse at center,rgba(14,165,233,.06),transparent 65%)", pointerEvents:"none" }} />
         <div style={{ maxWidth:1060, margin:"0 auto", position:"relative", zIndex:1 }}>
           <div style={{ textAlign:"center", marginBottom:46 }}>
-            <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ Passez à l'action</div>
+            <div style={{ color:C.skyL, fontSize:".72rem", fontWeight:700, letterSpacing:".15em", textTransform:"uppercase", marginBottom:14 }}>✦ {lang === "en" ? "Take action" : "Passez à l'action"}</div>
             <h2 style={{ fontFamily:"'Sora',sans-serif", fontSize:"clamp(1.6rem,3.5vw,2.5rem)", fontWeight:800, lineHeight:1.2, color:C.text, marginBottom:10 }}>
-              Trouvez votre expert<br /><GradientText>télécom en 5-8 jours.</GradientText>
+              {lang === "en" ? <>Find your telecom expert<br /><GradientText>in 5-8 days.</GradientText></> : <>Trouvez votre expert<br /><GradientText>télécom en 5-8 jours.</GradientText></>}
             </h2>
-            <p style={{ color:C.muted, fontSize:".92rem", lineHeight:1.7 }}>Aucun frais avant l'embauche. Certifications vérifiées. Satisfaction garantie.</p>
+            <p style={{ color:C.muted, fontSize:".92rem", lineHeight:1.7 }}>{lang === "en" ? "No fees until hire. Certifications verified. Satisfaction guaranteed." : "Aucun frais avant l'embauche. Certifications vérifiées. Satisfaction garantie."}</p>
           </div>
 
           <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 300px", gap:22 }}>
@@ -483,12 +508,21 @@ export default function TalentFluxTelecom() {
               ) : !submitted ? (
                 <div style={{ padding:24 }}>
                   <div style={{ display:"grid", gridTemplateColumns:isMobile?"1fr":"1fr 1fr", gap:12, marginBottom:12 }}>
-                    <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
-                    <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
+                    <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
+                    <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="s.martin@telco.ch" value={form.email} onChange={set("email")} required />
-                    <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    <InputField label="Entreprise" placeholder="Opérateur / Bureau télécom" value={form.company} onChange={set("company")} required />
-                    <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
+                    <InputField label={lang === "en" ? "Phone" : "Téléphone"} type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
+                    <InputField label={lang === "en" ? "Company" : "Entreprise"} placeholder={lang === "en" ? "Operator / Telecom firm" : "Opérateur / Bureau télécom"} value={form.company} onChange={set("company")} required />
+                    <SelectField label={lang === "en" ? "Profile sought" : "Profil recherché"} value={form.specialite} onChange={set("specialite")} options={lang === "en" ? [
+                      {value:"",label:"Select"},
+                      {value:"Spécialiste RNI",label:"RNI Specialist"},
+                      {value:"RF Planner",label:"RF Planner"},
+                      {value:"Géomaticien télécom",label:"Telecom Geomatics Engineer"},
+                      {value:"Technicien fibre",label:"Fibre Technician"},
+                      {value:"Ingénieur transmission",label:"Transmission Engineer"},
+                      {value:"Pilote drone certifié",label:"Certified Drone Pilot OFAC"},
+                      {value:"Expert conformité",label:"Compliance Expert OFCOM/ORNI"},
+                    ] : [
                       {value:"",label:"Sélectionner"},
                       {value:"Spécialiste RNI",label:"Spécialiste RNI"},
                       {value:"RF Planner",label:"RF Planner"},
@@ -502,9 +536,9 @@ export default function TalentFluxTelecom() {
 
                   <div style={{ marginBottom:12 }}>
                     <label style={{ display:"block", color:C.subtle, fontSize:".7rem", fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", marginBottom:7 }}>
-                      Description du besoin
+                      {lang === "en" ? "Need description" : "Description du besoin"}
                     </label>
-                    <textarea placeholder="Ex: Spécialiste RNI autonome pour constituer les fiches ORNI et dossiers de permis, canton VD/GE, certification drone souhaitée..."
+                    <textarea placeholder={lang === "en" ? "Ex: Autonomous RNI specialist to build ORNI sheets and permit files, canton VD/GE, drone certification preferred..." : "Ex: Spécialiste RNI autonome pour constituer les fiches ORNI et dossiers de permis, canton VD/GE, certification drone souhaitée..."}
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width:"100%", padding:"12px 15px", borderRadius:12, background:"rgba(4,10,24,.8)", border:`1px solid ${C.border}`, color:C.text, fontSize:".88rem", outline:"none", resize:"vertical", transition:"all .25s", fontFamily:"'DM Sans',sans-serif", lineHeight:1.6 }}
                       onFocus={e=>{e.target.style.borderColor="rgba(56,189,248,.5)"; e.target.style.boxShadow="0 0 0 3px rgba(14,165,233,.06)";}}
@@ -515,7 +549,7 @@ export default function TalentFluxTelecom() {
                   {/* Upload cahier des charges */}
                   <div style={{ marginBottom:16 }}>
                     <label style={{ display:"block", color:C.subtle, fontSize:".7rem", fontWeight:700, letterSpacing:".08em", textTransform:"uppercase", marginBottom:7 }}>
-                      Cahier des charges <span style={{ color:C.subtle, fontWeight:400, marginLeft:6, textTransform:"none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      {lang === "en" ? "Specification sheet" : "Cahier des charges"} <span style={{ color:C.subtle, fontWeight:400, marginLeft:6, textTransform:"none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -526,7 +560,7 @@ export default function TalentFluxTelecom() {
                         onMouseEnter={e=>e.currentTarget.style.borderColor="rgba(56,189,248,.4)"}
                         onMouseLeave={e=>{if(!dragOver)e.currentTarget.style.borderColor=C.border;}}>
                         <Upload size={19} style={{ color:C.subtle, margin:"0 auto 7px" }} />
-                        <p style={{ color:C.muted, fontSize:".82rem" }}><span style={{ color:C.skyL, fontWeight:600 }}>Cliquez</span> ou glissez votre PDF</p>
+                        <p style={{ color:C.muted, fontSize:".82rem" }}><span style={{ color:C.skyL, fontWeight:600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}</p>
                         <input ref={fileRef} type="file" accept=".pdf" style={{ display:"none" }} onChange={e=>handleFile(e.target.files[0])} />
                       </div>
                     ) : (
@@ -555,14 +589,14 @@ export default function TalentFluxTelecom() {
                     onMouseLeave={e=>{e.currentTarget.style.boxShadow="0 4px 22px rgba(14,165,233,.3)"; e.currentTarget.style.transform="translateY(0)";}}>
                     {loading ? <><div style={{ width:16,height:16,border:"2px solid rgba(255,255,255,.3)",borderTop:"2px solid #fff",borderRadius:"50%",animation:"spin .8s linear infinite" }}/>Envoi...</> : <><Send size={16}/>{lang === "en" ? "Find my telecom expert" : "Trouver mon expert télécom"}</>}
                   </button>
-                  <p style={{ color:C.subtle, fontSize:".7rem", textAlign:"center", marginTop:9 }}>🔒 Données sécurisées · RGPD conforme</p>
+                  <p style={{ color:C.subtle, fontSize:".7rem", textAlign:"center", marginTop:9 }}>🔒 {lang === "en" ? "Secure data · GDPR compliant" : "Données sécurisées · RGPD conforme"}</p>
                 </div>
               ) : (
                 <div style={{ padding:"52px 26px", textAlign:"center" }}>
                   <div style={{ fontSize:40, marginBottom:16 }}>📡</div>
-                  <h3 style={{ color:C.text, fontWeight:700, fontSize:"1.2rem", marginBottom:10 }}>Demande reçue <GradientText>✓</GradientText></h3>
-                  <p style={{ color:C.muted, marginBottom:20, lineHeight:1.7, fontSize:".9rem" }}>Merci <strong style={{ color:C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color:C.skyL }}>24h</strong>.</p>
-                  <button onClick={resetForm} style={{ padding:"10px 24px", borderRadius:11, border:`1px solid rgba(56,189,248,.3)`, background:"rgba(14,165,233,.07)", color:C.skyL, fontWeight:600, cursor:"pointer", fontSize:".86rem", fontFamily:"'DM Sans',sans-serif" }}>Nouvelle demande</button>
+                  <h3 style={{ color:C.text, fontWeight:700, fontSize:"1.2rem", marginBottom:10 }}>{lang === "en" ? "Request received" : "Demande reçue"} <GradientText>✓</GradientText></h3>
+                  <p style={{ color:C.muted, marginBottom:20, lineHeight:1.7, fontSize:".9rem" }}>{lang === "en" ? "Thank you" : "Merci"} <strong style={{ color:C.text }}>{form.firstName}</strong> !<br />{lang === "en" ? <>A TalentFlux consultant will reply within <strong style={{ color:C.skyL }}>24h</strong>.</> : <>Un consultant TalentFlux vous répond sous <strong style={{ color:C.skyL }}>24h</strong>.</>}</p>
+                  <button onClick={resetForm} style={{ padding:"10px 24px", borderRadius:11, border:`1px solid rgba(56,189,248,.3)`, background:"rgba(14,165,233,.07)", color:C.skyL, fontWeight:600, cursor:"pointer", fontSize:".86rem", fontFamily:"'DM Sans',sans-serif" }}>{lang === "en" ? "New request" : "Nouvelle demande"}</button>
                 </div>
               )}
             </div>
@@ -570,7 +604,7 @@ export default function TalentFluxTelecom() {
             {/* SIDEBAR */}
             <div style={{ display:"flex", flexDirection:"column", gap:13 }}>
               <div style={{ background:"rgba(6,12,26,.95)", border:`1px solid ${C.border}`, borderRadius:20, padding:22 }}>
-                <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:".88rem", marginBottom:15, color:C.text }}>Nous contacter</h3>
+                <h3 style={{ fontFamily:"'Sora',sans-serif", fontWeight:700, fontSize:".88rem", marginBottom:15, color:C.text }}>{lang === "en" ? "Contact us" : "Nous contacter"}</h3>
                 {[{icon:Mail,label:"Email",value:"info@talentflux.ch",href:"mailto:info@talentflux.ch"},{icon:Phone,label:"Tél.",value:"+41 76 592 88 06",href:"tel:+41765928806"},{icon:MapPin,label:"Adresse",value:"Yverdon-les-Bains, VD",href:null}].map(({ icon:Icon, label, value, href }) => (
                   <div key={label} style={{ display:"flex", alignItems:"center", gap:10, padding:"9px 0", borderBottom:`1px solid ${C.border}` }}>
                     <div style={{ width:30, height:30, borderRadius:8, flexShrink:0, background:"rgba(14,165,233,.1)", border:`1px solid rgba(56,189,248,.15)`, display:"flex", alignItems:"center", justifyContent:"center" }}>
@@ -587,9 +621,9 @@ export default function TalentFluxTelecom() {
               <div style={{ background:"linear-gradient(135deg,rgba(14,165,233,.1),rgba(56,189,248,.05))", border:`1px solid rgba(56,189,248,.2)`, borderRadius:20, padding:18 }}>
                 <div style={{ display:"flex", alignItems:"center", gap:7, marginBottom:11 }}>
                   <Clock size={13} style={{ color:C.skyL }} />
-                  <span style={{ color:C.text, fontWeight:700, fontSize:".85rem" }}>Délais</span>
+                  <span style={{ color:C.text, fontWeight:700, fontSize:".85rem" }}>{lang === "en" ? "Timelines" : "Délais"}</span>
                 </div>
-                {[["Accusé de réception","< 2h"],["Premier brief","< 24h"],["Premiers profils","5-8 jours"]].map(([l,d]) => (
+                {(lang === "en" ? [["Acknowledgement","< 2h"],["First brief","< 24h"],["First profiles","5-8 days"]] : [["Accusé de réception","< 2h"],["Premier brief","< 24h"],["Premiers profils","5-8 jours"]]).map(([l,d]) => (
                   <div key={l} style={{ display:"flex", justifyContent:"space-between", padding:"6px 0", borderBottom:`1px solid rgba(255,255,255,.04)` }}>
                     <span style={{ color:C.muted, fontSize:".78rem" }}>{l}</span>
                     <span style={{ color:C.skyL, fontSize:".73rem", fontWeight:700, background:"rgba(14,165,233,.1)", padding:"2px 8px", borderRadius:5 }}>{d}</span>
@@ -598,7 +632,7 @@ export default function TalentFluxTelecom() {
               </div>
 
               <div style={{ background:"rgba(6,12,26,.9)", border:`1px solid ${C.border}`, borderRadius:20, padding:18 }}>
-                {[["✓","Aucun frais avant embauche"],["✓","Certifications vérifiées avant présentation"],["✓","Valeurs ORNI testées en entretien"],["✓","Garantie remplacement 3 mois"]].map(([icon,text]) => (
+                {(lang === "en" ? [["✓","No fees until hire"],["✓","Certifications verified before presentation"],["✓","ORNI values tested in interview"],["✓","3-month replacement guarantee"]] : [["✓","Aucun frais avant embauche"],["✓","Certifications vérifiées avant présentation"],["✓","Valeurs ORNI testées en entretien"],["✓","Garantie remplacement 3 mois"]]).map(([icon,text]) => (
                   <div key={text} style={{ display:"flex", gap:9, padding:"6px 0", alignItems:"center" }}>
                     <span style={{ color:C.skyL, fontWeight:700, fontSize:".9rem" }}>{icon}</span>
                     <span style={{ color:C.muted, fontSize:".8rem" }}>{text}</span>
@@ -621,18 +655,18 @@ export default function TalentFluxTelecom() {
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ color: "#0EA5E9", fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
-              ✦ Nos autres expertises
+              ✦ {lang === "en" ? "Our other expertise" : "Nos autres expertises"}
             </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
-              Vous recrutez aussi dans...
+              {lang === "en" ? "You also recruit in..." : "Vous recrutez aussi dans..."}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".88rem" }}>
-              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+              {lang === "en" ? "TalentFlux operates across 6 specialised sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
             </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             
-          <a href="/it" style={{
+          <a href={lang === "en" ? "/en/it" : "/it"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#38BDF810", border: "1px solid #38BDF830",
@@ -645,10 +679,10 @@ export default function TalentFluxTelecom() {
             <span style={{ fontSize: "1.1rem" }}>💻</span>
             <div>
               <div style={{ color: "#38BDF8", fontWeight: 700, fontSize: ".88rem" }}>IT & Digital</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
-          <a href="/ingenierie" style={{
+          <a href={lang === "en" ? "/en/ingenierie" : "/ingenierie"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#818CF810", border: "1px solid #818CF830",
@@ -660,8 +694,8 @@ export default function TalentFluxTelecom() {
           >
             <span style={{ fontSize: "1.1rem" }}>⚙️</span>
             <div>
-              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Engineering" : "Ingénierie"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           </div>
@@ -673,11 +707,11 @@ export default function TalentFluxTelecom() {
         <div style={{ maxWidth:1060, margin:"0 auto", display:"flex", alignItems:"center", justifyContent:"space-between", flexWrap:"wrap", gap:12 }}>
           <div style={{ display:"flex", alignItems:"center", gap:11 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height:30, objectFit:"contain" }} />
-            <span style={{ color:C.subtle, fontSize:".7rem" }}>· Télécommunications · Yverdon-les-Bains, VD</span>
+            <span style={{ color:C.subtle, fontSize:".7rem" }}>· {lang === "en" ? "Telecommunications · Yverdon-les-Bains, Switzerland" : "Télécommunications · Yverdon-les-Bains, VD"}</span>
           </div>
-          <p style={{ color:C.subtle, fontSize:".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
+          <p style={{ color:C.subtle, fontSize:".72rem" }}>© 2025 TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display:isMobile?"none":"flex", gap:16 }}>
-            {[["Confidentialité","/privacy"],["CGU","/cgu"],["Contact", "/contact"]].map(([label,to]) => (
+            {(lang === "en" ? [["Privacy","/privacy"],["Terms","/cgu"],["Contact","/contact"]] : [["Confidentialité","/privacy"],["CGU","/cgu"],["Contact", "/contact"]]).map(([label,to]) => (
               <Link key={to} href={to} style={{ color:C.subtle, fontSize:".72rem", textDecoration:"none", transition:"color .2s" }} onMouseEnter={e=>e.target.style.color=C.muted} onMouseLeave={e=>e.target.style.color=C.subtle}>{label}</Link>
             ))}
           </div>

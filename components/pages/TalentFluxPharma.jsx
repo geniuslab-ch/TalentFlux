@@ -181,14 +181,14 @@ export default function TalentFluxPharma() {
 
   const handleFile = file => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Fichier trop lourd (max 10 MB)."); return; }
     setError(null); setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
@@ -248,8 +248,12 @@ export default function TalentFluxPharma() {
           </a>
         ) : (
           <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
-            {["Solution", "Métiers", "FAQ"].map(item => (
-              <span key={item} onClick={() => scrollTo(item.toLowerCase())} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{item}</span>
+            {[
+              { label: lang === "en" ? "Solution" : "Solution", id: "solution" },
+              { label: lang === "en" ? "Specialties" : "Métiers", id: "métiers" },
+              { label: "FAQ", id: "faq" },
+            ].map(({ label, id }) => (
+              <span key={id} onClick={() => scrollTo(id)} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{label}</span>
             ))}
             <a href="tel:+41765928806" style={{
               display: "flex", alignItems: "center", gap: 6,
@@ -301,33 +305,32 @@ export default function TalentFluxPharma() {
           </div>
 
           <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: C.roseL, marginBottom: 16 }}>
-            Recrutement · Pharma, Biotech & Life Sciences · Suisse
+            {lang === "en" ? "Recruitment · Pharma, Biotech & Life Sciences · Switzerland" : "Recrutement · Pharma, Biotech & Life Sciences · Suisse"}
           </p>
 
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-.02em", color: C.text, marginBottom: 22 }}>
-            Recrutement Pharma & Life Sciences en Suisse :<br />
-            <GradientText>votre Responsible Person répond aux experts, pas aux généralistes.</GradientText>
+            {lang === "en" ? <>Pharma & Life Sciences Recruitment in Switzerland:<br /><GradientText>your Responsible Person answers to experts, not generalists.</GradientText></> : <>Recrutement Pharma & Life Sciences en Suisse :<br /><GradientText>votre Responsible Person répond aux experts, pas aux généralistes.</GradientText></>}
           </h1>
 
           <p style={{ color: C.muted, fontSize: ".97rem", lineHeight: 1.8, maxWidth: 580, margin: "0 auto 36px" }}>
-            QA Manager, Affaires Réglementaires, Responsable Production GMP, Ingénieur Validation — des profils pris d'assaut par Roche, Novartis et Lonza. TalentFlux les connaît avant qu'ils ne soient sur le marché.
+            {lang === "en" ? "QA Manager, Regulatory Affairs, GMP Production Manager, Validation Engineer — profiles in high demand from Roche, Novartis and Lonza. TalentFlux knows them before they hit the market." : "QA Manager, Affaires Réglementaires, Responsable Production GMP, Ingénieur Validation — des profils pris d'assaut par Roche, Novartis et Lonza. TalentFlux les connaît avant qu'ils ne soient sur le marché."}
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => scrollTo("contact")} style={{ background: C.grad, border: "none", color: "#fff", padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", cursor: "pointer", display: "flex", alignItems: "center", gap: 9, boxShadow: "0 0 28px rgba(192,38,211,.35)", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 50px rgba(232,121,249,.6)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(192,38,211,.35)"; }}>
-              <Users size={17} /> Trouver mon expert <ArrowRight size={16} />
+              <Users size={17} /> {lang === "en" ? "Find my expert" : "Trouver mon expert"} <ArrowRight size={16} />
             </button>
             <Link href="/candidature/pharma" style={{ background: "rgba(192,38,211,.08)", border: "1.5px solid rgba(232,121,249,.4)", color: C.roseL, padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", display: "flex", alignItems: "center", gap: 9, textDecoration: "none", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(192,38,211,.14)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(192,38,211,.08)"; }}>
-              <FlaskConical size={17} /> Déposer ma candidature <ArrowRight size={16} />
+              <FlaskConical size={17} /> {lang === "en" ? "Submit my application" : "Déposer ma candidature"} <ArrowRight size={16} />
             </Link>
           </div>
 
           <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: isMobile ? 18 : 32, justifyContent: "center", flexWrap: "wrap", marginTop: 52, paddingTop: 34, borderTop: `1px solid ${C.border}` }}>
-            {[{ v: "6-10j", l: "Délai profil RP / Head QA" }, { v: "100%", l: "Au succès" }, { v: "3 mois", l: "Garantie remplacement" }, { v: "CH", l: "Romande & Alémanique" }].map(({ v, l }, i) => (
+            {(lang === "en" ? [{ v: "6-10d", l: "RP / Head QA profile" }, { v: "100%", l: "Success-based" }, { v: "3 months", l: "Replacement guarantee" }, { v: "CH", l: "French & German speaking" }] : [{ v: "6-10j", l: "Délai profil RP / Head QA" }, { v: "100%", l: "Au succès" }, { v: "3 mois", l: "Garantie remplacement" }, { v: "CH", l: "Romande & Alémanique" }]).map(({ v, l }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "1.8rem", fontWeight: 900, fontFamily: "'Sora',sans-serif", marginBottom: 3 }}><GradientText>{v}</GradientText></div>
                 <div style={{ color: C.subtle, fontSize: ".75rem" }}>{l}</div>
@@ -476,7 +479,7 @@ export default function TalentFluxPharma() {
             {/* FORM */}
             <div style={{ background: "rgba(10,4,18,.95)", border: `1px solid ${C.border}`, borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: `1px solid ${C.border}` }}>
-                {[{ key: "recruiter", label: "🏢 Je recrute" }, { key: "candidate", label: "🔬 Je suis candidat" }].map(({ key, label }) => (
+                {[{ key: "recruiter", label: lang === "en" ? "🏢 I'm hiring" : "🏢 Je recrute" }, { key: "candidate", label: lang === "en" ? "🔬 I'm a candidate" : "🔬 Je suis candidat" }].map(({ key, label }) => (
                   <button key={key} onClick={() => setActiveTab(key)} style={{ flex: 1, padding: "15px", border: "none", cursor: "pointer", background: activeTab === key ? "linear-gradient(135deg,rgba(124,58,237,.15),rgba(192,38,211,.08))" : "transparent", borderBottom: `2px solid ${activeTab === key ? C.roseL : "transparent"}`, color: activeTab === key ? C.text : C.subtle, fontWeight: 700, fontSize: ".84rem", transition: "all .25s", fontFamily: "'DM Sans',sans-serif" }}>{label}</button>
                 ))}
               </div>
@@ -488,12 +491,23 @@ export default function TalentFluxPharma() {
               ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                    <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
-                    <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
+                    <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
+                    <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="s.martin@pharma.ch" value={form.email} onChange={set("email")} required />
-                    <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    <InputField label="Entreprise" placeholder="Roche / Lonza / biotech..." value={form.company} onChange={set("company")} required />
-                    <SelectField label="Profil recherché" value={form.specialite} onChange={set("specialite")} options={[
+                    <InputField label={lang === "en" ? "Phone" : "Téléphone"} type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
+                    <InputField label={lang === "en" ? "Company" : "Entreprise"} placeholder="Roche / Lonza / biotech..." value={form.company} onChange={set("company")} required />
+                    <SelectField label={lang === "en" ? "Profile sought" : "Profil recherché"} value={form.specialite} onChange={set("specialite")} options={lang === "en" ? [
+                      { value: "", label: "Select" },
+                      { value: "QA Manager", label: "QA Manager / Director" },
+                      { value: "Affaires Réglementaires", label: "Regulatory Affairs (RA)" },
+                      { value: "QC", label: "QC / Quality Control" },
+                      { value: "Production GMP", label: "GMP Production Manager" },
+                      { value: "Validation", label: "Validation Engineer (IQ/OQ/PQ / CSV)" },
+                      { value: "Pharmacovigilance", label: "Pharmacovigilance / QPPV" },
+                      { value: "R&D", label: "R&D / Formulation" },
+                      { value: "HSE", label: "HSE / EHS" },
+                      { value: "Responsible Person", label: "Responsible Person (RP)" },
+                    ] : [
                       { value: "", label: "Sélectionner" },
                       { value: "QA Manager", label: "QA Manager / Director" },
                       { value: "Affaires Réglementaires", label: "Affaires Réglementaires (AR)" },
@@ -509,9 +523,9 @@ export default function TalentFluxPharma() {
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      Description du besoin
+                      {lang === "en" ? "Description of need" : "Description du besoin"}
                     </label>
-                    <textarea placeholder="Ex: QA Manager avec expérience audits Swissmedic, maîtrise ICH Q9/Q10, contexte CDMO, canton VD, anglais C1..."
+                    <textarea placeholder={lang === "en" ? "E.g.: QA Manager with Swissmedic audit experience, ICH Q9/Q10, CDMO context, canton VD, English C1..." : "Ex: QA Manager avec expérience audits Swissmedic, maîtrise ICH Q9/Q10, contexte CDMO, canton VD, anglais C1..."}
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "12px 15px", borderRadius: 12, background: "rgba(8,2,16,.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", transition: "all .25s", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(232,121,249,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(192,38,211,.06)"; }}
@@ -521,7 +535,7 @@ export default function TalentFluxPharma() {
 
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      Cahier des charges <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      {lang === "en" ? "Specification sheet" : "Cahier des charges"} <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -532,7 +546,7 @@ export default function TalentFluxPharma() {
                         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(232,121,249,.4)"}
                         onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = C.border; }}>
                         <Upload size={19} style={{ color: C.subtle, margin: "0 auto 7px" }} />
-                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.roseL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
+                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.roseL, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}</p>
                         <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                       </div>
                     ) : (
@@ -561,14 +575,14 @@ export default function TalentFluxPharma() {
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(192,38,211,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                     {loading ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</> : <><Send size={16} />{lang === "en" ? "Find my pharma expert" : "Trouver mon expert pharma"}</>}
                   </button>
-                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données sécurisées · RGPD conforme</p>
+                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 {lang === "en" ? "Secure data · GDPR compliant" : "Données sécurisées · RGPD conforme"}</p>
                 </div>
               ) : (
                 <div style={{ padding: "52px 26px", textAlign: "center" }}>
                   <div style={{ fontSize: 40, marginBottom: 16 }}>🔬</div>
-                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>Demande reçue <GradientText>✓</GradientText></h3>
-                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color: C.roseL }}>24h</strong>.</p>
-                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(232,121,249,.3)`, background: "rgba(192,38,211,.07)", color: C.roseL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>Nouvelle demande</button>
+                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>{lang === "en" ? "Request received" : "Demande reçue"} <GradientText>✓</GradientText></h3>
+                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>{lang === "en" ? <>Thank you <strong style={{ color: C.text }}>{form.firstName}</strong>!<br />A TalentFlux consultant will get back to you within <strong style={{ color: C.roseL }}>24h</strong>.</> : <>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color: C.roseL }}>24h</strong>.</>}</p>
+                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(232,121,249,.3)`, background: "rgba(192,38,211,.07)", color: C.roseL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>{lang === "en" ? "New request" : "Nouvelle demande"}</button>
                 </div>
               )}
             </div>
@@ -576,8 +590,8 @@ export default function TalentFluxPharma() {
             {/* SIDEBAR */}
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               <div style={{ background: "rgba(10,4,18,.95)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 22 }}>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>Nous contacter</h3>
-                {[{ icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" }, { icon: Phone, label: "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" }, { icon: MapPin, label: "Adresse", value: "Yverdon-les-Bains, VD", href: null }].map(({ icon: Icon, label, value, href }) => (
+                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>{lang === "en" ? "Contact us" : "Nous contacter"}</h3>
+                {[{ icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" }, { icon: Phone, label: lang === "en" ? "Tel." : "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" }, { icon: MapPin, label: lang === "en" ? "Address" : "Adresse", value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, VD", href: null }].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(192,38,211,.1)", border: `1px solid rgba(232,121,249,.15)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Icon size={12} style={{ color: C.roseL }} strokeWidth={1.5} />
@@ -593,9 +607,9 @@ export default function TalentFluxPharma() {
               <div style={{ background: "linear-gradient(135deg,rgba(124,58,237,.1),rgba(192,38,211,.05))", border: `1px solid rgba(232,121,249,.2)`, borderRadius: 20, padding: 18 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 11 }}>
                   <Clock size={13} style={{ color: C.roseL }} />
-                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>Délais</span>
+                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>{lang === "en" ? "Timelines" : "Délais"}</span>
                 </div>
-                {[["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "6-10 jours"]].map(([l, d]) => (
+                {(lang === "en" ? [["Acknowledgement", "< 2h"], ["First brief", "< 24h"], ["First profiles", "6-10 days"]] : [["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "6-10 jours"]]).map(([l, d]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid rgba(255,255,255,.04)` }}>
                     <span style={{ color: C.muted, fontSize: ".78rem" }}>{l}</span>
                     <span style={{ color: C.roseL, fontSize: ".73rem", fontWeight: 700, background: "rgba(192,38,211,.1)", padding: "2px 8px", borderRadius: 5 }}>{d}</span>
@@ -604,7 +618,7 @@ export default function TalentFluxPharma() {
               </div>
 
               <div style={{ background: "rgba(10,4,18,.9)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 18 }}>
-                {[["✓", "Aucun frais avant embauche"], ["✓", "Compétences GMP vérifiées"], ["✓", "Expérience Swissmedic testée"], ["✓", "Garantie remplacement 3 mois"]].map(([icon, text]) => (
+                {(lang === "en" ? [["✓", "No fees until hire"], ["✓", "Verified GMP expertise"], ["✓", "Swissmedic experience tested"], ["✓", "3-month replacement guarantee"]] : [["✓", "Aucun frais avant embauche"], ["✓", "Compétences GMP vérifiées"], ["✓", "Expérience Swissmedic testée"], ["✓", "Garantie remplacement 3 mois"]]).map(([icon, text]) => (
                   <div key={text} style={{ display: "flex", gap: 9, padding: "6px 0", alignItems: "center" }}>
                     <span style={{ color: C.roseL, fontWeight: 700, fontSize: ".9rem" }}>{icon}</span>
                     <span style={{ color: C.muted, fontSize: ".8rem" }}>{text}</span>
@@ -630,15 +644,15 @@ export default function TalentFluxPharma() {
               ✦ Nos autres expertises
             </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
-              Vous recrutez aussi dans...
+              {lang === "en" ? "Also hiring in..." : "Vous recrutez aussi dans..."}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".88rem" }}>
-              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+              {lang === "en" ? "TalentFlux operates across 6 specialised sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
             </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             
-          <a href="/finance" style={{
+          <a href={lang === "en" ? "/en/finance" : "/finance"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#D4AF5A10", border: "1px solid #D4AF5A30",
@@ -650,11 +664,11 @@ export default function TalentFluxPharma() {
           >
             <span style={{ fontSize: "1.1rem" }}>💰</span>
             <div>
-              <div style={{ color: "#D4AF5A", fontWeight: 700, fontSize: ".88rem" }}>Finance & Contrôle</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#D4AF5A", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Finance & Control" : "Finance & Contrôle"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
-          <a href="/ingenierie" style={{
+          <a href={lang === "en" ? "/en/ingenierie" : "/ingenierie"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#818CF810", border: "1px solid #818CF830",
@@ -666,8 +680,8 @@ export default function TalentFluxPharma() {
           >
             <span style={{ fontSize: "1.1rem" }}>⚙️</span>
             <div>
-              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Engineering" : "Ingénierie"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           </div>
@@ -679,11 +693,11 @@ export default function TalentFluxPharma() {
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
-            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Pharma & Life Sciences · Yverdon-les-Bains, VD</span>
+            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Pharma & Life Sciences · {lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, VD"}</span>
           </div>
-          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en" ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]] : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.muted} onMouseLeave={e => e.target.style.color = C.subtle}>{label}</Link>
             ))}
           </div>

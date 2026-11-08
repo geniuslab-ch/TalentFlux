@@ -245,15 +245,15 @@ export default function TalentFluxPaysagisme() {
 
   const handleFile = file => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Fichier trop lourd (max 10 MB)."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
@@ -330,12 +330,16 @@ export default function TalentFluxPaysagisme() {
         
 
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
-          {["Solution", "Métiers", "FAQ"].map(item => (
-            <span key={item} onClick={() => scrollTo(item.toLowerCase())}
+          {[
+            { label: lang === "en" ? "Solution" : "Solution", id: "solution" },
+            { label: lang === "en" ? "Trades" : "Métiers", id: "métiers" },
+            { label: "FAQ", id: "faq" },
+          ].map(({ label, id }) => (
+            <span key={id} onClick={() => scrollTo(id)}
               style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = C.text}
               onMouseLeave={e => e.target.style.color = C.muted}
-            >{item}</span>
+            >{label}</span>
           ))}
         
           
@@ -398,16 +402,15 @@ export default function TalentFluxPaysagisme() {
           </div>
 
           <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: C.greenL, marginBottom: 16 }}>
-            Recrutement · Paysagisme & Aménagements extérieurs
+            {lang === "en" ? "Recruitment · Landscaping & Outdoor Projects" : "Recrutement · Paysagisme & Aménagements extérieurs"}
           </p>
 
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-.02em", color: C.text, marginBottom: 22 }}>
-            Recrutement Paysagisme en Suisse romande :<br />
-            <GradientText>le bon profil ne pousse pas tout seul dans votre jardin.</GradientText>
+            {lang === "en" ? <>Landscaping Recruitment in Switzerland:<br /><GradientText>the right profile doesn't grow on trees.</GradientText></> : <>Recrutement Paysagisme en Suisse romande :<br /><GradientText>le bon profil ne pousse pas tout seul dans votre jardin.</GradientText></>}
           </h1>
 
           <p style={{ color: C.muted, fontSize: ".97rem", lineHeight: 1.8, maxWidth: 580, margin: "0 auto 36px" }}>
-            Jardiniers, maçons paysagistes, chefs de chantier, conducteurs de travaux — TalentFlux constitue votre équipe terrain avec le même soin que vous apportez à vos réalisations.
+            {lang === "en" ? "Gardeners, landscape masons, site managers, project managers — TalentFlux builds your field team with the same care you put into your projects." : "Jardiniers, maçons paysagistes, chefs de chantier, conducteurs de travaux — TalentFlux constitue votre équipe terrain avec le même soin que vous apportez à vos réalisations."}
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
@@ -420,7 +423,7 @@ export default function TalentFluxPaysagisme() {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 50px rgba(34,197,94,.6)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(34,197,94,.35)"; }}
             >
-              <Users size={17} /> Trouver mon profil <ArrowRight size={16} />
+              <Users size={17} /> {lang === "en" ? "Find my profile" : "Trouver mon profil"} <ArrowRight size={16} />
             </button>
             <Link href="/candidature/paysagisme" style={{
               background: "rgba(202,138,4,.08)", border: "1.5px solid rgba(202,138,4,.4)", color: C.earthL,
@@ -430,18 +433,23 @@ export default function TalentFluxPaysagisme() {
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(202,138,4,.14)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(202,138,4,.08)"; }}
             >
-              <Sprout size={17} /> Déposer ma candidature <ArrowRight size={16} />
+              <Sprout size={17} /> {lang === "en" ? "Submit my application" : "Déposer ma candidature"} <ArrowRight size={16} />
             </Link>
           </div>
 
           {/* Stats */}
           <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: isMobile ? 18 : 32, justifyContent: "center", flexWrap: "wrap", marginTop: 52, paddingTop: 34, borderTop: `1px solid ${C.border}` }}>
-            {[
+            {(lang === "en" ? [
+              { v: "72h",    l: "First profile" },
+              { v: "100%",   l: "Success-based" },
+              { v: "3 months", l: "Replacement guarantee" },
+              { v: "Switzerland", l: "French & German speaking" },
+            ] : [
               { v: "72h",  l: "Délai premier profil" },
               { v: "100%", l: "Au succès" },
               { v: "3 mois", l: "Garantie remplacement" },
               { v: "Suisse", l: "Romande & Alémanique" },
-            ].map(({ v, l }, i) => (
+            ]).map(({ v, l }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "1.8rem", fontWeight: 900, fontFamily: "'Sora',sans-serif", marginBottom: 3 }}><GradientText>{v}</GradientText></div>
                 <div style={{ color: C.subtle, fontSize: ".75rem" }}>{l}</div>
@@ -625,11 +633,11 @@ export default function TalentFluxPaysagisme() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center,rgba(22,163,74,.06),transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1060, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 46 }}>
-            <div style={{ color: C.mint, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Passez à l'action</div>
+            <div style={{ color: C.mint, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ {lang === "en" ? "Take action" : "Passez à l'action"}</div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, lineHeight: 1.2, color: C.text, marginBottom: 10 }}>
-              Prêt à constituer<br /><GradientText>votre équipe terrain ?</GradientText>
+              {lang === "en" ? <>Ready to build<br /><GradientText>your field team?</GradientText></> : <>Prêt à constituer<br /><GradientText>votre équipe terrain ?</GradientText></>}
             </h2>
-            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>Aucun frais avant l'embauche. Satisfaction garantie. Premier profil sous 72h.</p>
+            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>{lang === "en" ? "No fees until hire. Satisfaction guaranteed. First profile within 72h." : "Aucun frais avant l'embauche. Satisfaction garantie. Premier profil sous 72h."}</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 300px", gap: 22 }}>
@@ -657,19 +665,31 @@ export default function TalentFluxPaysagisme() {
               ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                    <InputField label="Prénom" placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
-                    <InputField label="Nom" placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
+                    <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder="Sophie" value={form.firstName} onChange={set("firstName")} required />
+                    <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder="Martin" value={form.lastName} onChange={set("lastName")} required />
                     <InputField label="Email" type="email" placeholder="sophie@paysage.ch" value={form.email} onChange={set("email")} required />
-                    <InputField label="Téléphone" type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
-                    <InputField label="Entreprise" placeholder="Paysage Vaud SA" value={form.company} onChange={set("company")} required />
-                    <InputField label="Profil recherché" placeholder="Chef de chantier paysagiste CFC" value={form.role} onChange={set("role")} />
-                    <SelectField label="Type de contrat" value={form.contrat || ""} onChange={set("contrat")} options={[
+                    <InputField label={lang === "en" ? "Phone" : "Téléphone"} type="tel" placeholder="+41 76 592 88 06" value={form.phone} onChange={set("phone")} />
+                    <InputField label={lang === "en" ? "Company" : "Entreprise"} placeholder={lang === "en" ? "Paysage Vaud Ltd" : "Paysage Vaud SA"} value={form.company} onChange={set("company")} required />
+                    <InputField label={lang === "en" ? "Profile sought" : "Profil recherché"} placeholder={lang === "en" ? "Landscaping site manager CFC" : "Chef de chantier paysagiste CFC"} value={form.role} onChange={set("role")} />
+                    <SelectField label={lang === "en" ? "Contract type" : "Type de contrat"} value={form.contrat || ""} onChange={set("contrat")} options={lang === "en" ? [
+                      {value:"", label:"No preference"},
+                      {value:"CDI", label:"Permanent position"},
+                      {value:"CDD saison", label:"Seasonal contract (Mar–Oct)"},
+                      {value:"Temporaire", label:"Temporary reinforcement"},
+                    ] : [
                       {value:"", label:"Indifférent"},
                       {value:"CDI", label:"CDI — poste fixe"},
                       {value:"CDD saison", label:"CDD saisonnier (mars–oct.)"},
                       {value:"Temporaire", label:"Renfort temporaire"},
                     ]} />
-                    <SelectField label="Zone d'intervention" value={form.zone || ""} onChange={set("zone")} options={[
+                    <SelectField label={lang === "en" ? "Area of operation" : "Zone d'intervention"} value={form.zone || ""} onChange={set("zone")} options={lang === "en" ? [
+                      {value:"", label:"No preference"},
+                      {value:"Vaud", label:"Canton of Vaud"},
+                      {value:"Genève", label:"Canton of Geneva"},
+                      {value:"Fribourg", label:"Canton of Fribourg"},
+                      {value:"Valais", label:"Canton of Valais"},
+                      {value:"Suisse romande", label:"French-speaking Switzerland"},
+                    ] : [
                       {value:"", label:"Indifférent"},
                       {value:"Vaud", label:"Canton de Vaud"},
                       {value:"Genève", label:"Canton de Genève"},
@@ -681,10 +701,10 @@ export default function TalentFluxPaysagisme() {
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      Description du besoin
+                      {lang === "en" ? "Description of need" : "Description du besoin"}
                     </label>
                     <textarea
-                      placeholder="Ex: Chef de chantier CFC pour chantiers privés + collectivités, équipe de 4, permis B+E requis, disponible mai, Vaud/Genève..."
+                      placeholder={lang === "en" ? "E.g.: CFC site manager for private + public projects, team of 4, B+E licence required, available May, Vaud/Geneva..." : "Ex: Chef de chantier CFC pour chantiers privés + collectivités, équipe de 4, permis B+E requis, disponible mai, Vaud/Genève..."}
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "12px 15px", borderRadius: 12, background: "rgba(5,12,7,0.8)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", transition: "all .25s", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(74,222,128,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(74,222,128,.06)"; }}
@@ -695,7 +715,7 @@ export default function TalentFluxPaysagisme() {
                   {/* Upload fiche de poste */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".08em", textTransform: "uppercase", marginBottom: 7 }}>
-                      Fiche de poste <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                      {lang === "en" ? "Job description" : "Fiche de poste"} <span style={{ color: C.subtle, fontWeight: 400, marginLeft: 6, textTransform: "none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -707,7 +727,7 @@ export default function TalentFluxPaysagisme() {
                         onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = C.border; }}
                       >
                         <Upload size={19} style={{ color: C.subtle, margin: "0 auto 7px" }} />
-                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.greenL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
+                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.greenL, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}</p>
                         <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                       </div>
                     ) : (
@@ -744,22 +764,21 @@ export default function TalentFluxPaysagisme() {
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(34,197,94,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}
                   >
                     {loading
-                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
-                      : <><Send size={16} />Trouver mon profil paysagiste</>
+                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi..."}</>
+                      : <><Send size={16} />{lang === "en" ? "Find my landscaping profile" : "Trouver mon profil paysagiste"}</>
                     }
                   </button>
-                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données sécurisées · RGPD conforme</p>
+                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 {lang === "en" ? "Secure data · GDPR compliant" : "Données sécurisées · RGPD conforme"}</p>
                 </div>
               ) : (
                 <div style={{ padding: "52px 26px", textAlign: "center" }}>
                   <div style={{ fontSize: 44, marginBottom: 16 }}>🌿</div>
-                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>Demande reçue <GradientText>✓</GradientText></h3>
+                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>{lang === "en" ? "Request received" : "Demande reçue"} <GradientText>✓</GradientText></h3>
                   <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>
-                    Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />
-                    Un consultant TalentFlux vous répond sous <strong style={{ color: C.greenL }}>24h</strong>.
+                    {lang === "en" ? <>Thank you <strong style={{ color: C.text }}>{form.firstName}</strong>!<br />A TalentFlux consultant will get back to you within <strong style={{ color: C.greenL }}>24h</strong>.</> : <>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color: C.greenL }}>24h</strong>.</>}
                   </p>
                   <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(74,222,128,.3)`, background: "rgba(74,222,128,.07)", color: C.greenL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>
-                    Nouvelle demande
+                    {lang === "en" ? "New request" : "Nouvelle demande"}
                   </button>
                 </div>
               )}
@@ -768,11 +787,11 @@ export default function TalentFluxPaysagisme() {
             {/* SIDEBAR */}
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               <div style={{ background: "rgba(8,15,10,.95)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 22 }}>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>Nous contacter</h3>
+                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>{lang === "en" ? "Contact us" : "Nous contacter"}</h3>
                 {[
                   { icon: Mail,  label: "Email",    value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
-                  { icon: Phone, label: "Tél.",     value: "+41 76 592 88 06",   href: "tel:+41765928806" },
-                  { icon: MapPin,label: "Adresse",  value: "Yverdon-les-Bains, VD", href: null },
+                  { icon: Phone, label: lang === "en" ? "Tel." : "Tél.",     value: "+41 76 592 88 06",   href: "tel:+41765928806" },
+                  { icon: MapPin,label: lang === "en" ? "Address" : "Adresse",  value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, VD", href: null },
                 ].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(22,163,74,.1)", border: `1px solid rgba(74,222,128,.15)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -789,9 +808,9 @@ export default function TalentFluxPaysagisme() {
               <div style={{ background: "linear-gradient(135deg,rgba(22,163,74,.1),rgba(74,222,128,.05))", border: `1px solid rgba(74,222,128,.2)`, borderRadius: 20, padding: 18 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 11 }}>
                   <Clock size={13} style={{ color: C.mint }} />
-                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>Délais</span>
+                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>{lang === "en" ? "Timelines" : "Délais"}</span>
                 </div>
-                {[["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "< 72h"]].map(([l, d]) => (
+                {(lang === "en" ? [["Acknowledgement", "< 2h"], ["First brief", "< 24h"], ["First profiles", "< 72h"]] : [["Accusé de réception", "< 2h"], ["Premier brief", "< 24h"], ["Premiers profils", "< 72h"]]).map(([l, d]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid rgba(255,255,255,.04)` }}>
                     <span style={{ color: C.muted, fontSize: ".78rem" }}>{l}</span>
                     <span style={{ color: C.mint, fontSize: ".73rem", fontWeight: 700, background: "rgba(74,222,128,.1)", padding: "2px 8px", borderRadius: 5 }}>{d}</span>
@@ -800,7 +819,7 @@ export default function TalentFluxPaysagisme() {
               </div>
 
               <div style={{ background: "rgba(8,15,10,.9)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 18 }}>
-                {[["✓", "Aucun frais avant embauche"], ["✓", "Garantie remplacement 3 mois"], ["✓", "Profils vérifiés terrain"], ["✓", "Spécialistes secteur paysage"]].map(([icon, text]) => (
+                {(lang === "en" ? [["✓", "No fees until hire"], ["✓", "3-month replacement guarantee"], ["✓", "Field-verified profiles"], ["✓", "Landscaping sector specialists"]] : [["✓", "Aucun frais avant embauche"], ["✓", "Garantie remplacement 3 mois"], ["✓", "Profils vérifiés terrain"], ["✓", "Spécialistes secteur paysage"]]).map(([icon, text]) => (
                   <div key={text} style={{ display: "flex", gap: 9, padding: "6px 0", alignItems: "center" }}>
                     <span style={{ color: C.mint, fontWeight: 700, fontSize: ".9rem" }}>{icon}</span>
                     <span style={{ color: C.muted, fontSize: ".8rem" }}>{text}</span>
@@ -826,15 +845,15 @@ export default function TalentFluxPaysagisme() {
               ✦ Nos autres expertises
             </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
-              Vous recrutez aussi dans...
+              {lang === "en" ? "Also hiring in..." : "Vous recrutez aussi dans..."}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".88rem" }}>
-              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+              {lang === "en" ? "TalentFlux operates across 6 specialised sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
             </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             
-          <a href="/ingenierie" style={{
+          <a href={lang === "en" ? "/en/ingenierie" : "/ingenierie"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#818CF810", border: "1px solid #818CF830",
@@ -846,11 +865,11 @@ export default function TalentFluxPaysagisme() {
           >
             <span style={{ fontSize: "1.1rem" }}>⚙️</span>
             <div>
-              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie & Technique</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Engineering & Technical" : "Ingénierie & Technique"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
-          <a href="/it" style={{
+          <a href={lang === "en" ? "/en/it" : "/it"} style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
             background: "#38BDF810", border: "1px solid #38BDF830",
@@ -863,7 +882,7 @@ export default function TalentFluxPaysagisme() {
             <span style={{ fontSize: "1.1rem" }}>💻</span>
             <div>
               <div style={{ color: "#38BDF8", fontWeight: 700, fontSize: ".88rem" }}>IT & Digital</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           </div>
@@ -875,11 +894,11 @@ export default function TalentFluxPaysagisme() {
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
-            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Paysagisme · Yverdon-les-Bains, VD</span>
+            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· {lang === "en" ? "Landscaping · Yverdon-les-Bains, Switzerland" : "Paysagisme · Yverdon-les-Bains, VD"}</span>
           </div>
-          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en" ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]] : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = C.muted}
                 onMouseLeave={e => e.target.style.color = C.subtle}

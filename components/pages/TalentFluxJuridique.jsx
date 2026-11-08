@@ -12,7 +12,6 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import CandidatureJuridique from "@/components/pages/CandidatureJuridique";
 
-// ── Intersection observer — hooks définis HORS du render ──────
 const useInView = (t = 0.12) => {
   const ref = useRef(null);
   const [v, setV] = useState(false);
@@ -27,7 +26,6 @@ const useInView = (t = 0.12) => {
   return [ref, v];
 };
 
-// ── Design tokens ─────────────────────────────────────────────
 const C = {
   bg:     "#06080F",
   card:   "rgba(10,14,30,0.92)",
@@ -50,7 +48,6 @@ const GoldText = ({ children }) => (
   </span>
 );
 
-// ── Composants extraits hors render (évite loss de focus et hooks dans map) ──
 const ProblemCard = ({ icon: Icon, color, title, desc, delay }) => {
   const [ref, inView] = useInView();
   return (
@@ -100,7 +97,6 @@ const FAQItem = ({ q, a, idx }) => {
   );
 };
 
-// ── Composant principal ───────────────────────────────────────
 export default function TalentFluxJuridique() {
   const lang = useLang();
   const { isMobile, isTablet } = useMobile();
@@ -113,7 +109,6 @@ export default function TalentFluxJuridique() {
   const fileRef = useRef(null);
   const [form, setForm] = useState({ firstName: "", lastName: "", email: "", phone: "", company: "", specialite: "", message: "", file: null });
 
-  // Tous les useEffect groupés — window/document uniquement ici
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", fn);
@@ -125,20 +120,20 @@ export default function TalentFluxJuridique() {
 
   const handleFile = file => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Fichier trop lourd (max 10 MB)."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const san = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const san = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fn = `${Date.now()}_${san(form.firstName)}_${san(form.lastName)}.pdf`;
         const { error: ue } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fn}`, form.file, { contentType: "application/pdf" });
         if (!ue) { pdfFileName = fn; pdfFileUrl = `submissions/${fn}`; }
@@ -150,10 +145,10 @@ export default function TalentFluxJuridique() {
         role: form.specialite.trim() || null, message: form.message.trim() || null,
         pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
-      if (ie) throw new Error("Erreur : " + ie.message);
+      if (ie) throw new Error((lang === "en" ? "Error: " : "Erreur : ") + ie.message);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || (lang === "en" ? "An error occurred." : "Une erreur est survenue."));
     } finally { setLoading(false); }
   };
 
@@ -162,7 +157,28 @@ export default function TalentFluxJuridique() {
     setForm({ firstName: "", lastName: "", email: "", phone: "", company: "", specialite: "", message: "", file: null });
   };
 
-  const faqData = [
+  const faqData = lang === "en" ? [
+    {
+      q: "Do you truly understand the differences between a corporate counsel, a counsel and a General Counsel?",
+      a: "Yes — and it's not just a matter of title. A General Counsel assumes criminal and civil liability for a group's compliance. A senior counsel in a law firm is subject to a different obligation of result. Our consultants have worked in both law firms and in-house: they ask the right questions about decision-making autonomy, signing authority and regulatory exposure before presenting a profile.",
+    },
+    {
+      q: "How do you assess mastery of Swiss business law vs. European law?",
+      a: "We test mastery of the CO (Code of Obligations), LPD/nLPD, FINMA requirements for compliance profiles, and sector regulations (LSPro, LMeF, LPCC depending on the client's sector). For EU profiles, we verify operational knowledge of GDPR, DORA, the NIS2 directive and the whistleblower directive.",
+    },
+    {
+      q: "Are your candidates licensed by the bar and in active practice?",
+      a: "For positions requiring a law degree and bar admission, we verify registration with the relevant cantonal bar and check for the absence of suspension or disbarment. For non-admitted lawyers, we verify the academic title (master's in law or recognized equivalent) and additional credentials (LL.M., accredited mediator diploma, CIPP/E for DPOs).",
+    },
+    {
+      q: "Do you work for law firms too, or only in-house?",
+      a: "Both. For law firms, we recruit associates at all levels (junior to senior), lateral partners, and non-legal management profiles (COO, business development). For in-house, we place General Counsels, Heads of Legal, compliance officers, DPOs and contract managers. Each mandate is handled with the required confidentiality.",
+    },
+    {
+      q: "What is your guarantee and what happens if the candidate leaves?",
+      a: "3-month replacement guarantee at no additional cost. If the candidate leaves voluntarily or fails the probationary period within 90 days of taking the position, we restart the sourcing process at our expense with no additional invoice. No cancellation clause.",
+    },
+  ] : [
     {
       q: "Connaissez-vous réellement les différences entre un juriste d'entreprise, un counsel et un General Counsel ?",
       a: "Oui — et ce n'est pas qu'une question de titre. Un General Counsel assume la responsabilité pénale et civile de la conformité d'un groupe. Un counsel senior en cabinet est soumis à une obligation de résultat différente. Nos consultants ont exercé dans des cabinets et des in-house : ils posent les bonnes questions sur l'autonomie décisionnelle, le périmètre de signature et l'exposition réglementaire avant de présenter un profil.",
@@ -185,7 +201,16 @@ export default function TalentFluxJuridique() {
     },
   ];
 
-  const metiers = [
+  const metiers = lang === "en" ? [
+    { icon: Scale,     label: "General Counsel",          lvl: "Group · Full autonomy" },
+    { icon: Gavel,     label: "Business Lawyer",          lvl: "Firm · M&A · Corporate" },
+    { icon: Shield,    label: "Compliance Officer",       lvl: "FINMA · AML · Integrity" },
+    { icon: Lock,      label: "DPO / Data Privacy",       lvl: "nLPD · GDPR · DORA" },
+    { icon: FileText,  label: "Contract Manager",         lvl: "NDA · SLA · B2B" },
+    { icon: BookOpen,  label: "In-house Lawyer",          lvl: "CO · Labor Law · IP" },
+    { icon: Building2, label: "Head of Legal",            lvl: "SME · Scale-up · PE" },
+    { icon: Award,     label: "Accredited Mediator",      lvl: "FSMA · CPC · Arbitration" },
+  ] : [
     { icon: Scale,     label: "General Counsel",          lvl: "Group · Autonomie totale" },
     { icon: Gavel,     label: "Avocat d'affaires",         lvl: "Cabinet · M&A · Corporate" },
     { icon: Shield,    label: "Compliance Officer",        lvl: "FINMA · AML · Intégrité" },
@@ -195,6 +220,10 @@ export default function TalentFluxJuridique() {
     { icon: Building2, label: "Head of Legal",             lvl: "PME · Scale-up · PE" },
     { icon: Award,     label: "Mediateur accrédité",       lvl: "FSMA · CPC · Arbitrage" },
   ];
+
+  const profileOptions = lang === "en"
+    ? ["General Counsel / Legal Director", "Business Lawyer (corporate / M&A)", "Compliance Officer (FINMA / AML)", "DPO / Data Privacy Officer", "Contract Manager", "In-house Lawyer", "Lateral Partner (law firm)", "Accredited Mediator", "Other legal profile"]
+    : ["General Counsel / Directeur Juridique", "Avocat d'affaires (corporate / M&A)", "Compliance Officer (FINMA / AML)", "DPO / Data Privacy Officer", "Contract Manager", "Juriste in-house", "Associé latéral (cabinet)", "Médiateur accrédité", "Autre profil juridique"];
 
   return (
     <div style={{ background: C.bg, color: C.text, fontFamily: "'DM Sans',sans-serif", overflowX: "hidden" }}>
@@ -213,22 +242,29 @@ export default function TalentFluxJuridique() {
             linear-gradient(90deg, rgba(59,91,219,.025) 1px, transparent 1px);
           background-size:52px 52px;
         }
+        input, select, textarea { font-size: 16px !important; }
+        @media (min-width: 768px) { input, select, textarea { font-size: .88rem !important; } }
       `}</style>
 
-      {/* ══ NAV ══ */}
+      {/* NAV */}
       <nav style={{ position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 66, background: scrolled ? "rgba(6,8,15,0.96)" : "transparent", backdropFilter: scrolled ? "blur(20px)" : "none", borderBottom: scrolled ? `1px solid ${C.border}` : "none", transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
           <img src="/logo.png" alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
-          <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: C.goldL, background: "rgba(200,169,110,.1)", border: `1px solid rgba(200,169,110,.3)`, borderRadius: 4, padding: "2px 7px" }}>JURIDIQUE</span>
+          <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: C.goldL, background: "rgba(200,169,110,.1)", border: `1px solid rgba(200,169,110,.3)`, borderRadius: 4, padding: "2px 7px" }}>
+            {lang === "en" ? "LEGAL" : "JURIDIQUE"}
+          </span>
         </div>
         {isMobile ? (
           <a href="tel:+41765928806" style={{ background: "rgba(59,91,219,.15)", border: "1px solid rgba(116,143,252,.3)", color: C.blueL, padding: "7px 14px", borderRadius: 10, fontWeight: 700, fontSize: ".8rem", textDecoration: "none" }}>
-            📞 Appeler
+            📞 {lang === "en" ? "Call" : "Appeler"}
           </a>
         ) : (
           <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
-            {["Solution", "Métiers", "FAQ"].map(item => (
-              <span key={item} onClick={() => scrollTo(item.toLowerCase())} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{item}</span>
+            {(lang === "en"
+              ? [["Solution", "solution"], ["Fields", "métiers"], ["FAQ", "faq"]]
+              : [["Solution", "solution"], ["Métiers", "métiers"], ["FAQ", "faq"]]
+            ).map(([label, id]) => (
+              <span key={label} onClick={() => scrollTo(id)} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{label}</span>
             ))}
             <a href="tel:+41765928806" style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: C.goldL, textDecoration: "none", fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em", transition: "all .2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
@@ -244,22 +280,28 @@ export default function TalentFluxJuridique() {
         )}
       </nav>
 
-      {/* ══ HERO ══ */}
+      {/* HERO */}
       <section className="juridique-grid" id="hero" style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", padding: isMobile ? "90px 1.4rem 60px" : "120px 2rem 80px" }}>
         <div style={{ position: "absolute", top: "12%", left: "6%", width: 480, height: 480, borderRadius: "50%", background: "radial-gradient(circle,rgba(59,91,219,.1),transparent 70%)", animation: "pulseGlow 7s ease-in-out infinite", pointerEvents: "none" }} />
         <div style={{ position: "absolute", bottom: "10%", right: "6%", width: 320, height: 320, borderRadius: "50%", background: "radial-gradient(circle,rgba(200,169,110,.07),transparent 70%)", animation: "pulseGlow 8s ease-in-out infinite 2s", pointerEvents: "none" }} />
 
         {!isMobile && (<>
           <div style={{ position: "absolute", left: "3%", top: "38%", background: "rgba(10,14,30,.95)", border: `1px solid rgba(116,143,252,.2)`, borderRadius: 14, padding: "12px 16px", animation: "float 5s ease-in-out infinite", pointerEvents: "none", zIndex: 1, minWidth: 178 }}>
-            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Pénurie CH</div>
+            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>
+              {lang === "en" ? "CH Shortage" : "Pénurie CH"}
+            </div>
             <div style={{ color: C.text, fontSize: ".82rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.blueL, boxShadow: `0 0 6px ${C.blueL}`, flexShrink: 0, display: "inline-block" }} /> GC & Compliance rares
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.blueL, boxShadow: `0 0 6px ${C.blueL}`, flexShrink: 0, display: "inline-block" }} />
+              {lang === "en" ? "GC & Compliance rare" : "GC & Compliance rares"}
             </div>
           </div>
           <div style={{ position: "absolute", right: "3%", top: "43%", background: "rgba(10,14,30,.95)", border: `1px solid rgba(200,169,110,.2)`, borderRadius: 14, padding: "12px 16px", animation: "float 5s ease-in-out infinite 1.8s", pointerEvents: "none", zIndex: 1, minWidth: 178 }}>
-            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Secteur</div>
+            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>
+              {lang === "en" ? "Sector" : "Secteur"}
+            </div>
             <div style={{ color: C.text, fontSize: ".82rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.gold, boxShadow: `0 0 6px ${C.gold}`, flexShrink: 0, display: "inline-block" }} /> Droit · FINMA · nLPD
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.gold, boxShadow: `0 0 6px ${C.gold}`, flexShrink: 0, display: "inline-block" }} />
+              {lang === "en" ? "Law · FINMA · nLPD" : "Droit · FINMA · nLPD"}
             </div>
           </div>
         </>)}
@@ -272,34 +314,42 @@ export default function TalentFluxJuridique() {
           </div>
 
           <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: C.goldL, marginBottom: 16 }}>
-            Recrutement · Droit des affaires & Compliance · Suisse
+            {lang === "en"
+              ? "Recruitment · Business Law & Compliance · Switzerland"
+              : "Recrutement · Droit des affaires & Compliance · Suisse"}
           </p>
 
-          {/* H1 visible — mot-clé SEO + localité */}
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-.02em", color: C.text, marginBottom: 22 }}>
-            Recrutement juridique en Suisse romande :<br />
-            <GoldText>votre General Counsel n'est pas sur LinkedIn.</GoldText>
+            {lang === "en"
+              ? <>Legal recruitment in French-speaking Switzerland:<br /><GoldText>your General Counsel is not on LinkedIn.</GoldText></>
+              : <>Recrutement juridique en Suisse romande :<br /><GoldText>votre General Counsel n'est pas sur LinkedIn.</GoldText></>
+            }
           </h1>
 
           <p style={{ color: C.muted, fontSize: ".97rem", lineHeight: 1.8, maxWidth: 590, margin: "0 auto 36px" }}>
-            Avocats d'affaires, General Counsel, Compliance Officers, DPO, Contract Managers — des profils soumis au secret professionnel qui ne diffusent pas publiquement. TalentFlux les atteint par le réseau, pas par l'annonce.
+            {lang === "en"
+              ? "Business lawyers, General Counsels, Compliance Officers, DPOs, Contract Managers — profiles bound by professional secrecy who don't advertise publicly. TalentFlux reaches them through networks, not job postings."
+              : "Avocats d'affaires, General Counsel, Compliance Officers, DPO, Contract Managers — des profils soumis au secret professionnel qui ne diffusent pas publiquement. TalentFlux les atteint par le réseau, pas par l'annonce."}
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => scrollTo("contact")} style={{ background: C.grad, border: "none", color: "#fff", padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", cursor: "pointer", display: "flex", alignItems: "center", gap: 9, boxShadow: "0 0 28px rgba(59,91,219,.35)", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 50px rgba(116,143,252,.55)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(59,91,219,.35)"; }}>
-              <Users size={17} /> Mandater TalentFlux <ArrowRight size={16} />
+              <Users size={17} /> {lang === "en" ? "Mandate TalentFlux" : "Mandater TalentFlux"} <ArrowRight size={16} />
             </button>
             <Link href="/candidature/juridique" style={{ background: "rgba(59,91,219,.08)", border: "1.5px solid rgba(116,143,252,.4)", color: C.blueL, padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", display: "flex", alignItems: "center", gap: 9, textDecoration: "none", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(59,91,219,.14)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.background = "rgba(59,91,219,.08)"; }}>
-              <Scale size={17} /> Déposer mon dossier <ArrowRight size={16} />
+              <Scale size={17} /> {lang === "en" ? "Submit my application" : "Déposer mon dossier"} <ArrowRight size={16} />
             </Link>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: isMobile ? 18 : 36, marginTop: 52, paddingTop: 34, borderTop: `1px solid ${C.border}` }}>
-            {[["6-10j", "Délai GC / Head of Legal"], ["100%", "Au succès"], ["3 mois", "Garantie remplacement"], ["CH", "Romande & Alémanique"]].map(([v, l], i) => (
+            {(lang === "en"
+              ? [["6-10d", "GC / Head of Legal delay"], ["100%", "Success fee"], ["3 months", "Replacement guarantee"], ["CH", "French & German-speaking"]]
+              : [["6-10j", "Délai GC / Head of Legal"], ["100%", "Au succès"], ["3 mois", "Garantie remplacement"], ["CH", "Romande & Alémanique"]]
+            ).map(([v, l], i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "1.8rem", fontWeight: 900, fontFamily: "'Sora',sans-serif", marginBottom: 3, background: "linear-gradient(135deg,#E2C98A,#748FFC)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{v}</div>
                 <div style={{ color: C.subtle, fontSize: ".75rem" }}>{l}</div>
@@ -310,32 +360,46 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ PROBLÈME ══ */}
+      {/* PROBLEM */}
       <section style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", maxWidth: 1060, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 50 }}>
-          <div style={{ color: "#EF4444", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>⚠ Le paradoxe du recrutement juridique</div>
+          <div style={{ color: "#EF4444", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+            ⚠ {lang === "en" ? "The legal recruitment paradox" : "Le paradoxe du recrutement juridique"}
+          </div>
           <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.6rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-            Les meilleurs juristes n'ont pas besoin<br /><GoldText>de diffuser leur disponibilité.</GoldText>
+            {lang === "en"
+              ? <>The best lawyers don't need<br /><GoldText>to advertise their availability.</GoldText></>
+              : <>Les meilleurs juristes n'ont pas besoin<br /><GoldText>de diffuser leur disponibilité.</GoldText></>
+            }
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 20 }}>
-          {[
+          {(lang === "en" ? [
+            { icon: Lock, color: "#F97316", title: "Professional secrecy & discretion", desc: "A General Counsel in a current role doesn't respond to a LinkedIn posting. Publicly advertising their search would expose their relationship with their current employer. They commission — or are approached by a trusted third party." },
+            { icon: Scale, color: "#EF4444", title: "Structural shortage of qualified profiles", desc: "Switzerland trains fewer than 300 licensed lawyers per year. Profiles combining Swiss law, fluent German and FINMA or M&A experience are retained before they even formally enter the market." },
+            { icon: Gavel, color: "#DC2626", title: "Misunderstanding by generalist agencies", desc: "The difference between a senior business lawyer and an in-house lawyer, or between a best-efforts obligation and a results obligation in compliance matters, escapes most recruiters. The result: ill-suited shortlists and wasted time for all." },
+          ] : [
             { icon: Lock, color: "#F97316", title: "Secret professionnel & discrétion", desc: "Un General Counsel en poste ne répond pas à une annonce LinkedIn. La diffusion publique de sa recherche exposerait sa relation avec son employeur actuel. Il mandate — ou est approché par un tiers de confiance." },
             { icon: Scale, color: "#EF4444", title: "Déficit structurel de profils qualifiés", desc: "La Suisse forme moins de 300 avocats brevetés par an. Les profils combinant droit suisse, allemand courant et expérience FINMA ou M&A sont retenus avant même d'être formellement disponibles sur le marché." },
             { icon: Gavel, color: "#DC2626", title: "Incompréhension des cabinets généralistes", desc: "La différence entre un avocat d'affaires senior et un juriste in-house, ou entre une obligation de moyen et une obligation de résultat en matière de compliance, échappe à la plupart des recruteurs. Résultat : des shortlists inadaptées et une perte de temps pour tous." },
-          ].map(({ icon, color, title, desc }, i) => (
+          ]).map(({ icon, color, title, desc }, i) => (
             <ProblemCard key={i} icon={icon} color={color} title={title} desc={desc} delay={i * 100} />
           ))}
         </div>
       </section>
 
-      {/* ══ MÉTIERS ══ */}
+      {/* MÉTIERS */}
       <section id="métiers" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", background: "rgba(10,14,30,.4)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Nos spécialités</div>
+            <div style={{ color: C.gold, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              ✦ {lang === "en" ? "Our specialties" : "Nos spécialités"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, color: C.text }}>
-              Tous les profils du <GoldText>droit suisse des affaires</GoldText>
+              {lang === "en"
+                ? <>All profiles in <GoldText>Swiss business law</GoldText></>
+                : <>Tous les profils du <GoldText>droit suisse des affaires</GoldText></>
+              }
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(4,1fr)", gap: 14 }}>
@@ -352,30 +416,59 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ SOLUTION ══ */}
+      {/* SOLUTION */}
       <section id="solution" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", maxWidth: 1060, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 50 }}>
-          <div style={{ color: C.goldL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Notre approche</div>
+          <div style={{ color: C.goldL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+            ✦ {lang === "en" ? "Our approach" : "Notre approche"}
+          </div>
           <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.6rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-            On distingue un counsel d'un GC.<br /><GoldText>On vérifie le brevet et l'inscription au barreau.</GoldText>
+            {lang === "en"
+              ? <>We distinguish a counsel from a GC.<br /><GoldText>We verify the bar admission and registration.</GoldText></>
+              : <>On distingue un counsel d'un GC.<br /><GoldText>On vérifie le brevet et l'inscription au barreau.</GoldText></>
+            }
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 20, marginBottom: 40 }}>
-          <FeatureCard icon={Scale} accent={C.blueL} sub="Vérification #1" title="Brevet & inscription barreau" desc="Nous contrôlons l'inscription au registre cantonal des avocats, l'absence de suspension ou de radiation, et la validité de l'assurance responsabilité professionnelle. Pour les DPO, nous vérifions la certification CIPP/E ou équivalente." delay={0} />
-          <FeatureCard icon={Shield} accent={C.gold} sub="Vérification #2" title="Maîtrise du droit positif suisse" desc="CO, LPD/nLPD, FINMA, LSPro, LMeF selon le secteur. Nous testons la connaissance opérationnelle, pas déclarative : un compliance officer qui n'a pas géré une inspection FINMA n'est pas senior." delay={100} />
-          <FeatureCard icon={Lock} accent={C.goldL} sub="Vérification #3" title="Confidentialité absolue du mandat" desc="Tout candidat signataire d'un NDA ou soumis à un devoir de réserve est approché par un canal discret. Nos processus respectent les règles déontologiques de la profession et les obligations de confidentialité de votre entreprise." delay={200} />
+          <FeatureCard icon={Scale} accent={C.blueL}
+            sub={lang === "en" ? "Verification #1" : "Vérification #1"}
+            title={lang === "en" ? "Bar admission & registration" : "Brevet & inscription barreau"}
+            desc={lang === "en"
+              ? "We check registration in the cantonal bar registry, the absence of suspension or disbarment, and the validity of professional liability insurance. For DPOs, we verify CIPP/E certification or equivalent."
+              : "Nous contrôlons l'inscription au registre cantonal des avocats, l'absence de suspension ou de radiation, et la validité de l'assurance responsabilité professionnelle. Pour les DPO, nous vérifions la certification CIPP/E ou équivalente."}
+            delay={0} />
+          <FeatureCard icon={Shield} accent={C.gold}
+            sub={lang === "en" ? "Verification #2" : "Vérification #2"}
+            title={lang === "en" ? "Mastery of Swiss positive law" : "Maîtrise du droit positif suisse"}
+            desc={lang === "en"
+              ? "CO, LPD/nLPD, FINMA, LSPro, LMeF depending on sector. We test operational knowledge, not declarative: a compliance officer who hasn't managed a FINMA inspection is not senior."
+              : "CO, LPD/nLPD, FINMA, LSPro, LMeF selon le secteur. Nous testons la connaissance opérationnelle, pas déclarative : un compliance officer qui n'a pas géré une inspection FINMA n'est pas senior."}
+            delay={100} />
+          <FeatureCard icon={Lock} accent={C.goldL}
+            sub={lang === "en" ? "Verification #3" : "Vérification #3"}
+            title={lang === "en" ? "Absolute mandate confidentiality" : "Confidentialité absolue du mandat"}
+            desc={lang === "en"
+              ? "Any candidate subject to an NDA or duty of reserve is approached through a discreet channel. Our processes respect the profession's ethical rules and your company's confidentiality obligations."
+              : "Tout candidat signataire d'un NDA ou soumis à un devoir de réserve est approché par un canal discret. Nos processus respectent les règles déontologiques de la profession et les obligations de confidentialité de votre entreprise."}
+            delay={200} />
         </div>
 
-        {/* Étapes */}
         <div style={{ padding: isMobile ? 24 : 38, background: "rgba(10,14,30,.8)", borderRadius: 22, border: `1px solid ${C.border}` }}>
-          <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 26, textAlign: "center" }}>Le processus en 4 étapes</div>
+          <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 26, textAlign: "center" }}>
+            {lang === "en" ? "The process in 4 steps" : "Le processus en 4 étapes"}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: isMobile ? 20 : 14 }}>
-            {[
+            {(lang === "en" ? [
+              { n: "01", t: "Confidential brief", d: "30 min to define the role scope, regulatory exposure and required autonomy level", icon: FileText },
+              { n: "02", t: "Network sourcing", d: "Activation of our network of lawyers — no public posting unless client agrees", icon: Users },
+              { n: "03", t: "Legal verification", d: "Bar admission, certifications, potential conflicts of interest and checked references", icon: Scale },
+              { n: "04", t: "Post-integration follow-up", d: "3-month support with replacement guarantee at no additional cost", icon: Shield },
+            ] : [
               { n: "01", t: "Brief confidentiel", d: "30 min pour cerner le périmètre du poste, l'exposition réglementaire et le niveau d'autonomie requis", icon: FileText },
               { n: "02", t: "Sourcing réseau", d: "Activation de notre réseau de juristes et d'avocats — pas d'annonce publique sauf accord explicite du client", icon: Users },
               { n: "03", t: "Vérification juridique", d: "Brevet, barreau, certifications, conflits d'intérêts potentiels et références vérifiées", icon: Scale },
               { n: "04", t: "Suivi post-intégration", d: "Accompagnement 3 mois avec garantie de remplacement sans frais supplémentaires", icon: Shield },
-            ].map(({ n, t, d, icon: Icon }, i) => (
+            ]).map(({ n, t, d, icon: Icon }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ width: 46, height: 46, borderRadius: "50%", margin: "0 auto 11px", background: "linear-gradient(135deg,rgba(59,91,219,.2),rgba(116,143,252,.1))", border: `1px solid rgba(116,143,252,.25)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Icon size={18} style={{ color: C.blueL }} strokeWidth={1.5} />
@@ -389,14 +482,18 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ TÉMOIGNAGES ══ */}
+      {/* TESTIMONIALS */}
       <section style={{ padding: isMobile ? "48px 1.4rem" : "72px 2rem", background: "rgba(10,14,30,.3)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 20 }}>
-          {[
+          {(lang === "en" ? [
+            { q: "We had been searching for a bilingual DE/FR General Counsel with FINMA experience for 6 months. TalentFlux presented 2 qualified candidates in 9 days. One was employed and hadn't advertised their availability.", a: "Managing Partner, Business Law Firm — Zurich" },
+            { q: "What convinced us: they immediately understood the difference between the GC scope of a listed group and that of a family SME. No other agency had asked that question.", a: "HR Director, listed industrial group — Vaud" },
+            { q: "The DPO profile they presented had their CIPP/E certification, knew the nLPD in detail, and had already managed a GDPR compliance rollout from scratch. Operational from day one.", a: "Legal Director, Fintech — Geneva" },
+          ] : [
             { q: "Nous cherchions un General Counsel bilingue DE/FR avec expérience FINMA depuis 6 mois. TalentFlux a présenté 2 candidats qualifiés en 9 jours. L'un était en poste et n'avait pas diffusé sa disponibilité.", a: "Managing Partner, Cabinet d'avocats d'affaires — Zurich" },
             { q: "Ce qui nous a convaincu : ils ont su différencier d'emblée le périmètre d'une fonction GC d'un groupe coté de celui d'une PME familiale. Aucune autre agence n'avait posé cette question.", a: "DRH, groupe industriel coté — Vaud" },
             { q: "Le profil DPO qu'ils nous ont présenté avait sa certification CIPP/E, connaissait la nLPD dans le détail et avait déjà géré une mise en conformité RGPD from scratch. Opérationnel dès le premier jour.", a: "Directeur Juridique, Fintech — Genève" },
-          ].map(({ q, a }, i) => (
+          ]).map(({ q, a }, i) => (
             <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderTop: `2px solid ${C.blueL}`, borderRadius: 18, padding: 24 }}>
               <div style={{ display: "flex", gap: 3, marginBottom: 13 }}>
                 {Array(5).fill(0).map((_, j) => <Star key={j} size={12} fill={C.gold} color={C.gold} />)}
@@ -408,13 +505,18 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ FAQ ══ */}
+      {/* FAQ */}
       <section id="faq" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 46 }}>
-            <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Questions fréquentes</div>
+            <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              ✦ {lang === "en" ? "Frequently asked questions" : "Questions fréquentes"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-              Ce que tout juriste<br /><GoldText>devrait demander à son recruteur</GoldText>
+              {lang === "en"
+                ? <>What every lawyer<br /><GoldText>should ask their recruiter</GoldText></>
+                : <>Ce que tout juriste<br /><GoldText>devrait demander à son recruteur</GoldText></>
+              }
             </h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -423,22 +525,34 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ CONTACT ══ */}
+      {/* CONTACT */}
       <section id="contact" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", background: "rgba(10,14,30,.4)", borderTop: `1px solid ${C.border}`, position: "relative" }}>
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center,rgba(59,91,219,.06),transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1060, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 46 }}>
-            <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Mandat confidentiel</div>
+            <div style={{ color: C.blueL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              ✦ {lang === "en" ? "Confidential mandate" : "Mandat confidentiel"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, lineHeight: 1.2, color: C.text, marginBottom: 10 }}>
-              Confiez-nous votre mandat<br /><GoldText>sous NDA si nécessaire.</GoldText>
+              {lang === "en"
+                ? <>Entrust us your mandate<br /><GoldText>under NDA if necessary.</GoldText></>
+                : <>Confiez-nous votre mandat<br /><GoldText>sous NDA si nécessaire.</GoldText></>
+              }
             </h2>
-            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>Aucun frais avant embauche · Confidentialité garantie · Réponse sous 2h</p>
+            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>
+              {lang === "en"
+                ? "No fees before hire · Guaranteed confidentiality · Response within 2h"
+                : "Aucun frais avant embauche · Confidentialité garantie · Réponse sous 2h"}
+            </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 300px", gap: 22 }}>
             <div style={{ background: "rgba(6,8,15,.95)", border: `1px solid ${C.border}`, borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: `1px solid ${C.border}` }}>
-                {[{ key: "recruiter", label: "⚖️ Je mandate" }, { key: "candidate", label: "📋 Je dépose mon dossier" }].map(({ key, label }) => (
+                {[
+                  { key: "recruiter", label: lang === "en" ? "⚖️ I mandate" : "⚖️ Je mandate" },
+                  { key: "candidate", label: lang === "en" ? "📋 I submit my application" : "📋 Je dépose mon dossier" }
+                ].map(({ key, label }) => (
                   <button key={key} onClick={() => setActiveTab(key)} style={{ flex: 1, padding: "15px", border: "none", cursor: "pointer", background: activeTab === key ? "linear-gradient(135deg,rgba(59,91,219,.15),rgba(116,143,252,.08))" : "transparent", borderBottom: `2px solid ${activeTab === key ? C.blueL : "transparent"}`, color: activeTab === key ? C.text : C.subtle, fontWeight: 700, fontSize: ".84rem", transition: "all .25s", fontFamily: "'DM Sans',sans-serif" }}>{label}</button>
                 ))}
               </div>
@@ -448,7 +562,10 @@ export default function TalentFluxJuridique() {
               ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                    {[["Prénom *", "firstName", "Sophie"], ["Nom *", "lastName", "Dupont"]].map(([label, key, ph]) => (
+                    {(lang === "en"
+                      ? [["First name *", "firstName", "Sophie"], ["Last name *", "lastName", "Dupont"]]
+                      : [["Prénom *", "firstName", "Sophie"], ["Nom *", "lastName", "Dupont"]]
+                    ).map(([label, key, ph]) => (
                       <div key={key}>
                         <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{label}</label>
                         <input placeholder={ph} value={form[key]} onChange={set(key)}
@@ -465,45 +582,52 @@ export default function TalentFluxJuridique() {
                         onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Téléphone</label>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
+                        {lang === "en" ? "Phone" : "Téléphone"}
+                      </label>
                       <input type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
                         onFocus={e => { e.target.style.borderColor = "rgba(116,143,252,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(59,91,219,.06)"; }}
                         onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Cabinet / Entreprise *</label>
-                      <input placeholder="Cabinet Martin & Associés" value={form.company} onChange={set("company")}
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
+                        {lang === "en" ? "Firm / Company *" : "Cabinet / Entreprise *"}
+                      </label>
+                      <input placeholder={lang === "en" ? "Martin & Associates" : "Cabinet Martin & Associés"} value={form.company} onChange={set("company")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
                         onFocus={e => { e.target.style.borderColor = "rgba(116,143,252,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(59,91,219,.06)"; }}
                         onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Profil recherché</label>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
+                        {lang === "en" ? "Profile sought" : "Profil recherché"}
+                      </label>
                       <select value={form.specialite} onChange={set("specialite")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(6,8,15,.9)", border: `1px solid ${C.border}`, color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
-                        <option value="">Sélectionner...</option>
-                        {["General Counsel / Directeur Juridique", "Avocat d'affaires (corporate / M&A)", "Compliance Officer (FINMA / AML)", "DPO / Data Privacy Officer", "Contract Manager", "Juriste in-house", "Associé latéral (cabinet)", "Médiateur accrédité", "Autre profil juridique"].map(o => <option key={o} value={o} style={{ background: "#06080F" }}>{o}</option>)}
+                        <option value="">{lang === "en" ? "Select..." : "Sélectionner..."}</option>
+                        {profileOptions.map(o => <option key={o} value={o} style={{ background: "#06080F" }}>{o}</option>)}
                       </select>
                     </div>
                   </div>
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      Description du mandat
+                      {lang === "en" ? "Mandate description" : "Description du mandat"}
                     </label>
                     <textarea
-                      placeholder="Ex: GC bilingue FR/DE, expérience FINMA, autonomie totale sur litiges, brevet d'avocat souhaité, groupe 500 pers., Genève..."
+                      placeholder={lang === "en"
+                        ? "E.g.: Bilingual FR/DE GC, FINMA experience, full litigation autonomy, bar admission preferred, group of 500 people, Geneva..."
+                        : "Ex: GC bilingue FR/DE, expérience FINMA, autonomie totale sur litiges, brevet d'avocat souhaité, groupe 500 pers., Genève..."}
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(116,143,252,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(59,91,219,.06)"; }}
                       onBlur={e => { e.target.style.borderColor = C.border; e.target.style.boxShadow = "none"; }} />
                   </div>
 
-                  {/* Upload CV / CDC */}
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      Cahier des charges (optionnel) <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
+                      {lang === "en" ? "Specifications (optional)" : "Cahier des charges (optionnel)"} <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -514,7 +638,9 @@ export default function TalentFluxJuridique() {
                         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(116,143,252,.4)"}
                         onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = C.border; }}>
                         <Upload size={19} style={{ color: C.subtle, margin: "0 auto 7px" }} />
-                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.blueL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
+                        <p style={{ color: C.muted, fontSize: ".82rem" }}>
+                          <span style={{ color: C.blueL, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}
+                        </p>
                         <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                       </div>
                     ) : (
@@ -543,17 +669,28 @@ export default function TalentFluxJuridique() {
                     onMouseEnter={e => { if (!loading) { e.currentTarget.style.boxShadow = "0 8px 36px rgba(116,143,252,.55)"; e.currentTarget.style.transform = "translateY(-2px)"; } }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(59,91,219,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                     {loading
-                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
-                      : <><Send size={16} />Transmettre le mandat</>}
+                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi..."}</>
+                      : <><Send size={16} />{lang === "en" ? "Submit the mandate" : "Transmettre le mandat"}</>}
                   </button>
-                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Traitement confidentiel · LPD suisse & RGPD conformes</p>
+                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>
+                    🔒 {lang === "en" ? "Confidential processing · Swiss LPD & GDPR compliant" : "Traitement confidentiel · LPD suisse & RGPD conformes"}
+                  </p>
                 </div>
               ) : (
                 <div style={{ padding: "52px 26px", textAlign: "center" }}>
                   <div style={{ fontSize: 40, marginBottom: 16 }}>⚖️</div>
-                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>Dossier reçu <GoldText>✓</GoldText></h3>
-                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color: C.blueL }}>2h ouvrées</strong>.</p>
-                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(116,143,252,.3)`, background: "rgba(59,91,219,.07)", color: C.blueL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>Nouvelle demande</button>
+                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>
+                    {lang === "en" ? "Application received" : "Dossier reçu"} <GoldText>✓</GoldText>
+                  </h3>
+                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>
+                    {lang === "en"
+                      ? <>{`Thank you `}<strong style={{ color: C.text }}>{form.firstName}</strong>!<br />A TalentFlux consultant will reply within <strong style={{ color: C.blueL }}>2 business hours</strong>.</>
+                      : <>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux vous répond sous <strong style={{ color: C.blueL }}>2h ouvrées</strong>.</>
+                    }
+                  </p>
+                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(116,143,252,.3)`, background: "rgba(59,91,219,.07)", color: C.blueL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>
+                    {lang === "en" ? "New request" : "Nouvelle demande"}
+                  </button>
                 </div>
               )}
             </div>
@@ -561,8 +698,14 @@ export default function TalentFluxJuridique() {
             {/* Sidebar */}
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               <div style={{ background: "rgba(6,8,15,.95)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 22 }}>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>Contact direct</h3>
-                {[{ icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" }, { icon: Phone, label: "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" }, { icon: MapPin, label: "Siège", value: "Yverdon-les-Bains, VD", href: null }].map(({ icon: Icon, label, value, href }) => (
+                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>
+                  {lang === "en" ? "Direct contact" : "Contact direct"}
+                </h3>
+                {[
+                  { icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
+                  { icon: Phone, label: lang === "en" ? "Tel." : "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" },
+                  { icon: MapPin, label: lang === "en" ? "Office" : "Siège", value: "Yverdon-les-Bains, VD", href: null }
+                ].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(59,91,219,.1)", border: `1px solid rgba(116,143,252,.15)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                       <Icon size={12} style={{ color: C.blueL }} strokeWidth={1.5} />
@@ -578,9 +721,12 @@ export default function TalentFluxJuridique() {
               <div style={{ background: "linear-gradient(135deg,rgba(59,91,219,.1),rgba(116,143,252,.05))", border: `1px solid rgba(116,143,252,.2)`, borderRadius: 20, padding: 18 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 11 }}>
                   <Clock size={13} style={{ color: C.blueL }} />
-                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>Délais</span>
+                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>{lang === "en" ? "Timelines" : "Délais"}</span>
                 </div>
-                {[["Accusé de réception", "< 2h"], ["Premier brief confidentiel", "< 24h"], ["Premiers profils présentés", "6-10 jours"]].map(([l, d]) => (
+                {(lang === "en"
+                  ? [["Acknowledgement of receipt", "< 2h"], ["First confidential brief", "< 24h"], ["First profiles presented", "6-10 days"]]
+                  : [["Accusé de réception", "< 2h"], ["Premier brief confidentiel", "< 24h"], ["Premiers profils présentés", "6-10 jours"]]
+                ).map(([l, d]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid rgba(255,255,255,.04)` }}>
                     <span style={{ color: C.muted, fontSize: ".78rem" }}>{l}</span>
                     <span style={{ color: C.blueL, fontSize: ".73rem", fontWeight: 700, background: "rgba(59,91,219,.1)", padding: "2px 8px", borderRadius: 5 }}>{d}</span>
@@ -589,7 +735,10 @@ export default function TalentFluxJuridique() {
               </div>
 
               <div style={{ background: "rgba(6,8,15,.9)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 18 }}>
-                {[["✓", "Aucun frais avant embauche"], ["✓", "Confidentialité & NDA si requis"], ["✓", "Vérification brevet & barreau"], ["✓", "Garantie remplacement 3 mois"]].map(([icon, text]) => (
+                {(lang === "en"
+                  ? [["✓", "No fees before hire"], ["✓", "Confidentiality & NDA if required"], ["✓", "Bar admission verification"], ["✓", "3-month replacement guarantee"]]
+                  : [["✓", "Aucun frais avant embauche"], ["✓", "Confidentialité & NDA si requis"], ["✓", "Vérification brevet & barreau"], ["✓", "Garantie remplacement 3 mois"]]
+                ).map(([icon, text]) => (
                   <div key={text} style={{ display: "flex", gap: 9, padding: "6px 0", alignItems: "center" }}>
                     <span style={{ color: C.blueL, fontWeight: 700, fontSize: ".9rem" }}>{icon}</span>
                     <span style={{ color: C.muted, fontSize: ".8rem" }}>{text}</span>
@@ -601,25 +750,31 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
+      {/* SEO SILO */}
       <section style={{ padding: "48px 2rem", background: "rgba(59,91,219,.04)", borderTop: `1px solid rgba(59,91,219,.15)`, borderBottom: `1px solid rgba(59,91,219,.15)` }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ color: C.blueL, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>✦ Nos autres expertises</div>
-            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: C.text, marginBottom: 6 }}>Vous recrutez aussi dans...</h2>
-            <p style={{ color: "#64748B", fontSize: ".88rem" }}>TalentFlux opère sur 6 secteurs spécialisés en Suisse.</p>
+            <div style={{ color: C.blueL, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
+              ✦ {lang === "en" ? "Our other expertise" : "Nos autres expertises"}
+            </div>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: C.text, marginBottom: 6 }}>
+              {lang === "en" ? "You also recruit in..." : "Vous recrutez aussi dans..."}
+            </h2>
+            <p style={{ color: "#64748B", fontSize: ".88rem" }}>
+              {lang === "en" ? "TalentFlux operates in 6 specialized sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
+            </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
             {[
-              { href: "/finance", label: "💰 Finance & Contrôle", color: "#D4AF5A", sub: "Compliance · FINMA · CFO" },
-              { href: "/pharma",  label: "🔬 Pharma & Life Sciences", color: "#C026D3", sub: "GMP · Swissmedic · AR" },
+              { href: "/finance", label: lang === "en" ? "💰 Finance & Control" : "💰 Finance & Contrôle", color: "#D4AF5A", sub: "Compliance · FINMA · CFO" },
+              { href: "/pharma",  label: lang === "en" ? "🔬 Pharma & Life Sciences" : "🔬 Pharma & Life Sciences", color: "#C026D3", sub: "GMP · Swissmedic · AR" },
             ].map(({ href, label, color, sub }) => (
               <a key={href} href={href} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 22px", borderRadius: 14, background: `${color}10`, border: `1px solid ${color}30`, textDecoration: "none", transition: "all .25s", flex: 1, minWidth: 200 }}
                 onMouseEnter={e => { e.currentTarget.style.background = `${color}18`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = `${color}10`; e.currentTarget.style.transform = "translateY(0)"; }}>
                 <div>
                   <div style={{ color, fontWeight: 700, fontSize: ".88rem" }}>{label}</div>
-                  <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{sub} · Voir la verticale →</div>
+                  <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{sub} · {lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
                 </div>
               </a>
             ))}
@@ -627,16 +782,19 @@ export default function TalentFluxJuridique() {
         </div>
       </section>
 
-      {/* ══ FOOTER ══ */}
+      {/* FOOTER */}
       <footer style={{ borderTop: `1px solid ${C.border}`, padding: "24px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
-            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Juridique · Yverdon-les-Bains, VD</span>
+            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· {lang === "en" ? "LEGAL" : "Juridique"} · Yverdon-les-Bains, VD</span>
           </div>
-          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en"
+              ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]]
+              : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]
+            ).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.muted} onMouseLeave={e => e.target.style.color = C.subtle}>{label}</Link>
             ))}
           </div>

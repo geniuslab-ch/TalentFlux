@@ -1,6 +1,7 @@
 "use client";
 import { useState, useEffect, useRef } from "react";
 import { useMobile } from "@/utils/responsive";
+import { useLang } from "@/contexts/LangContext";
 import Link from "next/link";
 import {
   ArrowRight, CheckCircle, ChevronDown, Star,
@@ -164,27 +165,59 @@ const VERTICALS = [
 
 // ── Clusters SEO — groupement par affinité métier ─────────────
 const CLUSTERS = [
-  {
-    key: "tech",
-    label: "Tech & Numérique",
-    color: "#38BDF8",
-    desc: "Profils techniques & digitaux",
-    verticals: ["it", "telecom", "ingenierie"],
-  },
-  {
-    key: "corporate",
-    label: "Corporate & Compliance",
-    color: "#D4AF5A",
-    desc: "Finance, droit et réglementation",
-    verticals: ["finance", "juridique", "pharma"],
-  },
-  {
-    key: "terrain",
-    label: "Terrain & Construction",
-    color: "#22C55E",
-    desc: "Métiers du chantier et de l'extérieur",
-    verticals: ["btp", "paysagisme"],
-  },
+  { key: "tech",      label: "Tech & Numérique",      color: "#38BDF8", desc: "Profils techniques & digitaux",          verticals: ["it", "telecom", "ingenierie"] },
+  { key: "corporate", label: "Corporate & Compliance", color: "#D4AF5A", desc: "Finance, droit et réglementation",        verticals: ["finance", "juridique", "pharma"] },
+  { key: "terrain",   label: "Terrain & Construction", color: "#22C55E", desc: "Métiers du chantier et de l'extérieur",   verticals: ["btp", "paysagisme"] },
+];
+
+// ── EN versions ───────────────────────────────────────────────
+const VERTICALS_EN = [
+  { key:"it",          icon:Terminal,     label:"IT & Digital",           tag:"Tech",         accent:"#38BDF8", accentD:"#2563EB", grad:"linear-gradient(135deg,#2563EB,#0EA5E9,#38BDF8)", bg:"rgba(14,165,233,.06)", border:"rgba(56,189,248,.25)", path:"/en/it", candidature:"/candidature/it",
+    pitch:"Dev, DevOps, Data, Cloud, Security",
+    detail:"Full-stack, cloud architects, ML engineers, CISOs — tech profiles in high demand from Swiss scale-ups and large groups.",
+    stats:[["200+","IT profiles placed"],["48h","average lead time"],["Permanent & Freelance","all contracts"]],
+    metiers:["Full-Stack Developer","DevOps / SRE","Data Engineer","Cloud Architect","Tech Lead","CISO / Cybersecurity"] },
+  { key:"finance",     icon:Landmark,     label:"Finance & Control",       tag:"Finance",      accent:"#D4AF5A", accentD:"#B4913C", grad:"linear-gradient(135deg,#B4913C,#D4AF5A,#E8C97A)", bg:"rgba(212,175,90,.06)", border:"rgba(212,175,90,.25)", path:"/en/finance", candidature:"/candidature/finance",
+    pitch:"CFO, Management Control, Audit, AR, Treasury",
+    detail:"Bilingual finance experts mastering Swiss GAAP, IFRS and FINMA requirements. From CFO to consolidation chief accountant.",
+    stats:[["Swiss GAAP","& IFRS"],["Geneva, Zurich","& Vaud"],["Big4 & SME","all contexts"]],
+    metiers:["CFO / Financial Direction","Management Control","Internal / External Audit","Treasury","M&A","FINMA Compliance"] },
+  { key:"ingenierie",  icon:Cpu,          label:"Engineering & Technical",  tag:"Engineering",  accent:"#818CF8", accentD:"#4F46E5", grad:"linear-gradient(135deg,#4F46E5,#818CF8,#A5B4FC)", bg:"rgba(129,140,248,.06)", border:"rgba(129,140,248,.25)", path:"/en/ingenierie", candidature:"/candidature/ingenierie",
+    pitch:"Mechanical, Automation, MedTech, Electronics, R&D",
+    detail:"Engineers specialised in Swiss standards ISO 13485, MDR, IEC 62304. Watchmaking, MedTech, industrial automation.",
+    stats:[["ISO 13485","& MDR"],["Watchmaking","& MedTech"],["R&D & Production","all levels"]],
+    metiers:["Mechanical Engineer","Automation / PLC","Quality / Regulatory","R&D / Innovation","Embedded Electronics","Validation"] },
+  { key:"paysagisme",  icon:Leaf,         label:"Landscaping",             tag:"Landscape",    accent:"#22C55E", accentD:"#15803D", grad:"linear-gradient(135deg,#15803D,#22C55E,#4ADE80)", bg:"rgba(34,197,94,.06)", border:"rgba(34,197,94,.25)", path:"/en/paysagisme", candidature:"/candidature/paysagisme",
+    pitch:"CFC, ISA/ECC Arborists, Site Managers, Supervisors",
+    detail:"CFC landscapers, ISA/ECC certified arborists, landscape masons, site managers — field profiles impossible to find via standard portals.",
+    stats:[["CFC & ISA","certifications"],["French & German","speaking Switzerland"],["Permanent & Seasonal","all contracts"]],
+    metiers:["CFC Landscape Gardener","ISA/ECC Climbing Arborist","Landscape Mason","Site Manager","Works Supervisor","Irrigation Technician"] },
+  { key:"telecom",     icon:Signal,       label:"Telecommunications",      tag:"Telecom",      accent:"#0EA5E9", accentD:"#0369A1", grad:"linear-gradient(135deg,#0369A1,#0EA5E9,#38BDF8)", bg:"rgba(14,165,233,.06)", border:"rgba(14,165,233,.25)", path:"/en/telecom", candidature:"/candidature/telecom",
+    pitch:"RNI/ORNI, RF Planning, IP Network, 5G, Fibre, VoIP",
+    detail:"RNI specialists, RF planners, IP network engineers (CCNP/CCIE), fibre technicians, OFAC drone pilots — profiles impossible to source via generic job postings.",
+    stats:[["ORNI & 5G","expertise"],["5-8 days","specialised lead time"],["Swisscom, Sunrise","Salt & CDMO"]],
+    metiers:["RNI / ORNI Specialist","RF Planner / 5G","IP Network Engineer","Fibre Technician","VoIP Engineer","OFAC Drone Pilot"] },
+  { key:"pharma",      icon:FlaskConical, label:"Pharma & Life Sciences",   tag:"Pharma",       accent:"#C026D3", accentD:"#7C3AED", grad:"linear-gradient(135deg,#7C3AED,#C026D3,#E879F9)", bg:"rgba(192,38,211,.06)", border:"rgba(232,121,249,.25)", path:"/en/pharma", candidature:"/candidature/pharma",
+    pitch:"QA/QC, Regulatory Affairs, GMP, Validation, PV",
+    detail:"QA Managers, Responsible Person, RA experts, IQ/OQ/PQ validation engineers — profiles mastering Swissmedic, ICH Q9 and GMP Annexes.",
+    stats:[["Swissmedic","& EMA"],["6-10 days","RP / Head QA lead time"],["CDMO & Biotech","all contexts"]],
+    metiers:["QA Manager / Director","Responsible Person","Regulatory Affairs","Validation Engineer","Pharmacovigilance","R&D / Formulation"] },
+  { key:"juridique",   icon:Scale,        label:"Law & Compliance",         tag:"Legal",        accent:"#748FFC", accentD:"#3B5BDB", grad:"linear-gradient(135deg,#1B2A52,#2C3E80,#3B5BDB)", bg:"rgba(116,143,252,.06)", border:"rgba(116,143,252,.25)", path:"/en/juridique", candidature:"/candidature/juridique",
+    pitch:"GC, Bar-admitted Lawyers, FINMA Compliance, nFADP DPO",
+    detail:"General Counsel, business lawyers, FINMA compliance officers, nFADP/GDPR-certified DPOs — profiles subject to professional secrecy, approached through networks only.",
+    stats:[["Patent","& bar verified"],["6-10 days","GC / Head Legal lead time"],["NDA","if required"]],
+    metiers:["General Counsel","Business Lawyer","FINMA Compliance Officer","DPO / Data Privacy","Contract Manager","Accredited Mediator"] },
+  { key:"btp",         icon:HardHat,      label:"Construction & Architecture", tag:"Construction", accent:"#FB923C", accentD:"#C2410C", grad:"linear-gradient(135deg,#92400E,#C2410C,#F97316)", bg:"rgba(249,115,22,.06)", border:"rgba(251,146,60,.25)", path:"/en/btp", candidature:"/candidature/btp",
+    pitch:"Site Managers, SIA Architects, Civil Engineers, HVAC",
+    detail:"Senior site managers, SIA architects, civil engineers, Minergie specialists and OTConst HSE managers — profiles retained before they're even available.",
+    stats:[["SIA 118","& OTConst"],["48h","first profiles"],["Minergie","& CECB"]],
+    metiers:["Site Manager","Works Director","SIA Architect","Civil / Structural Engineer","HVAC Engineer","HSE Manager"] },
+];
+
+const CLUSTERS_EN = [
+  { key: "tech",      label: "Tech & Digital",         color: "#38BDF8", desc: "Technical & digital profiles",          verticals: ["it", "telecom", "ingenierie"] },
+  { key: "corporate", label: "Corporate & Compliance",  color: "#D4AF5A", desc: "Finance, law and regulation",           verticals: ["finance", "juridique", "pharma"] },
+  { key: "terrain",   label: "Field & Construction",    color: "#22C55E", desc: "Site and outdoor trades",               verticals: ["btp", "paysagisme"] },
 ];
 
 // ── Composant carte verticale (hooks au niveau module) ───────
@@ -219,7 +252,7 @@ const VerticalCard = ({ v, active, onClick, isMobile }) => {
 };
 
 // ── Panneau détail (sans hooks) ──────────────────────────────
-const VerticalPanel = ({ v, isMobile }) => {
+const VerticalPanel = ({ v, isMobile, lang }) => {
   const Icon = v.icon;
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: 22 }}>
@@ -239,12 +272,12 @@ const VerticalPanel = ({ v, isMobile }) => {
           <Link href={v.candidature} style={{ padding: "10px 18px", borderRadius: 11, background: v.bg, border: `1px solid ${v.border}`, color: v.accent, fontWeight: 700, fontSize: ".82rem", textDecoration: "none", display: "flex", alignItems: "center", gap: 7, transition: "all .2s", fontFamily: "'DM Sans',sans-serif" }}
             onMouseEnter={e => e.currentTarget.style.background = v.bg.replace(".06", ".12")}
             onMouseLeave={e => e.currentTarget.style.background = v.bg}>
-            Postuler
+            {lang === "en" ? "Apply" : "Postuler"}
           </Link>
           <Link href={v.path} style={{ padding: "10px 20px", borderRadius: 11, background: v.grad, border: "none", color: "#fff", fontWeight: 700, fontSize: ".82rem", textDecoration: "none", display: "flex", alignItems: "center", gap: 7, boxShadow: `0 4px 18px ${v.accent}35`, transition: "all .2s", fontFamily: "'DM Sans',sans-serif" }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.filter = "brightness(1.1)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.filter = "none"; }}>
-            Découvrir <ArrowRight size={14} />
+            {lang === "en" ? "Discover" : "Découvrir"} <ArrowRight size={14} />
           </Link>
         </div>
       </div>
@@ -261,7 +294,7 @@ const VerticalPanel = ({ v, isMobile }) => {
 
       {/* Métiers */}
       <div>
-        <div style={{ color: "#475569", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 10 }}>Métiers clés</div>
+        <div style={{ color: "#475569", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 10 }}>{lang === "en" ? "Key trades" : "Métiers clés"}</div>
         <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
           {v.metiers.map(m => (
             <span key={m} style={{ padding: "6px 13px", borderRadius: 100, fontSize: ".78rem", fontWeight: 600, background: v.bg, border: `1px solid ${v.border}`, color: v.accent }}>{m}</span>
@@ -272,7 +305,7 @@ const VerticalPanel = ({ v, isMobile }) => {
       {/* CTA bas */}
       <div style={{ display: "flex", alignItems: "center", gap: 14, paddingTop: 8, borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <CheckCircle size={14} style={{ color: v.accent, flexShrink: 0 }} />
-        <span style={{ color: "#64748B", fontSize: ".82rem" }}>Aucun frais avant embauche · Garantie remplacement 3 mois · 100% au succès</span>
+        <span style={{ color: "#64748B", fontSize: ".82rem" }}>{lang === "en" ? "No fees until hire · 3-month replacement guarantee · 100% success-based" : "Aucun frais avant embauche · Garantie remplacement 3 mois · 100% au succès"}</span>
       </div>
     </div>
   );
@@ -293,6 +326,7 @@ const StatCard = ({ value, label, delay }) => {
 // PAGE PRINCIPALE
 // ════════════════════════════════════════════════════════════
 export default function Home() {
+  const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
   const [activeTab, setActiveTab] = useState("it");
@@ -307,12 +341,14 @@ export default function Home() {
     return () => window.removeEventListener("scroll", fn);
   }, []);
 
-  const active = VERTICALS.find(v => v.key === activeTab);
+  const verticals = lang === "en" ? VERTICALS_EN : VERTICALS;
+  const clusters = lang === "en" ? CLUSTERS_EN : CLUSTERS;
+  const active = verticals.find(v => v.key === activeTab);
   const scrollTo = id => document.getElementById(id)?.scrollIntoView({ behavior: "smooth" });
 
   const handleContact = async () => {
     setFormError(null);
-    if (!contactForm.firstName || !contactForm.email) { setFormError("Prénom et email requis."); return; }
+    if (!contactForm.firstName || !contactForm.email) { setFormError(lang === "en" ? "First name and email required." : "Prénom et email requis."); return; }
     setSending(true);
     try {
       const { error } = await supabase.from("contact_submissions").insert([{
@@ -351,18 +387,18 @@ export default function Home() {
           <img src="/logo.png" alt="TalentFlux — Recrutement spécialisé Suisse" style={{ height: 36, objectFit: "contain" }} />
         </div>
         <div style={{ display: isMobile ? "none" : "flex", gap: "1.4rem", alignItems: "center" }}>
-          {[["Verticales", "verticales"], ["Notre approche", "approche"]].map(([label, id]) => (
+          {(lang === "en" ? [["Verticals", "verticales"], ["Our approach", "approche"]] : [["Verticales", "verticales"], ["Notre approche", "approche"]]).map(([label, id]) => (
             <span key={id} onClick={() => scrollTo(id)} style={{ color: "#64748B", fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = "#F1F5F9"} onMouseLeave={e => e.target.style.color = "#64748B"}>{label}</span>
           ))}
           <button onClick={() => scrollTo("contact")} style={{ background: "linear-gradient(135deg,#2563EB,#0EA5E9)", border: "none", color: "#fff", padding: "10px 22px", borderRadius: 12, fontWeight: 700, fontSize: ".85rem", cursor: "pointer", boxShadow: "0 0 20px rgba(14,165,233,.3)", fontFamily: "'DM Sans',sans-serif", transition: "all .3s" }}
             onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 36px rgba(56,189,248,.5)"; }}
             onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 20px rgba(14,165,233,.3)"; }}>
-            Nous contacter
+            {lang === "en" ? "Contact us" : "Nous contacter"}
           </button>
         </div>
         {isMobile && (
-          <button onClick={() => scrollTo("contact")} style={{ background: "linear-gradient(135deg,#2563EB,#0EA5E9)", border: "none", color: "#fff", padding: "8px 16px", borderRadius: 10, fontWeight: 700, fontSize: ".82rem", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>Contact →</button>
+          <button onClick={() => scrollTo("contact")} style={{ background: "linear-gradient(135deg,#2563EB,#0EA5E9)", border: "none", color: "#fff", padding: "8px 16px", borderRadius: 10, fontWeight: 700, fontSize: ".82rem", cursor: "pointer", fontFamily: "'DM Sans',sans-serif" }}>{lang === "en" ? "Contact →" : "Contact →"}</button>
         )}
       </nav>
 
@@ -375,15 +411,15 @@ export default function Home() {
         {/* Floating badges */}
         {!isMobile && (<>
           <div style={{ position: "absolute", left: "3%", top: "38%", background: "rgba(8,18,40,.95)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 14, padding: "11px 16px", animation: "float 5s ease-in-out infinite", pointerEvents: "none", zIndex: 1 }}>
-            <div style={{ color: "#334155", fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Réseau actif</div>
+            <div style={{ color: "#334155", fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>{lang === "en" ? "Active network" : "Réseau actif"}</div>
             <div style={{ color: "#F1F5F9", fontSize: ".8rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 6px #22C55E", display: "inline-block" }} /> 6 secteurs · Suisse
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#22C55E", boxShadow: "0 0 6px #22C55E", display: "inline-block" }} /> {lang === "en" ? "8 sectors · Switzerland" : "6 secteurs · Suisse"}
             </div>
           </div>
           <div style={{ position: "absolute", right: "3%", top: "42%", background: "rgba(8,18,40,.95)", border: "1px solid rgba(212,175,90,.2)", borderRadius: 14, padding: "11px 16px", animation: "float 5s ease-in-out infinite 1.6s", pointerEvents: "none", zIndex: 1 }}>
-            <div style={{ color: "#334155", fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>Modèle</div>
+            <div style={{ color: "#334155", fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", marginBottom: 4 }}>{lang === "en" ? "Model" : "Modèle"}</div>
             <div style={{ color: "#F1F5F9", fontSize: ".8rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 7 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#D4AF5A", boxShadow: "0 0 6px #D4AF5A", display: "inline-block" }} /> 100% au succès
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#D4AF5A", boxShadow: "0 0 6px #D4AF5A", display: "inline-block" }} /> {lang === "en" ? "100% success-based" : "100% au succès"}
             </div>
           </div>
         </>)}
@@ -392,20 +428,22 @@ export default function Home() {
           {/* Tag */}
           <div style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "rgba(37,99,235,.08)", border: "1px solid rgba(56,189,248,.2)", borderRadius: 100, padding: "7px 18px", marginBottom: 28 }}>
             <span style={{ width: 7, height: 7, borderRadius: "50%", background: "#38BDF8", boxShadow: "0 0 8px #38BDF8", display: "inline-block" }} />
-            <span style={{ color: "#94A3B8", fontSize: ".78rem", fontWeight: 600 }}>Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse</span>
+            <span style={{ color: "#94A3B8", fontSize: ".78rem", fontWeight: 600 }}>{lang === "en" ? "Specialised recruitment agency · Yverdon-les-Bains, Switzerland" : "Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse"}</span>
           </div>
 
           {/* H1 */}
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(2rem,5.5vw,3.8rem)", fontWeight: 900, lineHeight: 1.1, letterSpacing: "-.02em", color: "#F1F5F9", marginBottom: 24 }}>
-            La précision du data scientist<br />
+            {lang === "en" ? "The data scientist's precision" : "La précision du data scientist"}<br />
             <span style={{ background: "linear-gradient(135deg,#60A5FA,#38BDF8,#2DD4BF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-              appliquée au flair du recruteur senior.
+              {lang === "en" ? "applied to the instinct of a senior recruiter." : "appliquée au flair du recruteur senior."}
             </span>
           </h1>
 
           {/* Description SEO */}
           <p style={{ color: "#94A3B8", fontSize: "clamp(.92rem,2vw,1.05rem)", lineHeight: 1.85, maxWidth: 620, margin: "0 auto 40px" }}>
-            TalentFlux place les profils rares en Suisse : IT & Digital, Finance, Ingénierie, Paysagisme, Télécommunications et Pharma & Life Sciences. Matching data-driven, vérification expert, garantie 3 mois.
+            {lang === "en"
+              ? "TalentFlux places rare profiles in Switzerland: IT & Digital, Finance, Engineering, Landscaping, Telecommunications and Pharma & Life Sciences. Data-driven matching, expert verification, 3-month guarantee."
+              : "TalentFlux place les profils rares en Suisse : IT & Digital, Finance, Ingénierie, Paysagisme, Télécommunications et Pharma & Life Sciences. Matching data-driven, vérification expert, garantie 3 mois."}
           </p>
 
           {/* CTAs */}
@@ -413,18 +451,18 @@ export default function Home() {
             <button onClick={() => scrollTo("verticales")} style={{ background: "linear-gradient(135deg,#2563EB,#0EA5E9,#14B8A6)", border: "none", color: "#fff", padding: isMobile ? "13px 24px" : "16px 36px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: isMobile ? ".9rem" : "1rem", cursor: "pointer", display: "flex", alignItems: "center", gap: 9, boxShadow: "0 0 30px rgba(14,165,233,.35)", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 50px rgba(56,189,248,.55)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 30px rgba(14,165,233,.35)"; }}>
-              <Users size={18} /> Voir nos secteurs <ArrowRight size={16} />
+              <Users size={18} /> {lang === "en" ? "View our sectors" : "Voir nos secteurs"} <ArrowRight size={16} />
             </button>
             <button onClick={() => scrollTo("contact")} style={{ background: "rgba(255,255,255,.05)", border: "1.5px solid rgba(255,255,255,.12)", color: "#94A3B8", padding: isMobile ? "13px 24px" : "16px 36px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: isMobile ? ".9rem" : "1rem", cursor: "pointer", display: "flex", alignItems: "center", gap: 9, transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.color = "#F1F5F9"; e.currentTarget.style.borderColor = "rgba(255,255,255,.3)"; }}
               onMouseLeave={e => { e.currentTarget.style.color = "#94A3B8"; e.currentTarget.style.borderColor = "rgba(255,255,255,.12)"; }}>
-              Nous contacter
+              {lang === "en" ? "Contact us" : "Nous contacter"}
             </button>
           </div>
 
           {/* Chiffres clés */}
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "repeat(2,1fr)" : "repeat(4,1fr)", gap: isMobile ? 20 : 36, paddingTop: 36, borderTop: "1px solid rgba(255,255,255,.06)" }}>
-            {[["8","Secteurs spécialisés"],["100%","Au succès"],["3 mois","Garantie remplacement"],["CH","Suisse romande & alémanique"]].map(([v, l], i) => (
+            {(lang === "en" ? [["8","Specialised sectors"],["100%","Success-based"],["3 months","Replacement guarantee"],["CH","French & German speaking"]] : [["8","Secteurs spécialisés"],["100%","Au succès"],["3 mois","Garantie remplacement"],["CH","Suisse romande & alémanique"]]).map(([v, l], i) => (
               <StatCard key={i} value={v} label={l} delay={i * 100} />
             ))}
           </div>
@@ -438,20 +476,20 @@ export default function Home() {
       <section id="verticales" style={{ padding: isMobile ? "64px 1.4rem" : "100px 2rem", background: "rgba(6,10,20,.6)", borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Nos 8 verticales</div>
+            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ {lang === "en" ? "Our 8 verticals" : "Nos 8 verticales"}</div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.7rem,4vw,2.8rem)", fontWeight: 800, lineHeight: 1.2, color: "#F1F5F9", marginBottom: 14 }}>
-              Un recruteur expert<br />dans chaque secteur
+              {lang === "en" ? <>An expert recruiter<br />in every sector</> : <>Un recruteur expert<br />dans chaque secteur</>}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".95rem", maxWidth: 520, margin: "0 auto" }}>
-              Chaque verticale a ses codes, ses certifications, ses réseaux. Nous connaissons les vôtres.
+              {lang === "en" ? "Every vertical has its own codes, certifications, networks. We know yours." : "Chaque verticale a ses codes, ses certifications, ses réseaux. Nous connaissons les vôtres."}
             </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "300px 1fr", gap: isMobile ? 20 : 24, alignItems: "start" }}>
             {/* Navigation groupée par cluster */}
             <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-              {CLUSTERS.map(cluster => {
-                const clusterVerticals = VERTICALS.filter(v => cluster.verticals.includes(v.key));
+              {clusters.map(cluster => {
+                const clusterVerticals = verticals.filter(v => cluster.verticals.includes(v.key));
                 return (
                   <div key={cluster.key}>
                     {/* Header cluster */}
@@ -472,14 +510,14 @@ export default function Home() {
 
             {/* Panneau détail */}
             <div style={{ background: "rgba(10,16,30,.9)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 22, padding: isMobile ? 22 : 36, boxShadow: `0 0 60px ${active.accent}12` }}>
-              <VerticalPanel key={activeTab} v={active} isMobile={isMobile} />
+              <VerticalPanel key={activeTab} v={active} isMobile={isMobile} lang={lang} />
             </div>
           </div>
 
           {/* Grille rapide toutes verticales — groupées par cluster */}
           <div style={{ marginTop: 52 }}>
-            {CLUSTERS.map(cluster => {
-              const clusterVerticals = VERTICALS.filter(v => cluster.verticals.includes(v.key));
+            {clusters.map(cluster => {
+              const clusterVerticals = verticals.filter(v => cluster.verticals.includes(v.key));
               return (
                 <div key={cluster.key} style={{ marginBottom: 32 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 14 }}>
@@ -511,22 +549,29 @@ export default function Home() {
       <section id="approche" style={{ padding: isMobile ? "64px 1.4rem" : "100px 2rem" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ color: "#D4AF5A", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Pourquoi TalentFlux</div>
+            <div style={{ color: "#D4AF5A", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ {lang === "en" ? "Why TalentFlux" : "Pourquoi TalentFlux"}</div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.7rem,4vw,2.8rem)", fontWeight: 800, color: "#F1F5F9" }}>
-              Pas une agence de plus.<br />
-              <span style={{ background: "linear-gradient(135deg,#D4AF5A,#E8C97A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Une approche différente.</span>
+              {lang === "en" ? "Not just another agency." : "Pas une agence de plus."}<br />
+              <span style={{ background: "linear-gradient(135deg,#D4AF5A,#E8C97A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{lang === "en" ? "A different approach." : "Une approche différente."}</span>
             </h2>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 18 }}>
-            {[
+            {(lang === "en" ? [
+              { icon: Users, accent: "#38BDF8", title: "Sector experts", desc: "Our consultants have worked in the sectors they recruit for. An IT recruiter who knows React. A pharma recruiter who understands a Swissmedic inspection." },
+              { icon: Shield, accent: "#22C55E", title: "Verified before presentation", desc: "Certifications checked, skills technically tested, references verified. You only meet candidates validated by a sector expert." },
+              { icon: Clock, accent: "#D4AF5A", title: "3-month guarantee", desc: "If the candidate leaves or doesn't work out within the first 3 months, we restart the process entirely at our expense. No negotiation, no clauses." },
+              { icon: Star, accent: "#818CF8", title: "100% success-based", desc: "No fixed fees, no subscriptions. You only pay if you hire. Our interests are aligned with yours from day one." },
+              { icon: CheckCircle, accent: "#C026D3", title: "Data-driven matching", desc: "40+ sector-specific criteria per profile. Matching score calculated before every presentation. No more misfit CVs wasting everyone's time." },
+              { icon: MapPin, accent: "#0EA5E9", title: "Swiss-rooted", desc: "Based in Yverdon-les-Bains, active across French and German-speaking Switzerland. Local networks, knowledge of collective agreements and cantonal markets." },
+            ] : [
               { icon: Users, accent: "#38BDF8", title: "Experts sectoriels", desc: "Nos consultants ont travaillé dans les secteurs qu'ils recrutent. Un recruteur IT qui connaît React. Un recruteur pharma qui sait ce qu'est une inspection Swissmedic." },
               { icon: Shield, accent: "#22C55E", title: "Vérification avant présentation", desc: "Certifications contrôlées, compétences testées techniquement, références vérifiées. Vous ne rencontrez que des candidats validés par un expert du secteur." },
               { icon: Clock, accent: "#D4AF5A", title: "Garantie 3 mois", desc: "Si le candidat quitte ou ne convient pas dans les 3 premiers mois, nous relançons le processus entièrement à nos frais. Sans négociation, sans clause." },
               { icon: Star, accent: "#818CF8", title: "100% au succès", desc: "Aucun frais fixe, aucun abonnement. Vous ne payez que si vous embauchez. Notre intérêt est aligné sur le vôtre dès le premier jour." },
               { icon: CheckCircle, accent: "#C026D3", title: "Matching data-driven", desc: "40+ critères sectoriels par profil. Score de matching calculé avant chaque présentation. Fini les CVs inadaptés qui font perdre du temps à tout le monde." },
               { icon: MapPin, accent: "#0EA5E9", title: "Ancrage suisse", desc: "Basés à Yverdon-les-Bains, actifs dans toute la Suisse romande et alémanique. Réseaux locaux, connaissance des conventions collectives et du marché cantonal." },
-            ].map(({ icon: Icon, accent, title, desc }, i) => (
+            ]).map(({ icon: Icon, accent, title, desc }, i) => (
               <div key={i} style={{ padding: 28, borderRadius: 20, background: "rgba(10,16,30,.8)", border: "1px solid rgba(255,255,255,.07)", transition: "all .3s" }}
                 onMouseEnter={e => { e.currentTarget.style.borderColor = `${accent}30`; e.currentTarget.style.boxShadow = `0 0 28px ${accent}12`; e.currentTarget.style.transform = "translateY(-3px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.borderColor = "rgba(255,255,255,.07)"; e.currentTarget.style.boxShadow = "none"; e.currentTarget.style.transform = "translateY(0)"; }}>
@@ -545,15 +590,19 @@ export default function Home() {
       <section style={{ padding: isMobile ? "56px 1.4rem" : "80px 2rem", background: "rgba(6,10,20,.5)", borderTop: "1px solid rgba(255,255,255,.06)" }}>
         <div style={{ maxWidth: 1120, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 44 }}>
-            <div style={{ color: "#D4AF5A", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 12 }}>✦ Ils nous font confiance</div>
-            <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.5rem,3.5vw,2.2rem)", fontWeight: 800, color: "#F1F5F9" }}>Ce que disent nos clients</h2>
+            <div style={{ color: "#D4AF5A", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 12 }}>✦ {lang === "en" ? "They trust us" : "Ils nous font confiance"}</div>
+            <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.5rem,3.5vw,2.2rem)", fontWeight: 800, color: "#F1F5F9" }}>{lang === "en" ? "What our clients say" : "Ce que disent nos clients"}</h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 18 }}>
-            {[
+            {(lang === "en" ? [
+              { q: "Rare IT profile found in 48h. Our Tech Lead had exactly the stack we were looking for and passed all our technical interviews. Impressive.", a: "CTO, SaaS scale-up — Lausanne", sector: "IT", color: "#38BDF8" },
+              { q: "We'd been searching for a RP for 6 months. TalentFlux presented 2 qualified candidates in 8 days. The selected candidate had already handled a Swissmedic inspection.", a: "Head of HR, pharma lab — Vaud", sector: "Pharma", color: "#C026D3" },
+              { q: "What stood out: they knew exactly what an RNI specialist is and asked the right ORNI questions from the very first call.", a: "Technical Director, telecom office — Geneva", sector: "Telecom", color: "#0EA5E9" },
+            ] : [
               { q: "Profil IT rare trouvé en 48h. Notre Tech Lead avait exactement le stack qu'on cherchait et a passé tous nos entretiens techniques. Impressionnant.", a: "CTO, scale-up SaaS — Lausanne", sector: "IT", color: "#38BDF8" },
               { q: "Nous cherchions une RP depuis 6 mois. TalentFlux nous a présenté 2 candidats qualifiés en 8 jours. La candidate retenue avait déjà géré une inspection Swissmedic.", a: "Head of HR, laboratoire pharma — Vaud", sector: "Pharma", color: "#C026D3" },
               { q: "Ce qui nous a marqué : ils savaient exactement ce qu'est un spécialiste RNI et ont posé les bonnes questions ORNI dès le premier appel.", a: "Directeur Technique, bureau télécom — Genève", sector: "Télécom", color: "#0EA5E9" },
-            ].map(({ q, a, sector, color }, i) => (
+            ]).map(({ q, a, sector, color }, i) => (
               <div key={i} style={{ background: "rgba(10,16,30,.9)", border: "1px solid rgba(255,255,255,.07)", borderTop: `2px solid ${color}`, borderRadius: 18, padding: 24 }}>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 14 }}>
                   <div style={{ display: "flex", gap: 3 }}>{Array(5).fill(0).map((_, j) => <Star key={j} size={11} fill="#D4AF5A" color="#D4AF5A" />)}</div>
@@ -572,25 +621,25 @@ export default function Home() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%,rgba(37,99,235,.06),transparent 60%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 900, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Passez à l'action</div>
+            <div style={{ color: "#38BDF8", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ {lang === "en" ? "Take action" : "Passez à l'action"}</div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.7rem,4vw,2.8rem)", fontWeight: 800, color: "#F1F5F9", marginBottom: 10 }}>
-              Parlons de votre besoin
+              {lang === "en" ? "Let's talk about your need" : "Parlons de votre besoin"}
             </h2>
-            <p style={{ color: "#64748B", fontSize: ".95rem" }}>Réponse garantie sous 2h · Aucun engagement</p>
+            <p style={{ color: "#64748B", fontSize: ".95rem" }}>{lang === "en" ? "Guaranteed response within 2h · No commitment" : "Réponse garantie sous 2h · Aucun engagement"}</p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 280px", gap: 22 }}>
             {/* Formulaire */}
             <div style={{ background: "rgba(8,14,28,.95)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 22, overflow: "hidden" }}>
               <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,.07)" }}>
-                {[{ key: "recruiter", label: "🏢 Je recrute" }, { key: "candidate", label: "💼 Je suis candidat" }].map(({ key, label }) => (
+                {(lang === "en" ? [{ key: "recruiter", label: "🏢 I'm hiring" }, { key: "candidate", label: "💼 I'm a candidate" }] : [{ key: "recruiter", label: "🏢 Je recrute" }, { key: "candidate", label: "💼 Je suis candidat" }]).map(({ key, label }) => (
                   <button key={key} onClick={() => setContactForm(f => ({ ...f, type: key }))} style={{ flex: 1, padding: "14px", border: "none", cursor: "pointer", background: contactForm.type === key ? "rgba(37,99,235,.1)" : "transparent", borderBottom: `2px solid ${contactForm.type === key ? "#38BDF8" : "transparent"}`, color: contactForm.type === key ? "#F1F5F9" : "#475569", fontWeight: 700, fontSize: ".84rem", transition: "all .25s", fontFamily: "'DM Sans',sans-serif" }}>{label}</button>
                 ))}
               </div>
               {!sent ? (
                 <div style={{ padding: 24, display: "flex", flexDirection: "column", gap: 12 }}>
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-                    {[["Prénom *", "firstName", "Sophie"], ["Nom", "lastName", "Martin"]].map(([label, key, ph]) => (
+                    {(lang === "en" ? [["First name *", "firstName", "Sophie"], ["Last name", "lastName", "Martin"]] : [["Prénom *", "firstName", "Sophie"], ["Nom", "lastName", "Martin"]]).map(([label, key, ph]) => (
                       <div key={key}>
                         <label style={{ display: "block", color: "#334155", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{label}</label>
                         <input placeholder={ph} value={contactForm[key]} onChange={e => setContactForm(f => ({ ...f, [key]: e.target.value }))}
@@ -602,7 +651,7 @@ export default function Home() {
                     ))}
                   </div>
                   <div>
-                    <label style={{ display: "block", color: "#334155", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Email *</label>
+                    <label style={{ display: "block", color: "#334155", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{lang === "en" ? "Email *" : "Email *"}</label>
                     <input type="email" placeholder="sophie@acme.ch" value={contactForm.email} onChange={e => setContactForm(f => ({ ...f, email: e.target.value }))}
                       style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", color: "#F1F5F9", fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
                       onFocus={e => { e.target.style.borderColor = "rgba(56,189,248,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(14,165,233,.06)"; }}
@@ -610,8 +659,8 @@ export default function Home() {
                     />
                   </div>
                   <div>
-                    <label style={{ display: "block", color: "#334155", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Message</label>
-                    <textarea placeholder={contactForm.type === "recruiter" ? "Décrivez votre besoin : secteur, rôle, délai, contexte..." : "Votre secteur, rôle actuel, ce que vous recherchez..."}
+                    <label style={{ display: "block", color: "#334155", fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{lang === "en" ? "Message" : "Message"}</label>
+                    <textarea placeholder={lang === "en" ? (contactForm.type === "recruiter" ? "Describe your need: sector, role, timeline, context..." : "Your sector, current role, what you're looking for...") : (contactForm.type === "recruiter" ? "Décrivez votre besoin : secteur, rôle, délai, contexte..." : "Votre secteur, rôle actuel, ce que vous recherchez...")}
                       value={contactForm.message} onChange={e => setContactForm(f => ({ ...f, message: e.target.value }))} rows={3}
                       style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.08)", color: "#F1F5F9", fontSize: ".88rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(56,189,248,.5)"; e.target.style.boxShadow = "0 0 0 3px rgba(14,165,233,.06)"; }}
@@ -620,15 +669,15 @@ export default function Home() {
                   </div>
                   {formError && <div style={{ padding: "9px 13px", borderRadius: 9, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)", color: "#FCA5A5", fontSize: ".82rem" }}>{formError}</div>}
                   <button onClick={handleContact} disabled={sending} style={{ padding: "13px", borderRadius: 12, border: "none", background: sending ? "rgba(37,99,235,.4)" : "linear-gradient(135deg,#2563EB,#0EA5E9)", color: "#fff", fontWeight: 700, fontSize: ".92rem", cursor: sending ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, fontFamily: "'DM Sans',sans-serif", transition: "all .3s" }}>
-                    {sending ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</> : "Envoyer →"}
+                    {sending ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi..."}</> : (lang === "en" ? "Send →" : "Envoyer →")}
                   </button>
-                  <p style={{ color: "#1E3A5F", fontSize: ".68rem", textAlign: "center" }}>🔒 LPD suisse & RGPD conformes</p>
+                  <p style={{ color: "#1E3A5F", fontSize: ".68rem", textAlign: "center" }}>🔒 {lang === "en" ? "Swiss nFADP & GDPR compliant" : "LPD suisse & RGPD conformes"}</p>
                 </div>
               ) : (
                 <div style={{ padding: "48px 24px", textAlign: "center" }}>
                   <CheckCircle size={36} style={{ color: "#22C55E", margin: "0 auto 16px" }} />
-                  <h3 style={{ color: "#F1F5F9", fontWeight: 700, marginBottom: 8 }}>Message reçu ✓</h3>
-                  <p style={{ color: "#64748B", fontSize: ".9rem" }}>Merci {contactForm.firstName} ! Réponse sous <strong style={{ color: "#38BDF8" }}>2h</strong>.</p>
+                  <h3 style={{ color: "#F1F5F9", fontWeight: 700, marginBottom: 8 }}>{lang === "en" ? "Message received ✓" : "Message reçu ✓"}</h3>
+                  <p style={{ color: "#64748B", fontSize: ".9rem" }}>{lang === "en" ? <>Thank you {contactForm.firstName}! Reply within <strong style={{ color: "#38BDF8" }}>2h</strong>.</> : <>Merci {contactForm.firstName} ! Réponse sous <strong style={{ color: "#38BDF8" }}>2h</strong>.</>}</p>
                 </div>
               )}
             </div>
@@ -636,8 +685,8 @@ export default function Home() {
             {/* Coordonnées */}
             <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div style={{ background: "rgba(8,14,28,.95)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: 22 }}>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 16, color: "#F1F5F9" }}>Contact direct</h3>
-                {[{ icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" }, { icon: Phone, label: "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" }, { icon: MapPin, label: "Siège", value: "Yverdon-les-Bains, VD", href: null }].map(({ icon: Icon, label, value, href }) => (
+                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 16, color: "#F1F5F9" }}>{lang === "en" ? "Direct contact" : "Contact direct"}</h3>
+                {[{ icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" }, { icon: Phone, label: lang === "en" ? "Tel." : "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" }, { icon: MapPin, label: lang === "en" ? "HQ" : "Siège", value: "Yverdon-les-Bains, VD", href: null }].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: "1px solid rgba(255,255,255,.05)" }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, background: "rgba(56,189,248,.08)", border: "1px solid rgba(56,189,248,.15)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <Icon size={12} style={{ color: "#38BDF8" }} strokeWidth={1.5} />
@@ -650,7 +699,7 @@ export default function Home() {
                 ))}
               </div>
               <div style={{ background: "rgba(8,14,28,.95)", border: "1px solid rgba(255,255,255,.08)", borderRadius: 20, padding: 18 }}>
-                {[["< 2h", "Accusé de réception"], ["< 24h", "Premier brief"], ["3-10j", "Premiers profils présentés"]].map(([time, label]) => (
+                {(lang === "en" ? [["< 2h", "Acknowledgement"], ["< 24h", "First brief"], ["3-10d", "First profiles presented"]] : [["< 2h", "Accusé de réception"], ["< 24h", "Premier brief"], ["3-10j", "Premiers profils présentés"]]).map(([time, label]) => (
                   <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "7px 0", borderBottom: "1px solid rgba(255,255,255,.04)" }}>
                     <span style={{ color: "#475569", fontSize: ".8rem" }}>{label}</span>
                     <span style={{ color: "#38BDF8", fontSize: ".74rem", fontWeight: 700, background: "rgba(14,165,233,.1)", padding: "2px 9px", borderRadius: 5 }}>{time}</span>
@@ -667,15 +716,15 @@ export default function Home() {
         <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
-            <span style={{ color: "#334155", fontSize: ".72rem" }}>Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse</span>
+            <span style={{ color: "#334155", fontSize: ".72rem" }}>{lang === "en" ? "Specialised recruitment agency · Yverdon-les-Bains, Switzerland" : "Agence de recrutement spécialisée · Yverdon-les-Bains, Suisse"}</span>
           </div>
-          <p style={{ color: "#1E3A5F", fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: "#1E3A5F", fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 18, flexWrap: "wrap" }}>
-            {[["IT", "/it"], ["Finance", "/finance"], ["Ingénierie", "/ingenierie"], ["Paysagisme", "/paysagisme"], ["Télécom", "/telecom"], ["Pharma", "/pharma"]].map(([label, to]) => (
+            {(lang === "en" ? [["IT", "/en/it"], ["Finance", "/en/finance"], ["Engineering", "/en/ingenierie"], ["Landscaping", "/en/paysagisme"], ["Telecom", "/en/telecom"], ["Pharma", "/en/pharma"]] : [["IT", "/it"], ["Finance", "/finance"], ["Ingénierie", "/ingenierie"], ["Paysagisme", "/paysagisme"], ["Télécom", "/telecom"], ["Pharma", "/pharma"]]).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: "#334155", fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = "#64748B"} onMouseLeave={e => e.target.style.color = "#334155"}>{label}</Link>
             ))}
             <span style={{ color: "#1E3A5F" }}>·</span>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en" ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]] : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: "#334155", fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = "#64748B"} onMouseLeave={e => e.target.style.color = "#334155"}>{label}</Link>
             ))}
           </div>

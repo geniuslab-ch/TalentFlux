@@ -107,7 +107,6 @@ const FAQItem = ({ q, a, idx }) => {
 
 // ── Composant principal ───────────────────────────────────────
 export default function TalentFluxBTP() {
-  // useLang() et useMobile() DANS le composant — jamais hors fonction
   const lang = useLang();
   const { isMobile, isTablet } = useMobile();
   const [scrolled, setScrolled] = useState(false);
@@ -122,7 +121,6 @@ export default function TalentFluxBTP() {
     company: "", specialite: "", message: "", file: null
   });
 
-  // window/document uniquement dans useEffect
   useEffect(() => {
     const fn = () => setScrolled(window.scrollY > 40);
     window.addEventListener("scroll", fn);
@@ -134,8 +132,8 @@ export default function TalentFluxBTP() {
 
   const handleFile = file => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Fichier trop lourd (max 10 MB)."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
@@ -143,14 +141,14 @@ export default function TalentFluxBTP() {
   const handleSubmit = async () => {
     setError(null);
     if (!form.firstName || !form.lastName || !form.email) {
-      setError("Veuillez remplir les champs obligatoires (*).");
+      setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*).");
       return;
     }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const san = s => s.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const san = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fn = `${Date.now()}_${san(form.firstName)}_${san(form.lastName)}.pdf`;
         const { error: ue } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fn}`, form.file, { contentType: "application/pdf" });
         if (!ue) { pdfFileName = fn; pdfFileUrl = `submissions/${fn}`; }
@@ -162,10 +160,10 @@ export default function TalentFluxBTP() {
         role: form.specialite.trim() || null, message: form.message.trim() || null,
         pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
-      if (ie) throw new Error("Erreur : " + ie.message);
+      if (ie) throw new Error((lang === "en" ? "Error: " : "Erreur : ") + ie.message);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || (lang === "en" ? "An error occurred." : "Une erreur est survenue."));
     } finally { setLoading(false); }
   };
 
@@ -174,19 +172,48 @@ export default function TalentFluxBTP() {
     setForm({ firstName: "", lastName: "", email: "", phone: "", company: "", specialite: "", message: "", file: null });
   };
 
-  // Données statiques — PAS de lang === ici, uniquement dans le JSX
-  const metiers = [
-    { icon: HardHat,   label: "Chef de chantier",       lvl: "CCTP · OPC · Planning" },
-    { icon: Building2, label: "Directeur de travaux",    lvl: "TCE · Marché public" },
-    { icon: Ruler,     label: "Architecte",              label2: "SIA · HEIA · EPFL/EPFZ" },
-    { icon: Layers,    label: "Ingénieur structure",     lvl: "Béton armé · Bois · Acier" },
-    { icon: Wrench,    label: "Conducteur de travaux",   lvl: "GC · CFC · Brevet fédéral" },
-    { icon: Shield,    label: "Responsable HSE",         lvl: "OTConst · SUVA · OPA" },
-    { icon: Zap,       label: "Ingénieur CVSE",          lvl: "SIA 382 · Minergie · CECB" },
-    { icon: MapPin,    label: "Géomètre-expert",         lvl: "MO · RDPPF · SWISSTOPO" },
+  const metiers = lang === "en" ? [
+    { icon: HardHat,   label: "Site Manager",             lvl: "CCTP · OPC · Scheduling" },
+    { icon: Building2, label: "Works Director",           lvl: "TCE · Public Tender" },
+    { icon: Ruler,     label: "Architect",                lvl: "SIA · HEIA · EPFL/EPFZ" },
+    { icon: Layers,    label: "Structural Engineer",      lvl: "RC · Timber · Steel" },
+    { icon: Wrench,    label: "Site Supervisor",          lvl: "GC · CFC · Federal Diploma" },
+    { icon: Shield,    label: "HSE Manager",              lvl: "OTConst · SUVA · OPA" },
+    { icon: Zap,       label: "HVAC/Electrical Engineer", lvl: "SIA 382 · Minergie · CECB" },
+    { icon: MapPin,    label: "Licensed Surveyor",        lvl: "MO · RDPPF · SWISSTOPO" },
+  ] : [
+    { icon: HardHat,   label: "Chef de chantier",         lvl: "CCTP · OPC · Planning" },
+    { icon: Building2, label: "Directeur de travaux",     lvl: "TCE · Marché public" },
+    { icon: Ruler,     label: "Architecte",               lvl: "SIA · HEIA · EPFL/EPFZ" },
+    { icon: Layers,    label: "Ingénieur structure",      lvl: "Béton armé · Bois · Acier" },
+    { icon: Wrench,    label: "Conducteur de travaux",    lvl: "GC · CFC · Brevet fédéral" },
+    { icon: Shield,    label: "Responsable HSE",          lvl: "OTConst · SUVA · OPA" },
+    { icon: Zap,       label: "Ingénieur CVSE",           lvl: "SIA 382 · Minergie · CECB" },
+    { icon: MapPin,    label: "Géomètre-expert",          lvl: "MO · RDPPF · SWISSTOPO" },
   ];
 
-  const faqData = [
+  const faqData = lang === "en" ? [
+    {
+      q: "Do you know the difference between a lump-sum contract and a bill-of-quantities contract under Swiss public procurement law?",
+      a: "Yes — and we test it in interviews. A site manager or works supervisor who doesn't have a solid grasp of CO Art. 363 ff., SIA 118, or LMP/IMP tender procedures is not operational on a Swiss public construction site. We systematically verify knowledge of submission rules, final accounts, and variation order management.",
+    },
+    {
+      q: "Do you recruit only in structural works, or also in finishing trades and HVAC/MEP?",
+      a: "Across the full construction cycle: structural works (concrete, masonry, timber frame), finishing trades (joinery, plastering, painting, tiling), HVAC/MEP (heating, ventilation, plumbing, electrical), as well as engineering consultancies (structural, geotechnical, environmental) and project management (SIA architects, civil engineers). Each mandate is handled by a consultant familiar with the relevant trade.",
+    },
+    {
+      q: "How do you assess whether a site manager can manage subcontractors in a Swiss context?",
+      a: "We verify mastery of the CCT construction (or CCT electrical/plumbing depending on the trade), knowledge of the general contractor's obligations towards subcontractors (Art. 16 LTN), and experience of SUVA/MSST site inspections. A site manager who has never drawn up a PGCS or been through an ISS inspection is not senior level.",
+    },
+    {
+      q: "Do you work on Minergie, CECB, or high-energy-performance projects?",
+      a: "Yes. We recruit Minergie specialists (P, A, ECO), CECB+ experts, SIA 380/1 energy consultants, and sustainability managers for public and private developers. Knowledge of cantonal requirements (MCEB, cantonal energy directives) is part of our evaluation framework.",
+    },
+    {
+      q: "What is your guarantee if the candidate leaves during the probationary period?",
+      a: "3-month replacement guarantee at no additional cost. In the event of voluntary departure or probationary period termination within 90 days of the start date, we relaunch sourcing at our own expense. Success-fee only — no invoice before confirmed hire.",
+    },
+  ] : [
     {
       q: "Connaissez-vous la différence entre un marché à forfait et un marché sur devis en droit suisse des marchés publics ?",
       a: "Oui — et nous la testons en entretien. Un chef de chantier ou conducteur de travaux qui ne maîtrise pas les bases du CO Art. 363 ss, de la norme SIA 118 ou des procédures LMP/IMP n'est pas opérationnel sur un chantier public en Suisse. Nous vérifions systématiquement la connaissance des règles de soumission, du décompte final et de la gestion des avenants.",
@@ -209,6 +236,70 @@ export default function TalentFluxBTP() {
     },
   ];
 
+  const profileOptions = lang === "en" ? [
+    "Site Manager (GC / Specialist)",
+    "Works Director / Site Supervisor",
+    "Architect (SIA / HEIA)",
+    "Civil / Structural Engineer",
+    "HVAC/MEP Engineer",
+    "HSE / Site Safety Manager",
+    "Licensed Surveyor / Geomatician",
+    "BIM Manager / BIM Coordinator",
+    "Sustainability Manager / Minergie Specialist",
+    "Other construction profile",
+  ] : [
+    "Chef de chantier (GC / Spécialisé)",
+    "Directeur de travaux / Conducteur de travaux",
+    "Architecte (SIA / HEIA)",
+    "Ingénieur civil / structure",
+    "Ingénieur CVSE",
+    "Responsable HSE / Sécurité chantier",
+    "Géomètre-expert / Géomaticien",
+    "BIM Manager / Coordinateur BIM",
+    "Responsable développement durable / Minergie",
+    "Autre profil BTP",
+  ];
+
+  const navItems = [
+    { label: lang === "en" ? "Solution" : "Solution", id: "solution" },
+    { label: lang === "en" ? "Trades" : "Métiers", id: "métiers" },
+    { label: "FAQ", id: "faq" },
+  ];
+
+  const statsStrip = lang === "en" ? [
+    ["48h", "First profiles"],
+    ["100%", "Success fee"],
+    ["3 months", "Replacement guarantee"],
+    ["CH+F", "Romandy & Cross-border"],
+  ] : [
+    ["48h", "Premiers profils"],
+    ["100%", "Au succès"],
+    ["3 mois", "Garantie remplacement"],
+    ["CH+F", "Romande & Frontaliers"],
+  ];
+
+  const processSteps = lang === "en" ? [
+    { n: "01", t: "Technical brief", d: "Trade, project scope, tools required, public or private developer context", icon: FileText },
+    { n: "02", t: "Network sourcing", d: "Direct approach of active profiles — no public job posting without client approval", icon: Users },
+    { n: "03", t: "Site verification", d: "Reference calls on declared projects, verification of certifications and accreditations", icon: HardHat },
+    { n: "04", t: "Post-integration follow-up", d: "3-month monitoring with replacement guarantee at no additional cost", icon: Shield },
+  ] : [
+    { n: "01", t: "Brief technique", d: "Corps de métier, envergure du chantier, outils requis, contexte MO public ou privé", icon: FileText },
+    { n: "02", t: "Sourcing réseau", d: "Approche directe des profils en poste — pas d'annonce publique sans accord client", icon: Users },
+    { n: "03", t: "Vérification terrain", d: "Appels de référence sur les chantiers déclarés, vérification des certifications et agréments", icon: HardHat },
+    { n: "04", t: "Suivi post-intégration", d: "Accompagnement 3 mois avec garantie de remplacement sans frais supplémentaires", icon: Shield },
+  ];
+
+  const testimonials = lang === "en" ? [
+    { q: "TalentFlux immediately understood that we were looking for a concrete site manager with Minergie P experience, not just a 'construction executive'. The profile presented in 8 days had been in post for 6 years — he would never have responded to a job ad.", a: "Works Director, Swiss general contractor — Vaud" },
+    { q: "What convinced us: they knew how to ask the right questions about the developer context. Public or private site, timber or concrete structure, MCT or GC — they don't mix everything up like other agencies do.", a: "CEO, Civil engineering consultancy — Geneva" },
+    { q: "We needed an HVAC engineer with Minergie ECO expertise and SIA 382 knowledge. TalentFlux presented two qualified candidates in under 10 days. The second one was hired.", a: "Partner, Specialist HVAC consultancy — Lausanne" },
+  ] : [
+    { q: "TalentFlux a compris immédiatement que nous cherchions un chef de chantier béton avec expérience Minergie P, pas simplement un 'cadre BTP'. Le profil présenté en 8 jours était en poste depuis 6 ans — il n'aurait jamais répondu à une annonce.", a: "Directeur travaux, EG Suisse romande — Vaud" },
+    { q: "Ce qui nous a convaincus : ils ont su poser les bonnes questions sur le contexte MO. Chantier public ou privé, structure bois ou béton, MCT ou EG — ils ne mélangent pas tout comme les autres agences.", a: "Directeur général, Bureau d'ingénieurs civils — Genève" },
+    { q: "Nous avions besoin d'un ingénieur CVSE avec expertise Minergie ECO et connaissance SIA 382. TalentFlux nous a présenté deux candidats qualifiés en moins de 10 jours. Le second a été engagé.", a: "Associé, Bureau technique spécialisé CVSE — Lausanne" },
+  ];
+
   return (
     <div style={{ background: C.bg, color: C.text, fontFamily: "'DM Sans',sans-serif", overflowX: "hidden" }}>
       <style>{`
@@ -217,6 +308,7 @@ export default function TalentFluxBTP() {
         html { scroll-behavior:smooth; }
         ::selection { background:rgba(249,115,22,0.25); color:#fff; }
         input::placeholder, textarea::placeholder { color:#1E2D42; }
+        input, select, textarea { font-size: 16px !important; }
         @keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
         @keyframes pulseGlow { 0%,100%{opacity:.25}50%{opacity:.65} }
         @keyframes spin { to{transform:rotate(360deg)} }
@@ -236,12 +328,12 @@ export default function TalentFluxBTP() {
         </div>
         {isMobile ? (
           <a href="tel:+41765928806" style={{ background: "rgba(249,115,22,.15)", border: "1px solid rgba(251,146,60,.3)", color: C.orangeL, padding: "7px 14px", borderRadius: 10, fontWeight: 700, fontSize: ".8rem", textDecoration: "none" }}>
-            📞 Appeler
+            📞 {lang === "en" ? "Call" : "Appeler"}
           </a>
         ) : (
           <div style={{ display: "flex", gap: "1.6rem", alignItems: "center" }}>
-            {["Solution", "Métiers", "FAQ"].map(item => (
-              <span key={item} onClick={() => scrollTo(item.toLowerCase())} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{item}</span>
+            {navItems.map(({ label, id }) => (
+              <span key={id} onClick={() => scrollTo(id)} style={{ color: C.muted, fontSize: ".85rem", cursor: "pointer", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.text} onMouseLeave={e => e.target.style.color = C.muted}>{label}</span>
             ))}
             <a href="tel:+41765928806" style={{ display: "flex", alignItems: "center", gap: 6, padding: "7px 14px", borderRadius: 10, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.1)", color: C.orangeL, textDecoration: "none", fontSize: ".78rem", fontWeight: 700, letterSpacing: ".03em", transition: "all .2s" }}
               onMouseEnter={e => e.currentTarget.style.background = "rgba(255,255,255,.09)"}
@@ -249,9 +341,9 @@ export default function TalentFluxBTP() {
               📞 +41 76 592 88 06
             </a>
             <div style={{ display: "flex", alignItems: "center", gap: 4, marginLeft: 8, padding: "4px 10px", borderRadius: 8, background: "rgba(255,255,255,.05)", border: "1px solid rgba(255,255,255,.09)" }}>
-              <Link href="/btp" style={{ color: "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
+              <Link href="/btp" style={{ color: lang === "en" ? "#64748B" : "#F1F5F9", fontSize: ".75rem", fontWeight: 700, textDecoration: "none" }}>FR</Link>
               <span style={{ color: "#334155", fontSize: ".7rem" }}>|</span>
-              <Link href="/en/btp" style={{ color: "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }} onMouseEnter={e => e.currentTarget.style.color = "#F1F5F9"} onMouseLeave={e => e.currentTarget.style.color = "#64748B"}>EN</Link>
+              <Link href="/en/btp" style={{ color: lang === "en" ? "#F1F5F9" : "#64748B", fontSize: ".75rem", fontWeight: 600, textDecoration: "none" }}>EN</Link>
             </div>
           </div>
         )}
@@ -264,13 +356,13 @@ export default function TalentFluxBTP() {
 
         {!isMobile && (<>
           <div style={{ position: "absolute", left: "3%", top: "38%", background: "rgba(12,16,22,.95)", border: `1px solid rgba(249,115,22,.2)`, borderRadius: 14, padding: "12px 16px", animation: "float 5s ease-in-out infinite", pointerEvents: "none", zIndex: 1, minWidth: 178 }}>
-            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Pénurie CH</div>
+            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>{lang === "en" ? "CH Shortage" : "Pénurie CH"}</div>
             <div style={{ color: C.text, fontSize: ".82rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
-              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.orangeL, boxShadow: `0 0 6px ${C.orangeL}`, flexShrink: 0, display: "inline-block" }} /> Chefs chantier seniors rares
+              <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.orangeL, boxShadow: `0 0 6px ${C.orangeL}`, flexShrink: 0, display: "inline-block" }} /> {lang === "en" ? "Senior site managers scarce" : "Chefs chantier seniors rares"}
             </div>
           </div>
           <div style={{ position: "absolute", right: "3%", top: "43%", background: "rgba(12,16,22,.95)", border: `1px solid rgba(59,130,246,.2)`, borderRadius: 14, padding: "12px 16px", animation: "float 5s ease-in-out infinite 1.8s", pointerEvents: "none", zIndex: 1, minWidth: 178 }}>
-            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>Secteur</div>
+            <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 5 }}>{lang === "en" ? "Sector" : "Secteur"}</div>
             <div style={{ color: C.text, fontSize: ".82rem", fontWeight: 600, display: "flex", alignItems: "center", gap: 6 }}>
               <span style={{ width: 7, height: 7, borderRadius: "50%", background: C.steelL, boxShadow: `0 0 6px ${C.steelL}`, flexShrink: 0, display: "inline-block" }} /> BTP · GC · Minergie
             </div>
@@ -285,24 +377,28 @@ export default function TalentFluxBTP() {
           </div>
 
           <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", color: C.orangeL, marginBottom: 16 }}>
-            Recrutement · Architecture, BTP & Génie civil · Suisse
+            {lang === "en" ? "Recruitment · Architecture, Construction & Civil Engineering · Switzerland" : "Recrutement · Architecture, BTP & Génie civil · Suisse"}
           </p>
 
-          {/* H1 visible — mot-clé SEO + localité */}
           <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4.5vw,3.2rem)", fontWeight: 800, lineHeight: 1.15, letterSpacing: "-.02em", color: C.text, marginBottom: 22 }}>
-            Recrutement BTP & Génie civil en Suisse romande :<br />
-            <OrangeText>votre chef de chantier senior n'est pas sur Indeed.</OrangeText>
+            {lang === "en" ? (
+              <>Construction & Civil Engineering recruitment in Western Switzerland:<br /><OrangeText>your senior site manager is not on Indeed.</OrangeText></>
+            ) : (
+              <>Recrutement BTP & Génie civil en Suisse romande :<br /><OrangeText>votre chef de chantier senior n'est pas sur Indeed.</OrangeText></>
+            )}
           </h1>
 
           <p style={{ color: C.muted, fontSize: ".97rem", lineHeight: 1.8, maxWidth: 590, margin: "0 auto 36px" }}>
-            Architectes SIA, chefs de chantier, directeurs de travaux, ingénieurs structure, spécialistes CVSE & Minergie — des profils retenus avant même d'être disponibles. TalentFlux les connaît par leur chantier de référence, pas par leur CV.
+            {lang === "en"
+              ? "SIA architects, site managers, works directors, structural engineers, HVAC/MEP & Minergie specialists — profiles retained before they're even available. TalentFlux knows them by their reference project, not their CV."
+              : "Architectes SIA, chefs de chantier, directeurs de travaux, ingénieurs structure, spécialistes CVSE & Minergie — des profils retenus avant même d'être disponibles. TalentFlux les connaît par leur chantier de référence, pas par leur CV."}
           </p>
 
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={() => scrollTo("contact")} style={{ background: C.gradO, border: "none", color: "#fff", padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", cursor: "pointer", display: "flex", alignItems: "center", gap: 9, boxShadow: "0 0 28px rgba(249,115,22,.35)", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.boxShadow = "0 0 50px rgba(249,115,22,.55)"; }}
               onMouseLeave={e => { e.currentTarget.style.transform = "translateY(0)"; e.currentTarget.style.boxShadow = "0 0 28px rgba(249,115,22,.35)"; }}>
-              <Users size={17} /> {lang === "en" ? "Hire a BTP Expert" : "Mandater TalentFlux"} <ArrowRight size={16} />
+              <Users size={17} /> {lang === "en" ? "Hire a Construction Expert" : "Mandater TalentFlux"} <ArrowRight size={16} />
             </button>
             <Link href="/candidature/btp" style={{ background: "rgba(249,115,22,.08)", border: "1.5px solid rgba(251,146,60,.4)", color: C.orangeL, padding: "15px 32px", borderRadius: 14, fontFamily: "'DM Sans',sans-serif", fontWeight: 700, fontSize: ".95rem", display: "flex", alignItems: "center", gap: 9, textDecoration: "none", transition: "all .3s" }}
               onMouseEnter={e => { e.currentTarget.style.transform = "translateY(-2px)"; e.currentTarget.style.background = "rgba(249,115,22,.14)"; }}
@@ -312,7 +408,7 @@ export default function TalentFluxBTP() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: isMobile ? 18 : 36, marginTop: 52, paddingTop: 34, borderTop: `1px solid ${C.border}` }}>
-            {[["48h", "Premiers profils"], ["100%", "Au succès"], ["3 mois", "Garantie remplacement"], ["CH+F", "Romande & Frontaliers"]].map(([v, l], i) => (
+            {statsStrip.map(([v, l], i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontSize: "1.8rem", fontWeight: 900, fontFamily: "'Sora',sans-serif", marginBottom: 3, background: "linear-gradient(135deg,#FB923C,#60A5FA)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{v}</div>
                 <div style={{ color: C.subtle, fontSize: ".75rem" }}>{l}</div>
@@ -326,15 +422,30 @@ export default function TalentFluxBTP() {
       {/* ══ PROBLÈME ══ */}
       <section style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", maxWidth: 1060, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 50 }}>
-          <div style={{ color: "#EF4444", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>⚠ Le paradoxe du recrutement BTP</div>
+          <div style={{ color: "#EF4444", fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+            {lang === "en" ? "⚠ The construction recruitment paradox" : "⚠ Le paradoxe du recrutement BTP"}
+          </div>
           <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.6rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-            Les bons cadres du bâtiment n'attendent pas<br /><OrangeText>votre annonce sur un portail d'emploi.</OrangeText>
+            {lang === "en" ? (
+              <>The best construction managers aren't waiting for<br /><OrangeText>your job posting on a recruitment portal.</OrangeText></>
+            ) : (
+              <>Les bons cadres du bâtiment n'attendent pas<br /><OrangeText>votre annonce sur un portail d'emploi.</OrangeText></>
+            )}
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 20 }}>
-          <ProblemCard icon={HardHat} color="#F97316" title="Pénurie structurelle de cadres terrain" desc="La Suisse forme insuffisamment de chefs de chantier et conducteurs de travaux pour répondre à la demande des EG et entreprises spécialisées. Les profils expérimentés sont approchés directement par les entreprises concurrentes — pas via des offres d'emploi." delay={0} />
-          <ProblemCard icon={Building2} color="#EF4444" title="Méconnaissance des normes SIA par les généralistes" desc="La norme SIA 118 sur les contrats de construction, les règles de décompte SIA 402, les exigences OTConst sur la sécurité des chantiers et les procédures LMP pour les marchés publics sont inconnues des recruteurs généralistes. Résultat : des shortlists hors-sujet." delay={100} />
-          <ProblemCard icon={Ruler} color="#DC2626" title="Mobilité géographique et frontaliers" desc="Le bassin de recrutement BTP en Suisse romande inclut le canton de Vaud, Genève, Fribourg, Valais — et les zones frontalières de Haute-Savoie et de l'Ain. Ignorer ce bassin, c'est se priver de 30% des candidats qualifiés disponibles." delay={200} />
+          <ProblemCard icon={HardHat} color="#F97316"
+            title={lang === "en" ? "Structural shortage of field managers" : "Pénurie structurelle de cadres terrain"}
+            desc={lang === "en" ? "Switzerland does not train enough site managers and works supervisors to meet demand from general contractors and specialist companies. Experienced profiles are approached directly by competing firms — not through job postings." : "La Suisse forme insuffisamment de chefs de chantier et conducteurs de travaux pour répondre à la demande des EG et entreprises spécialisées. Les profils expérimentés sont approchés directement par les entreprises concurrentes — pas via des offres d'emploi."}
+            delay={0} />
+          <ProblemCard icon={Building2} color="#EF4444"
+            title={lang === "en" ? "Generalist recruiters don't know SIA standards" : "Méconnaissance des normes SIA par les généralistes"}
+            desc={lang === "en" ? "SIA 118 construction contract standards, SIA 402 billing rules, OTConst site safety requirements, and LMP public tender procedures are unknown to generalist recruiters. Result: irrelevant shortlists." : "La norme SIA 118 sur les contrats de construction, les règles de décompte SIA 402, les exigences OTConst sur la sécurité des chantiers et les procédures LMP pour les marchés publics sont inconnues des recruteurs généralistes. Résultat : des shortlists hors-sujet."}
+            delay={100} />
+          <ProblemCard icon={Ruler} color="#DC2626"
+            title={lang === "en" ? "Geographic mobility & cross-border candidates" : "Mobilité géographique et frontaliers"}
+            desc={lang === "en" ? "The construction recruitment pool in Western Switzerland includes cantons of Vaud, Geneva, Fribourg, Valais — and the cross-border areas of Haute-Savoie and Ain. Ignoring this pool means missing 30% of available qualified candidates." : "Le bassin de recrutement BTP en Suisse romande inclut le canton de Vaud, Genève, Fribourg, Valais — et les zones frontalières de Haute-Savoie et de l'Ain. Ignorer ce bassin, c'est se priver de 30% des candidats qualifiés disponibles."}
+            delay={200} />
         </div>
       </section>
 
@@ -342,9 +453,11 @@ export default function TalentFluxBTP() {
       <section id="métiers" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", background: "rgba(12,16,22,.4)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Nos spécialités</div>
+            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ Our specialties" : "✦ Nos spécialités"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, color: C.text }}>
-              Tous les métiers du <OrangeText>bâtiment suisse</OrangeText>
+              {lang === "en" ? <>All trades in <OrangeText>Swiss construction</OrangeText></> : <>Tous les métiers du <OrangeText>bâtiment suisse</OrangeText></>}
             </h2>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : isTablet ? "repeat(3,1fr)" : "repeat(4,1fr)", gap: 14 }}>
@@ -364,26 +477,41 @@ export default function TalentFluxBTP() {
       {/* ══ SOLUTION ══ */}
       <section id="solution" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem", maxWidth: 1060, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 50 }}>
-          <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Notre approche</div>
+          <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+            {lang === "en" ? "✦ Our approach" : "✦ Notre approche"}
+          </div>
           <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.6rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-            On connaît la SIA 118, l'OTConst et la CCT.<br /><SteelText>On vérifie les chantiers de référence, pas les diplômes.</SteelText>
+            {lang === "en" ? (
+              <>We know SIA 118, OTConst and CCT.<br /><SteelText>We verify reference projects, not diplomas.</SteelText></>
+            ) : (
+              <>On connaît la SIA 118, l'OTConst et la CCT.<br /><SteelText>On vérifie les chantiers de référence, pas les diplômes.</SteelText></>
+            )}
           </h2>
         </div>
         <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "repeat(3,1fr)", gap: 20, marginBottom: 40 }}>
-          <FeatureCard icon={HardHat} accent={C.orangeL} sub="Vérification #1" title="Chantiers de référence" desc="Nous contactons systématiquement les maîtres d'ouvrage et directeurs de travaux des chantiers déclarés par le candidat. Un chef de chantier qui a livré un immeuble en structure bois à 12M CHF dans les délais, ça se vérifie." delay={0} />
-          <FeatureCard icon={Shield} accent={C.amber} sub="Vérification #2" title="Certifications & agréments" desc="CAS Construction, brevet fédéral, diplôme ASTP, agrément Minergie, accréditation CECB selon le poste. Pour les postes HSE : formation OTConst, certificat SUVA, MSST niveau 2 ou 3 selon l'effectif du chantier." delay={100} />
-          <FeatureCard icon={Layers} accent={C.steelL} sub="Vérification #3" title="Maîtrise des outils & normes" desc="Autocad, Revit (BIM), MS Project, Allplan selon le profil. Connaissance des normes SIA 260 à 267 (structures), SIA 380/1 (énergie), SIA 416 (surfaces), et de la procédure LMP pour les marchés publics cantonaux et fédéraux." delay={200} />
+          <FeatureCard icon={HardHat} accent={C.orangeL}
+            sub={lang === "en" ? "Verification #1" : "Vérification #1"}
+            title={lang === "en" ? "Reference project checks" : "Chantiers de référence"}
+            desc={lang === "en" ? "We systematically contact the developers and works directors of projects declared by the candidate. A site manager who delivered a 12M CHF timber-frame building on time — that can be verified." : "Nous contactons systématiquement les maîtres d'ouvrage et directeurs de travaux des chantiers déclarés par le candidat. Un chef de chantier qui a livré un immeuble en structure bois à 12M CHF dans les délais, ça se vérifie."}
+            delay={0} />
+          <FeatureCard icon={Shield} accent={C.amber}
+            sub={lang === "en" ? "Verification #2" : "Vérification #2"}
+            title={lang === "en" ? "Certifications & accreditations" : "Certifications & agréments"}
+            desc={lang === "en" ? "CAS Construction, federal diploma, ASTP diploma, Minergie accreditation, CECB certification depending on the role. For HSE roles: OTConst training, SUVA certificate, MSST level 2 or 3 depending on site headcount." : "CAS Construction, brevet fédéral, diplôme ASTP, agrément Minergie, accréditation CECB selon le poste. Pour les postes HSE : formation OTConst, certificat SUVA, MSST niveau 2 ou 3 selon l'effectif du chantier."}
+            delay={100} />
+          <FeatureCard icon={Layers} accent={C.steelL}
+            sub={lang === "en" ? "Verification #3" : "Vérification #3"}
+            title={lang === "en" ? "Tools & standards mastery" : "Maîtrise des outils & normes"}
+            desc={lang === "en" ? "Autocad, Revit (BIM), MS Project, Allplan depending on the profile. Knowledge of SIA standards 260–267 (structures), SIA 380/1 (energy), SIA 416 (surfaces), and LMP procedures for cantonal and federal public tenders." : "Autocad, Revit (BIM), MS Project, Allplan selon le profil. Connaissance des normes SIA 260 à 267 (structures), SIA 380/1 (énergie), SIA 416 (surfaces), et de la procédure LMP pour les marchés publics cantonaux et fédéraux."}
+            delay={200} />
         </div>
 
         <div style={{ padding: isMobile ? 24 : 38, background: "rgba(12,16,22,.8)", borderRadius: 22, border: `1px solid ${C.border}` }}>
-          <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 26, textAlign: "center" }}>Le processus en 4 étapes</div>
+          <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 26, textAlign: "center" }}>
+            {lang === "en" ? "The 4-step process" : "Le processus en 4 étapes"}
+          </div>
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr 1fr" : "repeat(4,1fr)", gap: isMobile ? 20 : 14 }}>
-            {[
-              { n: "01", t: "Brief technique", d: "Corps de métier, envergure du chantier, outils requis, contexte MO public ou privé", icon: FileText },
-              { n: "02", t: "Sourcing réseau", d: "Approche directe des profils en poste — pas d'annonce publique sans accord client", icon: Users },
-              { n: "03", t: "Vérification terrain", d: "Appels de référence sur les chantiers déclarés, vérification des certifications et agréments", icon: HardHat },
-              { n: "04", t: "Suivi post-intégration", d: "Accompagnement 3 mois avec garantie de remplacement sans frais supplémentaires", icon: Shield },
-            ].map(({ n, t, d, icon: Icon }, i) => (
+            {processSteps.map(({ n, t, d, icon: Icon }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ width: 46, height: 46, borderRadius: "50%", margin: "0 auto 11px", background: "linear-gradient(135deg,rgba(249,115,22,.2),rgba(251,146,60,.1))", border: `1px solid rgba(249,115,22,.25)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
                   <Icon size={18} style={{ color: C.orangeL }} strokeWidth={1.5} />
@@ -400,11 +528,7 @@ export default function TalentFluxBTP() {
       {/* ══ TÉMOIGNAGES ══ */}
       <section style={{ padding: isMobile ? "48px 1.4rem" : "72px 2rem", background: "rgba(12,16,22,.3)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3,1fr)", gap: 20 }}>
-          {[
-            { q: "TalentFlux a compris immédiatement que nous cherchions un chef de chantier béton avec expérience Minergie P, pas simplement un 'cadre BTP'. Le profil présenté en 8 jours était en poste depuis 6 ans — il n'aurait jamais répondu à une annonce.", a: "Directeur travaux, EG Suisse romande — Vaud" },
-            { q: "Ce qui nous a convaincus : ils ont su poser les bonnes questions sur le contexte MO. Chantier public ou privé, structure bois ou béton, MCT ou EG — ils ne mélangent pas tout comme les autres agences.", a: "Directeur général, Bureau d'ingénieurs civils — Genève" },
-            { q: "Nous avions besoin d'un ingénieur CVSE avec expertise Minergie ECO et connaissance SIA 382. TalentFlux nous a présenté deux candidats qualifiés en moins de 10 jours. Le second a été engagé.", a: "Associé, Bureau technique spécialisé CVSE — Lausanne" },
-          ].map(({ q, a }, i) => (
+          {testimonials.map(({ q, a }, i) => (
             <div key={i} style={{ background: C.card, border: `1px solid ${C.border}`, borderTop: `2px solid ${C.orangeL}`, borderRadius: 18, padding: 24 }}>
               <div style={{ display: "flex", gap: 3, marginBottom: 13 }}>
                 {Array(5).fill(0).map((_, j) => <Star key={j} size={12} fill={C.amber} color={C.amber} />)}
@@ -420,9 +544,15 @@ export default function TalentFluxBTP() {
       <section id="faq" style={{ padding: isMobile ? "56px 1.4rem" : "88px 2rem" }}>
         <div style={{ maxWidth: 720, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 46 }}>
-            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Questions fréquentes</div>
+            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ Frequently asked questions" : "✦ Questions fréquentes"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-              Ce que tout MO devrait<br /><OrangeText>demander à son recruteur BTP</OrangeText>
+              {lang === "en" ? (
+                <>What every developer should<br /><OrangeText>ask their construction recruiter</OrangeText></>
+              ) : (
+                <>Ce que tout MO devrait<br /><OrangeText>demander à son recruteur BTP</OrangeText></>
+              )}
             </h2>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -436,11 +566,19 @@ export default function TalentFluxBTP() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center,rgba(249,115,22,.05),transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 1060, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 46 }}>
-            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>✦ Votre mandat</div>
+            <div style={{ color: C.orangeL, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ Your mandate" : "✦ Votre mandat"}
+            </div>
             <h2 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.6rem,3.5vw,2.5rem)", fontWeight: 800, lineHeight: 1.2, color: C.text, marginBottom: 10 }}>
-              Confiez-nous votre recherche.<br /><OrangeText>Aucun frais avant embauche.</OrangeText>
+              {lang === "en" ? (
+                <>Entrust us with your search.<br /><OrangeText>No fee before hire.</OrangeText></>
+              ) : (
+                <>Confiez-nous votre recherche.<br /><OrangeText>Aucun frais avant embauche.</OrangeText></>
+              )}
             </h2>
-            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>Réponse sous 2h · Sourcing en 48h · Garantie 3 mois</p>
+            <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>
+              {lang === "en" ? "Reply within 2h · Sourcing in 48h · 3-month guarantee" : "Réponse sous 2h · Sourcing en 48h · Garantie 3 mois"}
+            </p>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 300px", gap: 22 }}>
@@ -459,7 +597,10 @@ export default function TalentFluxBTP() {
               ) : !submitted ? (
                 <div style={{ padding: 24 }}>
                   <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 12, marginBottom: 12 }}>
-                    {[["Prénom *", "firstName", "Jean"], ["Nom *", "lastName", "Dupont"]].map(([label, key, ph]) => (
+                    {[
+                      [lang === "en" ? "First name *" : "Prénom *", "firstName", lang === "en" ? "John" : "Jean"],
+                      [lang === "en" ? "Last name *" : "Nom *", "lastName", lang === "en" ? "Smith" : "Dupont"],
+                    ].map(([label, key, ph]) => (
                       <div key={key}>
                         <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{label}</label>
                         <input placeholder={ph} value={form[key]} onChange={set(key)}
@@ -476,25 +617,25 @@ export default function TalentFluxBTP() {
                         onBlur={e => { e.target.style.borderColor = C.border; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Téléphone</label>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{lang === "en" ? "Phone" : "Téléphone"}</label>
                       <input type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
                         onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
                         onBlur={e => { e.target.style.borderColor = C.border; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Entreprise *</label>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{lang === "en" ? "Company *" : "Entreprise *"}</label>
                       <input placeholder="BTP Construct SA" value={form.company} onChange={set("company")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" }}
                         onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
                         onBlur={e => { e.target.style.borderColor = C.border; }} />
                     </div>
                     <div>
-                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>Profil recherché</label>
+                      <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>{lang === "en" ? "Profile sought" : "Profil recherché"}</label>
                       <select value={form.specialite} onChange={set("specialite")}
                         style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(7,9,12,.9)", border: `1px solid ${C.border}`, color: form.specialite ? C.text : C.subtle, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif", cursor: "pointer", appearance: "none" }}>
-                        <option value="">Sélectionner...</option>
-                        {["Chef de chantier (GC / Spécialisé)", "Directeur de travaux / Conducteur de travaux", "Architecte (SIA / HEIA)", "Ingénieur civil / structure", "Ingénieur CVSE", "Responsable HSE / Sécurité chantier", "Géomètre-expert / Géomaticien", "BIM Manager / Coordinateur BIM", "Responsable développement durable / Minergie", "Autre profil BTP"].map(o => (
+                        <option value="">{lang === "en" ? "Select..." : "Sélectionner..."}</option>
+                        {profileOptions.map(o => (
                           <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
                         ))}
                       </select>
@@ -503,10 +644,10 @@ export default function TalentFluxBTP() {
 
                   <div style={{ marginBottom: 12 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      Description du poste & contexte chantier
+                      {lang === "en" ? "Job description & site context" : "Description du poste & contexte chantier"}
                     </label>
                     <textarea
-                      placeholder="Ex: Chef de chantier béton armé, chantier logements collectifs 8M CHF, Vaud, maîtrise SIA 118, expérience Minergie souhaitée, disponible dans 2 mois..."
+                      placeholder={lang === "en" ? "E.g.: Reinforced concrete site manager, collective housing project 8M CHF, Vaud, SIA 118 mastery, Minergie experience preferred, available in 2 months..." : "Ex: Chef de chantier béton armé, chantier logements collectifs 8M CHF, Vaud, maîtrise SIA 118, expérience Minergie souhaitée, disponible dans 2 mois..."}
                       value={form.message} onChange={set("message")} rows={3}
                       style={{ width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: `1px solid ${C.border}`, color: C.text, fontSize: ".88rem", outline: "none", resize: "vertical", fontFamily: "'DM Sans',sans-serif", lineHeight: 1.6 }}
                       onFocus={e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; }}
@@ -515,7 +656,7 @@ export default function TalentFluxBTP() {
 
                   <div style={{ marginBottom: 16 }}>
                     <label style={{ display: "block", color: C.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 }}>
-                      Cahier des charges (optionnel) <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
+                      {lang === "en" ? "Job specification (optional)" : "Cahier des charges (optionnel)"} <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span>
                     </label>
                     {!form.file ? (
                       <div onClick={() => fileRef.current?.click()}
@@ -526,7 +667,7 @@ export default function TalentFluxBTP() {
                         onMouseEnter={e => e.currentTarget.style.borderColor = "rgba(249,115,22,.4)"}
                         onMouseLeave={e => { if (!dragOver) e.currentTarget.style.borderColor = C.border; }}>
                         <Upload size={19} style={{ color: C.subtle, margin: "0 auto 7px" }} />
-                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.orangeL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
+                        <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.orangeL, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}</p>
                         <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                       </div>
                     ) : (
@@ -555,17 +696,28 @@ export default function TalentFluxBTP() {
                     onMouseEnter={e => { if (!loading) { e.currentTarget.style.boxShadow = "0 8px 36px rgba(249,115,22,.55)"; e.currentTarget.style.transform = "translateY(-2px)"; } }}
                     onMouseLeave={e => { e.currentTarget.style.boxShadow = "0 4px 22px rgba(249,115,22,.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
                     {loading
-                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
+                      ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi..."}</>
                       : <><Send size={16} />{lang === "en" ? "Send my brief" : "Envoyer mon brief"}</>}
                   </button>
-                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Données protégées · LPD suisse & RGPD conformes</p>
+                  <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>
+                    🔒 {lang === "en" ? "Protected data · Swiss LPD & GDPR compliant" : "Données protégées · LPD suisse & RGPD conformes"}
+                  </p>
                 </div>
               ) : (
                 <div style={{ padding: "52px 26px", textAlign: "center" }}>
                   <div style={{ fontSize: 40, marginBottom: 16 }}>🏗️</div>
-                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>Demande reçue <OrangeText>✓</OrangeText></h3>
-                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>Merci <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />Un consultant TalentFlux BTP vous répond sous <strong style={{ color: C.orangeL }}>2h ouvrées</strong>.</p>
-                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(249,115,22,.3)`, background: "rgba(249,115,22,.07)", color: C.orangeL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>Nouvelle demande</button>
+                  <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10 }}>
+                    {lang === "en" ? "Request received" : "Demande reçue"} <OrangeText>✓</OrangeText>
+                  </h3>
+                  <p style={{ color: C.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".9rem" }}>
+                    {lang === "en" ? "Thank you" : "Merci"} <strong style={{ color: C.text }}>{form.firstName}</strong> !<br />
+                    {lang === "en"
+                      ? <>A TalentFlux BTP consultant will reply within <strong style={{ color: C.orangeL }}>2 business hours</strong>.</>
+                      : <>Un consultant TalentFlux BTP vous répond sous <strong style={{ color: C.orangeL }}>2h ouvrées</strong>.</>}
+                  </p>
+                  <button onClick={resetForm} style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid rgba(249,115,22,.3)`, background: "rgba(249,115,22,.07)", color: C.orangeL, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>
+                    {lang === "en" ? "New request" : "Nouvelle demande"}
+                  </button>
                 </div>
               )}
             </div>
@@ -573,11 +725,13 @@ export default function TalentFluxBTP() {
             {/* Sidebar */}
             <div style={{ display: "flex", flexDirection: "column", gap: 13 }}>
               <div style={{ background: "rgba(7,9,12,.95)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 22 }}>
-                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>Contact direct</h3>
+                <h3 style={{ fontFamily: "'Sora',sans-serif", fontWeight: 700, fontSize: ".88rem", marginBottom: 15, color: C.text }}>
+                  {lang === "en" ? "Direct contact" : "Contact direct"}
+                </h3>
                 {[
                   { icon: Mail, label: "Email", value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
-                  { icon: Phone, label: "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" },
-                  { icon: MapPin, label: "Siège", value: "Yverdon-les-Bains, VD", href: null },
+                  { icon: Phone, label: lang === "en" ? "Tel." : "Tél.", value: "+41 76 592 88 06", href: "tel:+41765928806" },
+                  { icon: MapPin, label: lang === "en" ? "HQ" : "Siège", value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, VD", href: null },
                 ].map(({ icon: Icon, label, value, href }) => (
                   <div key={label} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: `1px solid ${C.border}` }}>
                     <div style={{ width: 30, height: 30, borderRadius: 8, flexShrink: 0, background: "rgba(249,115,22,.1)", border: `1px solid rgba(249,115,22,.15)`, display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -593,9 +747,17 @@ export default function TalentFluxBTP() {
               <div style={{ background: "linear-gradient(135deg,rgba(249,115,22,.1),rgba(251,146,60,.05))", border: `1px solid rgba(249,115,22,.2)`, borderRadius: 20, padding: 18 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 7, marginBottom: 11 }}>
                   <Clock size={13} style={{ color: C.orangeL }} />
-                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>Délais</span>
+                  <span style={{ color: C.text, fontWeight: 700, fontSize: ".85rem" }}>{lang === "en" ? "Timelines" : "Délais"}</span>
                 </div>
-                {[["Accusé de réception", "< 2h"], ["Premiers profils", "48h"], ["Processus complet", "2-3 semaines"]].map(([l, d]) => (
+                {(lang === "en" ? [
+                  ["Acknowledgement", "< 2h"],
+                  ["First profiles", "48h"],
+                  ["Full process", "2–3 weeks"],
+                ] : [
+                  ["Accusé de réception", "< 2h"],
+                  ["Premiers profils", "48h"],
+                  ["Processus complet", "2-3 semaines"],
+                ]).map(([l, d]) => (
                   <div key={l} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: `1px solid rgba(255,255,255,.04)` }}>
                     <span style={{ color: C.muted, fontSize: ".78rem" }}>{l}</span>
                     <span style={{ color: C.orangeL, fontSize: ".73rem", fontWeight: 700, background: "rgba(249,115,22,.1)", padding: "2px 8px", borderRadius: 5 }}>{d}</span>
@@ -603,7 +765,17 @@ export default function TalentFluxBTP() {
                 ))}
               </div>
               <div style={{ background: "rgba(7,9,12,.9)", border: `1px solid ${C.border}`, borderRadius: 20, padding: 18 }}>
-                {[["✓", "Aucun frais avant embauche"], ["✓", "Sourcing réseau — pas d'annonce"], ["✓", "Vérification chantiers de référence"], ["✓", "Garantie remplacement 3 mois"]].map(([icon, text]) => (
+                {(lang === "en" ? [
+                  ["✓", "No fee before confirmed hire"],
+                  ["✓", "Network sourcing — no job posting"],
+                  ["✓", "Reference project verification"],
+                  ["✓", "3-month replacement guarantee"],
+                ] : [
+                  ["✓", "Aucun frais avant embauche"],
+                  ["✓", "Sourcing réseau — pas d'annonce"],
+                  ["✓", "Vérification chantiers de référence"],
+                  ["✓", "Garantie remplacement 3 mois"],
+                ]).map(([icon, text]) => (
                   <div key={text} style={{ display: "flex", gap: 9, padding: "6px 0", alignItems: "center" }}>
                     <span style={{ color: C.orangeL, fontWeight: 700, fontSize: ".9rem" }}>{icon}</span>
                     <span style={{ color: C.muted, fontSize: ".8rem" }}>{text}</span>
@@ -615,25 +787,34 @@ export default function TalentFluxBTP() {
         </div>
       </section>
 
-      {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
+      {/* ══ SILO SEO ══ */}
       <section style={{ padding: "48px 2rem", background: "rgba(249,115,22,.04)", borderTop: `1px solid rgba(249,115,22,.15)`, borderBottom: `1px solid rgba(249,115,22,.15)` }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
-            <div style={{ color: C.orangeL, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>✦ Nos autres expertises</div>
-            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: C.text, marginBottom: 6 }}>Vous recrutez aussi dans...</h2>
-            <p style={{ color: "#64748B", fontSize: ".88rem" }}>TalentFlux opère sur 7 secteurs spécialisés en Suisse.</p>
+            <div style={{ color: C.orangeL, fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
+              {lang === "en" ? "✦ Our other expertise" : "✦ Nos autres expertises"}
+            </div>
+            <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: C.text, marginBottom: 6 }}>
+              {lang === "en" ? "You also recruit in..." : "Vous recrutez aussi dans..."}
+            </h2>
+            <p style={{ color: "#64748B", fontSize: ".88rem" }}>
+              {lang === "en" ? "TalentFlux operates across 7 specialised sectors in Switzerland." : "TalentFlux opère sur 7 secteurs spécialisés en Suisse."}
+            </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-            {[
+            {(lang === "en" ? [
+              { href: "/en/ingenierie", label: "⚙️ Engineering & Technical", color: "#818CF8", sub: "MedTech · Automation · R&D" },
+              { href: "/en/juridique",  label: "⚖️ Legal & Compliance",      color: "#748FFC", sub: "GC · FINMA · nLPD" },
+            ] : [
               { href: "/ingenierie", label: "⚙️ Ingénierie & Technique",    color: "#818CF8", sub: "MedTech · Automation · R&D" },
               { href: "/juridique",  label: "⚖️ Droit & Compliance",         color: "#748FFC", sub: "GC · FINMA · nLPD" },
-            ].map(({ href, label, color, sub }) => (
+            ]).map(({ href, label, color, sub }) => (
               <a key={href} href={href} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 22px", borderRadius: 14, background: `${color}10`, border: `1px solid ${color}30`, textDecoration: "none", transition: "all .25s", flex: 1, minWidth: 200 }}
                 onMouseEnter={e => { e.currentTarget.style.background = `${color}18`; e.currentTarget.style.transform = "translateY(-2px)"; }}
                 onMouseLeave={e => { e.currentTarget.style.background = `${color}10`; e.currentTarget.style.transform = "translateY(0)"; }}>
                 <div>
                   <div style={{ color, fontWeight: 700, fontSize: ".88rem" }}>{label}</div>
-                  <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{sub} · Voir la verticale →</div>
+                  <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{sub} · {lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
                 </div>
               </a>
             ))}
@@ -646,11 +827,15 @@ export default function TalentFluxBTP() {
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 11 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, objectFit: "contain" }} />
-            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· BTP & Génie civil · Yverdon-les-Bains, VD</span>
+            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· {lang === "en" ? "Construction & Civil Engineering · Yverdon-les-Bains, Switzerland" : "BTP & Génie civil · Yverdon-les-Bains, VD"}</span>
           </div>
-          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© {new Date().getFullYear()} TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: isMobile ? "none" : "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en" ? [
+              ["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]
+            ] : [
+              ["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]
+            ]).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }} onMouseEnter={e => e.target.style.color = C.muted} onMouseLeave={e => e.target.style.color = C.subtle}>{label}</Link>
             ))}
           </div>

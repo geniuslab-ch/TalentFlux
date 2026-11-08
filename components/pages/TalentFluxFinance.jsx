@@ -213,8 +213,8 @@ export default function TalentFluxFinance() {
 
   const handleFile = (file) => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Le fichier ne doit pas dépasser 10 MB."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Le fichier ne doit pas dépasser 10 MB."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
@@ -222,15 +222,15 @@ export default function TalentFluxFinance() {
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const sanitize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const sanitize = (str) => str.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fileName = `${Date.now()}_${sanitize(form.firstName)}_${sanitize(form.lastName)}.pdf`;
         const { error: uploadError } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fileName}`, form.file, { contentType: "application/pdf" });
-        if (uploadError) throw new Error("Erreur upload PDF : " + uploadError.message);
+        if (uploadError) throw new Error((lang === "en" ? "PDF upload error: " : "Erreur upload PDF : ") + uploadError.message);
         pdfFileName = fileName; pdfFileUrl = `submissions/${fileName}`;
       }
       const { error: insertError } = await supabase.from("contact_submissions").insert([{
@@ -243,13 +243,22 @@ export default function TalentFluxFinance() {
       if (insertError) throw new Error(insertError.message);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || (lang === "en" ? "An error occurred." : "Une erreur est survenue."));
     } finally {
       setLoading(false);
     }
   };
 
-  const profiles = [
+  const profiles = lang === "en" ? [
+    { value: "", label: "Select the profile sought..." },
+    { value: "cfo", label: "CFO / Finance Director" },
+    { value: "controller", label: "Financial Controller" },
+    { value: "auditor", label: "Internal / External Auditor" },
+    { value: "accountant", label: "Chartered Accountant / Chief Accountant" },
+    { value: "treasury", label: "Treasurer / Risk Manager" },
+    { value: "analyst", label: "Financial Analyst / M&A" },
+    { value: "other", label: "Other finance profile" },
+  ] : [
     { value: "", label: "Sélectionnez le profil recherché..." },
     { value: "cfo", label: "CFO / Directeur Financier" },
     { value: "controller", label: "Contrôleur de gestion" },
@@ -317,16 +326,19 @@ export default function TalentFluxFinance() {
             style={{ background: "linear-gradient(135deg,#B45309,#D97706)", border: "none", color: "#fff",
               padding: "8px 16px", borderRadius: 10, fontWeight: 700, fontSize: ".82rem", cursor: "pointer",
               fontFamily: "'DM Sans',sans-serif" }}>
-            Nous contacter →
+            {lang === "en" ? "Contact us →" : "Nous contacter →"}
           </button>
         )}
-                <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
-          {["Approche","Méthodologie"].map(item => (
-            <span key={item} onClick={() => scrollTo(item.toLowerCase())}
+        <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
+          {[
+            { label: lang === "en" ? "Approach" : "Approche", id: "approche" },
+            { label: lang === "en" ? "Methodology" : "Méthodologie", id: "méthodologie" },
+          ].map(({ label, id }) => (
+            <span key={label} onClick={() => scrollTo(id)}
               style={{ color: C.muted, fontSize: ".86rem", cursor: "pointer", transition: "color .2s" }}
               onMouseEnter={e => e.target.style.color = C.text}
               onMouseLeave={e => e.target.style.color = C.muted}
-            >{item}</span>
+            >{label}</span>
           ))}
           <button onClick={() => scrollTo("contact")} className="shimmer-btn" style={{
             border: "none", color: "#0B1120", padding: "10px 22px", borderRadius: 12,
@@ -334,10 +346,10 @@ export default function TalentFluxFinance() {
             display: "flex", alignItems: "center", gap: 7,
             transition: "all .3s", fontFamily: "'DM Sans', sans-serif",
           }}>
-            Confier un mandat <ArrowRight size={15} />
+            {lang === "en" ? "Submit a mandate" : "Confier un mandat"} <ArrowRight size={15} />
           </button>
-        
-          
+
+
           <a href="tel:+41765928806" style={{
             display: "flex", alignItems: "center", gap: 6,
             padding: "7px 14px", borderRadius: 10,
@@ -375,8 +387,8 @@ export default function TalentFluxFinance() {
                 <Lock size={15} style={{ color: C.goldLight }} strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Garantie</div>
-                <div style={{ color: "#E2E8F0", fontSize: ".82rem", fontWeight: 600 }}>Discrétion absolue</div>
+                <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>{lang === "en" ? "Guarantee" : "Garantie"}</div>
+                <div style={{ color: "#E2E8F0", fontSize: ".82rem", fontWeight: 600 }}>{lang === "en" ? "Absolute discretion" : "Discrétion absolue"}</div>
               </div>
             </div>
           </GlassCard>
@@ -389,8 +401,8 @@ export default function TalentFluxFinance() {
                 <Award size={15} style={{ color: C.blueLight }} strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Approche</div>
-                <div style={{ color: "#E2E8F0", fontSize: ".82rem", fontWeight: 600 }}>Méthodologie éprouvée</div>
+                <div style={{ color: C.subtle, fontSize: ".62rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>{lang === "en" ? "Approach" : "Approche"}</div>
+                <div style={{ color: "#E2E8F0", fontSize: ".82rem", fontWeight: 600 }}>{lang === "en" ? "Proven methodology" : "Méthodologie éprouvée"}</div>
               </div>
             </div>
           </GlassCard>
@@ -406,7 +418,9 @@ export default function TalentFluxFinance() {
             animation: "fadeUp .6s ease both",
           }}>
             <div style={{ width: 7, height: 7, borderRadius: "50%", background: C.goldLight, boxShadow: `0 0 8px ${C.goldLight}` }} />
-            <span style={{ color: C.muted, fontSize: ".8rem", fontWeight: 500 }}>Placement Finance · Suisse · Réponse sous 24h</span>
+            <span style={{ color: C.muted, fontSize: ".8rem", fontWeight: 500 }}>
+              {lang === "en" ? "Finance Placement · Switzerland · Response within 24h" : "Placement Finance · Suisse · Réponse sous 24h"}
+            </span>
           </div>
 
           {/* H1 */}
@@ -417,8 +431,8 @@ export default function TalentFluxFinance() {
             color: C.text, marginBottom: 24,
             animation: "fadeUp .7s ease .1s both",
           }}>
-            Recrutement Finance & Comptabilité en Suisse :<br />
-            <GoldText>votre expert financier existe, il ne répond pas aux annonces.</GoldText>
+            {lang === "en" ? "Finance & Accounting Recruitment in Switzerland:" : "Recrutement Finance & Comptabilité en Suisse :"}<br />
+            <GoldText>{lang === "en" ? "your financial expert exists — they just don't apply to job postings." : "votre expert financier existe, il ne répond pas aux annonces."}</GoldText>
           </h1>
 
           <p style={{
@@ -426,7 +440,10 @@ export default function TalentFluxFinance() {
             maxWidth: 580, margin: "0 auto 44px",
             animation: "fadeUp .7s ease .2s both",
           }}>
-            Talent Flux combine l'expertise humaine et le <strong style={{ color: "#CBD5E1" }}>matching algorithmique</strong> pour chasser les meilleurs CFO, contrôleurs et experts financiers de Suisse.
+            {lang === "en"
+              ? <>TalentFlux combines human expertise with <strong style={{ color: "#CBD5E1" }}>algorithmic matching</strong> to headhunt the best CFOs, controllers and financial experts in Switzerland.</>
+              : <>Talent Flux combine l'expertise humaine et le <strong style={{ color: "#CBD5E1" }}>matching algorithmique</strong> pour chasser les meilleurs CFO, contrôleurs et experts financiers de Suisse.</>
+            }
           </p>
 
           {/* CTAs */}
@@ -437,7 +454,7 @@ export default function TalentFluxFinance() {
               cursor: "pointer", display: "flex", alignItems: "center", gap: 9,
               boxShadow: `0 0 30px rgba(180,145,60,0.3)`, transition: "all .3s",
             }}>
-              <Briefcase size={17} /> Confier un mandat <span style={{ opacity: .7, fontSize: ".8rem" }}>(Réponse sous 24h)</span>
+              <Briefcase size={17} /> {lang === "en" ? "Submit a mandate" : "Confier un mandat"} <span style={{ opacity: .7, fontSize: ".8rem" }}>{lang === "en" ? "(Response within 24h)" : "(Réponse sous 24h)"}</span>
             </button>
             <button onClick={() => scrollTo("approche")} style={{
               background: "rgba(59,130,246,.07)", border: `1.5px solid ${C.borderBlue}`,
@@ -448,7 +465,7 @@ export default function TalentFluxFinance() {
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(59,130,246,.12)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(59,130,246,.07)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              Notre approche <ChevronRight size={16} />
+              {lang === "en" ? "Our approach" : "Notre approche"} <ChevronRight size={16} />
             </button>
           </div>
 
@@ -459,10 +476,10 @@ export default function TalentFluxFinance() {
             animation: "fadeUp .7s ease .4s both",
           }}>
             {[
-              { val: "50+", lbl: "Profils qualifiés" },
-              { val: "72h", lbl: "Délai de réponse" },
-              { val: "95%", lbl: "Satisfaction client" },
-              { val: "100%", lbl: "Au succès" },
+              { val: "50+", lbl: lang === "en" ? "Qualified profiles" : "Profils qualifiés" },
+              { val: "72h", lbl: lang === "en" ? "Response time" : "Délai de réponse" },
+              { val: "95%", lbl: lang === "en" ? "Client satisfaction" : "Satisfaction client" },
+              { val: "100%", lbl: lang === "en" ? "Success fee" : "Au succès" },
             ].map(({ val, lbl }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{
@@ -483,7 +500,7 @@ export default function TalentFluxFinance() {
               onMouseEnter={e => e.currentTarget.style.color="#94A3B8"}
               onMouseLeave={e => e.currentTarget.style.color="#475569"}
             >
-              Vous êtes candidat Finance ? → Déposez votre dossier
+              {lang === "en" ? "Are you a Finance candidate? → Submit your application" : "Vous êtes candidat Finance ? → Déposez votre dossier"}
             </Link>
           </div>
         </div>
@@ -493,29 +510,40 @@ export default function TalentFluxFinance() {
       <section id="approche" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{ color: C.goldLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Pourquoi TalentFlux Finance</div>
+            <div style={{ color: C.goldLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ Why TalentFlux Finance" : "✦ Pourquoi TalentFlux Finance"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.5vw, 2.7rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-              Le recrutement financier<br /><BlueText>est une science exacte.</BlueText>
+              {lang === "en" ? <>Financial recruitment<br /><BlueText>is an exact science.</BlueText></> : <>Le recrutement financier<br /><BlueText>est une science exacte.</BlueText></>}
             </h2>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)", gap: 22 }}>
             <ProblemCard
-              icon={TrendingDown} label="Le problème classique"
-              title="Les erreurs de casting coûtent cher."
-              desc="Un mauvais recrutement au niveau CFO ou contrôleur génère en moyenne 6 à 12 mois de salaire perdu, sans compter l'impact sur la gouvernance financière."
+              icon={TrendingDown}
+              label={lang === "en" ? "The classic problem" : "Le problème classique"}
+              title={lang === "en" ? "Hiring mistakes are costly." : "Les erreurs de casting coûtent cher."}
+              desc={lang === "en"
+                ? "A poor hire at CFO or controller level costs on average 6 to 12 months of salary, not counting the impact on financial governance."
+                : "Un mauvais recrutement au niveau CFO ou contrôleur génère en moyenne 6 à 12 mois de salaire perdu, sans compter l'impact sur la gouvernance financière."}
               accent="#EF4444" delay={0}
             />
             <ProblemCard
-              icon={ShieldCheck} label="Notre solution"
-              title="Audit des Hard & Soft Skills."
-              desc="Au-delà du CV, nous auditons la rigueur analytique, la gestion du stress en période de clôture et le fit culturel avec votre direction générale."
+              icon={ShieldCheck}
+              label={lang === "en" ? "Our solution" : "Notre solution"}
+              title={lang === "en" ? "Hard & Soft Skills Audit." : "Audit des Hard & Soft Skills."}
+              desc={lang === "en"
+                ? "Beyond the CV, we audit analytical rigor, stress management during year-end close, and cultural fit with your executive team."
+                : "Au-delà du CV, nous auditons la rigueur analytique, la gestion du stress en période de clôture et le fit culturel avec votre direction générale."}
               accent={C.goldLight} delay={100}
             />
             <ProblemCard
-              icon={Cpu} label="L'approche data-driven"
-              title="Matching Algorithmique."
-              desc="Notre algorithme croise 65 points de données — budget, culture, technicité ERP, remote policy — pour un match précis à 94% dès la première shortlist."
+              icon={Cpu}
+              label={lang === "en" ? "The data-driven approach" : "L'approche data-driven"}
+              title={lang === "en" ? "Algorithmic Matching." : "Matching Algorithmique."}
+              desc={lang === "en"
+                ? "Our algorithm cross-references 65 data points — budget, culture, ERP expertise, remote policy — for a 94% accurate match from the first shortlist."
+                : "Notre algorithme croise 65 points de données — budget, culture, technicité ERP, remote policy — pour un match précis à 94% dès la première shortlist."}
               accent={C.blueLight} delay={200}
             />
           </div>
@@ -525,23 +553,33 @@ export default function TalentFluxFinance() {
             <GlassCard style={{ padding: "36px 40px" }}>
               <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: "24px 48px" }}>
                 <div>
-                  <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 20 }}>Critères évalués</div>
+                  <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 20 }}>
+                    {lang === "en" ? "Evaluation criteria" : "Critères évalués"}
+                  </div>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                    <StatBar label="Maîtrise ERP / reporting" value="98%" pct={98} color={C.blueLight} delay={0} />
-                    <StatBar label="Rigueur analytique" value="94%" pct={94} color={C.goldLight} delay={100} />
-                    <StatBar label="Gestion clôture & audit" value="91%" pct={91} color={C.emeraldL} delay={200} />
-                    <StatBar label="Culture fit / management" value="89%" pct={89} color={C.blueLight} delay={300} />
+                    <StatBar label={lang === "en" ? "ERP / reporting mastery" : "Maîtrise ERP / reporting"} value="98%" pct={98} color={C.blueLight} delay={0} />
+                    <StatBar label={lang === "en" ? "Analytical rigor" : "Rigueur analytique"} value="94%" pct={94} color={C.goldLight} delay={100} />
+                    <StatBar label={lang === "en" ? "Closing & audit management" : "Gestion clôture & audit"} value="91%" pct={91} color={C.emeraldL} delay={200} />
+                    <StatBar label={lang === "en" ? "Culture fit / management" : "Culture fit / management"} value="89%" pct={89} color={C.blueLight} delay={300} />
                   </div>
                 </div>
                 <div>
-                  <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 20 }}>Nos engagements</div>
-                  {[
+                  <div style={{ color: C.muted, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 20 }}>
+                    {lang === "en" ? "Our commitments" : "Nos engagements"}
+                  </div>
+                  {(lang === "en" ? [
+                    ["Shortlist within 72h", C.goldLight],
+                    ["Max 3 profiles, all qualified", C.blueLight],
+                    ["Detailed matching score per candidate", C.emeraldL],
+                    ["Behavioral AI analysis included", C.goldLight],
+                    ["3-month replacement guarantee", C.blueLight],
+                  ] : [
                     ["Shortlist en 72h", C.goldLight],
                     ["3 profils maximum, tous qualifiés", C.blueLight],
                     ["Score de matching détaillé par candidat", C.emeraldL],
                     ["Analyse IA comportementale incluse", C.goldLight],
                     ["Garantie remplacement 3 mois", C.blueLight],
-                  ].map(([text, color], i) => (
+                  ]).map(([text, color], i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 0", borderBottom: i < 4 ? `1px solid ${C.border}` : "none" }}>
                       <CheckCircle size={15} style={{ color, flexShrink: 0 }} />
                       <span style={{ color: C.muted, fontSize: ".86rem" }}>{text}</span>
@@ -558,9 +596,11 @@ export default function TalentFluxFinance() {
       <section id="méthodologie" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: "rgba(15,22,40,0.5)", borderTop: `1px solid ${C.border}` }}>
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 64 }}>
-            <div style={{ color: C.blueLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Comment ça marche</div>
+            <div style={{ color: C.blueLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ How it works" : "✦ Comment ça marche"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.5vw, 2.7rem)", fontWeight: 800, lineHeight: 1.2, color: C.text }}>
-              Une méthodologie <GoldText>en 3 étapes précises.</GoldText>
+              {lang === "en" ? "A methodology" : "Une méthodologie"} <GoldText>{lang === "en" ? "in 3 precise steps." : "en 3 étapes précises."}</GoldText>
             </h2>
           </div>
 
@@ -568,21 +608,27 @@ export default function TalentFluxFinance() {
             {/* Timeline */}
             <div>
               <TimelineStep num={1}
-                subtitle="Étape 1 — Le Kick-off"
-                title="Micro-brief & Matrice des priorités"
-                desc="15 minutes suffisent. Nous définissons ensemble la matrice de priorités : budget, technicité ERP, style de management, culture d'entreprise."
+                subtitle={lang === "en" ? "Step 1 — The Kick-off" : "Étape 1 — Le Kick-off"}
+                title={lang === "en" ? "Micro-brief & Priority Matrix" : "Micro-brief & Matrice des priorités"}
+                desc={lang === "en"
+                  ? "15 minutes is enough. Together we define the priority matrix: budget, ERP expertise, management style, company culture."
+                  : "15 minutes suffisent. Nous définissons ensemble la matrice de priorités : budget, technicité ERP, style de management, culture d'entreprise."}
                 delay={0}
               />
               <TimelineStep num={2}
-                subtitle="Étape 2 — Le Matching Algorithmique"
-                title="Évaluation sur 65 critères stricts"
-                desc="Notre algorithme analyse notre réseau de profils financiers sur 65 variables : hard skills comptables, soft skills décisionnels, disponibilité, prétentions salariales."
+                subtitle={lang === "en" ? "Step 2 — Algorithmic Matching" : "Étape 2 — Le Matching Algorithmique"}
+                title={lang === "en" ? "Evaluation on 65 strict criteria" : "Évaluation sur 65 critères stricts"}
+                desc={lang === "en"
+                  ? "Our algorithm analyzes our network of financial profiles on 65 variables: accounting hard skills, decision-making soft skills, availability, salary expectations."
+                  : "Notre algorithme analyse notre réseau de profils financiers sur 65 variables : hard skills comptables, soft skills décisionnels, disponibilité, prétentions salariales."}
                 delay={150}
               />
               <TimelineStep num={3}
-                subtitle="Étape 3 — La Shortlist Premium"
-                title="3 profils avec Score de Matching"
-                desc="Vous recevez une présentation détaillée des 3 meilleurs candidats, incluant leur Score de Matching personnalisé et l'analyse comportementale IA."
+                subtitle={lang === "en" ? "Step 3 — The Premium Shortlist" : "Étape 3 — La Shortlist Premium"}
+                title={lang === "en" ? "3 profiles with Matching Score" : "3 profils avec Score de Matching"}
+                desc={lang === "en"
+                  ? "You receive a detailed presentation of the 3 best candidates, including their personalized Matching Score and AI behavioral analysis."
+                  : "Vous recevez une présentation détaillée des 3 meilleurs candidats, incluant leur Score de Matching personnalisé et l'analyse comportementale IA."}
                 delay={300}
               />
             </div>
@@ -590,7 +636,9 @@ export default function TalentFluxFinance() {
             {/* Score card */}
             <div style={{ position: "sticky", top: 100 }}>
               <GlassCard gold style={{ padding: 32 }}>
-                <div style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: C.goldLight, marginBottom: 20 }}>Exemple — Score de Matching</div>
+                <div style={{ fontSize: ".68rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", color: C.goldLight, marginBottom: 20 }}>
+                  {lang === "en" ? "Example — Matching Score" : "Exemple — Score de Matching"}
+                </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 24, paddingBottom: 20, borderBottom: `1px solid ${C.border}` }}>
                   <div style={{ width: 44, height: 44, borderRadius: "50%", background: "linear-gradient(135deg, rgba(30,64,175,.3), rgba(59,130,246,.2))", border: `1px solid ${C.borderBlue}`, display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Sora',sans-serif", fontWeight: 800, fontSize: ".8rem", color: C.blueLight }}>MC</div>
                   <div>
@@ -603,11 +651,11 @@ export default function TalentFluxFinance() {
                   </div>
                 </div>
                 {[
-                  ["Maîtrise SAP FI/CO", "Expert", C.goldLight],
-                  ["IFRS / Swiss GAAP", "Certifiée", C.goldLight],
-                  ["Management équipe", "8 ans", C.blueLight],
-                  ["Disponibilité", "45 jours", C.emeraldL],
-                  ["Fit culturel PME", "Élevé", C.emeraldL],
+                  [lang === "en" ? "SAP FI/CO mastery" : "Maîtrise SAP FI/CO", lang === "en" ? "Expert" : "Expert", C.goldLight],
+                  ["IFRS / Swiss GAAP", lang === "en" ? "Certified" : "Certifiée", C.goldLight],
+                  [lang === "en" ? "Team management" : "Management équipe", lang === "en" ? "8 years" : "8 ans", C.blueLight],
+                  [lang === "en" ? "Availability" : "Disponibilité", lang === "en" ? "45 days" : "45 jours", C.emeraldL],
+                  [lang === "en" ? "SME cultural fit" : "Fit culturel PME", lang === "en" ? "High" : "Élevé", C.emeraldL],
                 ].map(([label, val, color], i) => (
                   <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < 4 ? `1px solid ${C.border}` : "none" }}>
                     <span style={{ color: C.muted, fontSize: ".82rem" }}>{label}</span>
@@ -615,8 +663,14 @@ export default function TalentFluxFinance() {
                   </div>
                 ))}
                 <div style={{ marginTop: 20, padding: "12px 16px", background: "rgba(5,150,105,.06)", border: `1px solid rgba(52,211,153,.2)`, borderRadius: 10 }}>
-                  <div style={{ color: C.emeraldL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>Analyse IA</div>
-                  <p style={{ color: C.muted, fontSize: ".8rem", lineHeight: 1.65 }}>Profil orienté performance et rigueur. Historique de réductions de coûts démontrées. Recommandée pour environnement PME en croissance.</p>
+                  <div style={{ color: C.emeraldL, fontSize: ".72rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", marginBottom: 4 }}>
+                    {lang === "en" ? "AI Analysis" : "Analyse IA"}
+                  </div>
+                  <p style={{ color: C.muted, fontSize: ".8rem", lineHeight: 1.65 }}>
+                    {lang === "en"
+                      ? "Performance-driven and rigorous profile. Track record of demonstrated cost reductions. Recommended for fast-growing SME environment."
+                      : "Profil orienté performance et rigueur. Historique de réductions de coûts démontrées. Recommandée pour environnement PME en croissance."}
+                  </p>
                 </div>
               </GlassCard>
             </div>
@@ -627,11 +681,15 @@ export default function TalentFluxFinance() {
       {/* TESTIMONIALS */}
       <section style={{ padding: "72px 2rem" }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)", gap: 20 }}>
-          {[
+          {(lang === "en" ? [
+            { q: "TalentFlux presented our current CFO in 4 days. The Matching Score was 91% — and it still is 18 months later.", a: "CEO, Industrial SME, Vaud" },
+            { q: "The discretion and quality of profiles are beyond our expectations. Well above the traditional firms we had tested.", a: "HR Director, Financial Group, Zurich" },
+            { q: "They found our financial controller in a network we would never have reached on our own. Off-LinkedIn profile, exactly as promised.", a: "Founder, Fintech, Geneva" },
+          ] : [
             { q: "TalentFlux nous a présenté notre CFO actuel en 4 jours. Le Score de Matching était de 91% — et il l'est toujours 18 mois après.", a: "CEO, PME industrielle, Vaud" },
             { q: "La discrétion et la qualité des profils sont au-delà de nos attentes. Bien au-dessus des cabinets traditionnels que nous avions testés.", a: "DRH, Groupe financier, Zurich" },
             { q: "Ils ont trouvé notre contrôleur de gestion dans un réseau que nous n'aurions jamais atteint seuls. Profil hors LinkedIn, exactement comme annoncé.", a: "Fondateur, Fintech, Genève" },
-          ].map(({ q, a }, i) => (
+          ]).map(({ q, a }, i) => (
             <GlassCard key={i} gold style={{ padding: 28 }}>
               <div style={{ display: "flex", gap: 3, marginBottom: 16 }}>
                 {Array(5).fill(0).map((_, j) => <Star key={j} size={12} fill={C.gold} color={C.gold} />)}
@@ -649,12 +707,20 @@ export default function TalentFluxFinance() {
         <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
 
           <div style={{ textAlign: "center", marginBottom: 48 }}>
-            <div style={{ color: C.goldLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>✦ Micro-Brief confidentiel</div>
+            <div style={{ color: C.goldLight, fontSize: ".74rem", fontWeight: 700, letterSpacing: ".18em", textTransform: "uppercase", marginBottom: 14 }}>
+              {lang === "en" ? "✦ Confidential Micro-Brief" : "✦ Micro-Brief confidentiel"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.5vw, 2.6rem)", fontWeight: 800, lineHeight: 1.2, color: C.text, marginBottom: 14 }}>
-              Prêt à sécuriser votre<br /><GoldText>département finance ?</GoldText>
+              {lang === "en"
+                ? <>{`Ready to secure your`}<br /><GoldText>finance department?</GoldText></>
+                : <>Prêt à sécuriser votre<br /><GoldText>département finance ?</GoldText></>
+              }
             </h2>
             <p style={{ color: C.muted, fontSize: ".92rem", lineHeight: 1.7 }}>
-              Décrivez votre besoin en 30 secondes.<br />Un consultant expert vous rappelle sous 24h.
+              {lang === "en"
+                ? <>Describe your need in 30 seconds.<br />An expert consultant will call you back within 24h.</>
+                : <>Décrivez votre besoin en 30 secondes.<br />Un consultant expert vous rappelle sous 24h.</>
+              }
             </p>
           </div>
 
@@ -662,32 +728,36 @@ export default function TalentFluxFinance() {
             {/* Header form */}
             <div style={{ padding: "20px 28px", background: "rgba(180,145,60,.04)", borderBottom: `1px solid ${C.borderGold}`, display: "flex", alignItems: "center", gap: 10 }}>
               <Lock size={14} style={{ color: C.goldLight }} />
-              <span style={{ color: C.subtle, fontSize: ".78rem", fontWeight: 600 }}>Vos informations sont strictement confidentielles · Aucun spam</span>
+              <span style={{ color: C.subtle, fontSize: ".78rem", fontWeight: 600 }}>
+                {lang === "en" ? "Your information is strictly confidential · No spam" : "Vos informations sont strictement confidentielles · Aucun spam"}
+              </span>
             </div>
 
             {!submitted ? (
               <div style={{ padding: 32 }}>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 16, marginBottom: 16 }}>
-                  <InputField label="Prénom" placeholder="Antoine" value={form.firstName} onChange={set("firstName")} required />
-                  <InputField label="Nom" placeholder="Dupont" value={form.lastName} onChange={set("lastName")} required />
-                  <InputField label="Email professionnel" type="email" placeholder="a.dupont@entreprise.ch" value={form.email} onChange={set("email")} required />
-                  <InputField label="Téléphone direct" type="tel" placeholder="+41 76 000 00 00" value={form.phone} onChange={set("phone")} />
+                  <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder={lang === "en" ? "Antoine" : "Antoine"} value={form.firstName} onChange={set("firstName")} required />
+                  <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder={lang === "en" ? "Dupont" : "Dupont"} value={form.lastName} onChange={set("lastName")} required />
+                  <InputField label={lang === "en" ? "Professional email" : "Email professionnel"} type="email" placeholder="a.dupont@company.ch" value={form.email} onChange={set("email")} required />
+                  <InputField label={lang === "en" ? "Direct phone" : "Téléphone direct"} type="tel" placeholder="+41 76 000 00 00" value={form.phone} onChange={set("phone")} />
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <InputField label="Entreprise / Groupe" placeholder="Nom de votre société" value={form.company} onChange={set("company")} />
+                  <InputField label={lang === "en" ? "Company / Group" : "Entreprise / Groupe"} placeholder={lang === "en" ? "Your company name" : "Nom de votre société"} value={form.company} onChange={set("company")} />
                 </div>
 
                 <div style={{ marginBottom: 16 }}>
-                  <SelectField label="Profil recherché" value={form.profile} onChange={set("profile")} options={profiles} required />
+                  <SelectField label={lang === "en" ? "Profile sought" : "Profil recherché"} value={form.profile} onChange={set("profile")} options={profiles} required />
                 </div>
 
                 <div style={{ marginBottom: 24 }}>
                   <label style={{ display: "block", color: C.subtle, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 8 }}>
-                    Contexte & urgence <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— Optionnel</span>
+                    {lang === "en" ? "Context & urgency" : "Contexte & urgence"} <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— {lang === "en" ? "Optional" : "Optionnel"}</span>
                   </label>
                   <textarea
-                    placeholder="Ex: Départ inattendu du CFO, croissance rapide, projet M&A, clôture annuelle imminente..."
+                    placeholder={lang === "en"
+                      ? "E.g.: Unexpected CFO departure, rapid growth, M&A project, imminent year-end close..."
+                      : "Ex: Départ inattendu du CFO, croissance rapide, projet M&A, clôture annuelle imminente..."}
                     value={form.message} onChange={set("message")} rows={3}
                     style={{
                       width: "100%", padding: "13px 16px", borderRadius: 12,
@@ -703,7 +773,7 @@ export default function TalentFluxFinance() {
                 {/* PDF Upload — Annonce de poste */}
                 <div style={{ marginBottom: 24 }}>
                   <label style={{ display: "block", color: C.subtle, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 8 }}>
-                    Annonce de poste <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                    {lang === "en" ? "Job posting" : "Annonce de poste"} <span style={{ color: C.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                   </label>
                   {!form.file ? (
                     <div
@@ -722,9 +792,9 @@ export default function TalentFluxFinance() {
                     >
                       <Upload size={22} style={{ color: C.subtle, margin: "0 auto 10px" }} />
                       <p style={{ color: C.muted, fontSize: ".85rem" }}>
-                        <span style={{ color: C.goldLight, fontWeight: 600 }}>Cliquez</span> ou glissez votre annonce PDF
+                        <span style={{ color: C.goldLight, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF posting" : "ou glissez votre annonce PDF"}
                       </p>
-                      <p style={{ color: C.subtle, fontSize: ".75rem", marginTop: 4 }}>Job description, fiche de poste, cahier des charges...</p>
+                      <p style={{ color: C.subtle, fontSize: ".75rem", marginTop: 4 }}>{lang === "en" ? "Job description, job spec, requirements..." : "Job description, fiche de poste, cahier des charges..."}</p>
                       <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                     </div>
                   ) : (
@@ -765,12 +835,14 @@ export default function TalentFluxFinance() {
                   transition: "all .3s", fontFamily: "'DM Sans', sans-serif",
                 }}>
                   {loading
-                    ? <><div style={{ width: 17, height: 17, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi en cours...</>
-                    : <><Send size={17} />Confier mon mandat — Réponse sous 24h</>
+                    ? <><div style={{ width: 17, height: 17, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Sending..." : "Envoi en cours..."}</>
+                    : <><Send size={17} />{lang === "en" ? "Submit my mandate — Response within 24h" : "Confier mon mandat — Réponse sous 24h"}</>
                   }
                 </button>
 
-                <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 12 }}>🔒 Données chiffrées · Stockées sur Supabase CH · RGPD & LPD conformes</p>
+                <p style={{ color: C.subtle, fontSize: ".7rem", textAlign: "center", marginTop: 12 }}>
+                  {lang === "en" ? "🔒 Encrypted data · Stored on Supabase CH · GDPR & LPD compliant" : "🔒 Données chiffrées · Stockées sur Supabase CH · RGPD & LPD conformes"}
+                </p>
                 <div style={{ textAlign: "center", marginTop: 14, paddingTop: 14, borderTop: `1px solid ${C.border}` }}>
                   <Link href="/candidature/finance" style={{
                     color: C.subtle, fontSize: ".8rem", textDecoration: "none",
@@ -781,7 +853,7 @@ export default function TalentFluxFinance() {
                     onMouseEnter={e => e.currentTarget.style.color = C.goldLight}
                     onMouseLeave={e => e.currentTarget.style.color = C.subtle}
                   >
-                    Vous êtes candidat Finance ? → Déposez votre dossier
+                    {lang === "en" ? "Are you a Finance candidate? → Submit your application" : "Vous êtes candidat Finance ? → Déposez votre dossier"}
                   </Link>
                 </div>
               </div>
@@ -791,15 +863,17 @@ export default function TalentFluxFinance() {
                   <CheckCircle size={32} style={{ color: C.goldLight }} />
                 </div>
                 <h3 style={{ color: C.text, fontWeight: 700, fontSize: "1.3rem", marginBottom: 10, fontFamily: "'Sora',sans-serif" }}>
-                  Mandat enregistré <GoldText>✓</GoldText>
+                  {lang === "en" ? "Mandate registered" : "Mandat enregistré"} <GoldText>✓</GoldText>
                 </h3>
                 <p style={{ color: C.muted, marginBottom: 22, lineHeight: 1.7, fontSize: ".9rem" }}>
-                  Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />
-                  Un consultant TalentFlux Finance vous contacte sous <strong style={{ color: C.goldLight }}>24 heures</strong>.
+                  {lang === "en"
+                    ? <>{`Thank you `}<strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />A TalentFlux Finance consultant will contact you within <strong style={{ color: C.goldLight }}>24 hours</strong>.</>
+                    : <>Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />Un consultant TalentFlux Finance vous contacte sous <strong style={{ color: C.goldLight }}>24 heures</strong>.</>
+                  }
                 </p>
                 <button onClick={() => { setSubmitted(false); setForm({ firstName:"",lastName:"",email:"",phone:"",company:"",profile:"",message:"" }); }}
                   style={{ padding: "10px 24px", borderRadius: 11, border: `1px solid ${C.borderGold}`, background: "rgba(180,145,60,.07)", color: C.goldLight, fontWeight: 600, cursor: "pointer", fontSize: ".86rem", fontFamily: "'DM Sans',sans-serif" }}>
-                  Nouveau mandat
+                  {lang === "en" ? "New mandate" : "Nouveau mandat"}
                 </button>
               </div>
             )}
@@ -810,7 +884,7 @@ export default function TalentFluxFinance() {
             {[
               { icon: Mail, value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
               { icon: Phone, value: "+41 76 592 88 06", href: "tel:+41765928806" },
-              { icon: MapPin, value: "Yverdon-les-Bains, Suisse", href: null },
+              { icon: MapPin, value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, Suisse", href: null },
             ].map(({ icon: Icon, value, href }, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
                 <Icon size={14} style={{ color: C.subtle }} strokeWidth={1.5} />
@@ -824,7 +898,7 @@ export default function TalentFluxFinance() {
         </div>
       </section>
 
-      
+
       {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
       <section style={{
         padding: "48px 2rem",
@@ -835,17 +909,17 @@ export default function TalentFluxFinance() {
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ color: "#D4AF5A", fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
-              ✦ Nos autres expertises
+              {lang === "en" ? "✦ Our other expertise" : "✦ Nos autres expertises"}
             </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
-              Vous recrutez aussi dans...
+              {lang === "en" ? "You also recruit in..." : "Vous recrutez aussi dans..."}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".88rem" }}>
-              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+              {lang === "en" ? "TalentFlux operates in 6 specialized sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
             </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-            
+
           <a href="/pharma" style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
@@ -859,7 +933,7 @@ export default function TalentFluxFinance() {
             <span style={{ fontSize: "1.1rem" }}>🔬</span>
             <div>
               <div style={{ color: "#C026D3", fontWeight: 700, fontSize: ".88rem" }}>Pharma & Life Sciences</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           <a href="/ingenierie" style={{
@@ -874,8 +948,8 @@ export default function TalentFluxFinance() {
           >
             <span style={{ fontSize: "1.1rem" }}>⚙️</span>
             <div>
-              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>Ingénierie</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#818CF8", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Engineering" : "Ingénierie"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           </div>
@@ -887,11 +961,14 @@ export default function TalentFluxFinance() {
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 14 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
-            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Finance · Yverdon-les-Bains, Suisse</span>
+            <span style={{ color: C.subtle, fontSize: ".7rem" }}>· Finance · {lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, Suisse"}</span>
           </div>
-          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. Tous droits réservés.</p>
+          <p style={{ color: C.subtle, fontSize: ".72rem" }}>© 2025 TalentFlux. {lang === "en" ? "All rights reserved." : "Tous droits réservés."}</p>
           <div style={{ display: "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en"
+              ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]]
+              : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]
+            ).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: C.subtle, fontSize: ".72rem", textDecoration: "none", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = C.muted}
                 onMouseLeave={e => e.target.style.color = C.subtle}

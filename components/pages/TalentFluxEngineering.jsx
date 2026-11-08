@@ -228,23 +228,23 @@ export default function TalentFluxEngineering() {
 
   const handleFile = (file) => {
     if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les fichiers PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Le fichier ne doit pas dépasser 10 MB."); return; }
+    if (file.type !== "application/pdf") { setError(lang === "en" ? "Only PDF files are accepted." : "Seuls les fichiers PDF sont acceptés."); return; }
+    if (file.size > 10 * 1024 * 1024) { setError(lang === "en" ? "The file must not exceed 10 MB." : "Le fichier ne doit pas dépasser 10 MB."); return; }
     setError(null);
     setForm(f => ({ ...f, file }));
   };
 
   const handleSubmit = async () => {
     setError(null);
-    if (!form.firstName || !form.lastName || !form.email) { setError("Veuillez remplir les champs obligatoires (*)."); return; }
+    if (!form.firstName || !form.lastName || !form.email) { setError(lang === "en" ? "Please fill in the required fields (*)." : "Veuillez remplir les champs obligatoires (*)."); return; }
     setLoading(true);
     try {
       let pdfFileName = null, pdfFileUrl = null;
       if (form.file) {
-        const sanitize = (str) => str.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
+        const sanitize = (str) => str.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
         const fileName = `${Date.now()}_${sanitize(form.firstName)}_${sanitize(form.lastName)}.pdf`;
         const { error: uploadError } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fileName}`, form.file, { contentType: "application/pdf" });
-        if (uploadError) throw new Error("Erreur upload : " + uploadError.message);
+        if (uploadError) throw new Error((lang === "en" ? "Upload error: " : "Erreur upload : ") + uploadError.message);
         pdfFileName = fileName; pdfFileUrl = `submissions/${fileName}`;
       }
       const { error: insertError } = await supabase.from("contact_submissions").insert([{
@@ -253,19 +253,29 @@ export default function TalentFluxEngineering() {
         email: form.email.trim().toLowerCase(), phone: form.phone.trim() || null,
         company: form.company.trim() || null, sector: "ingenierie",
         role: form.specialty || null,
-        message: `[Urgence: ${form.urgency || "Non précisée"}] ${form.message.trim()}`,
+        message: `[${lang === "en" ? "Urgency" : "Urgence"}: ${form.urgency || (lang === "en" ? "Not specified" : "Non précisée")}] ${form.message.trim()}`,
         pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
       }]);
       if (insertError) throw new Error(insertError.message);
       setSubmitted(true);
     } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
+      setError(err.message || (lang === "en" ? "An error occurred." : "Une erreur est survenue."));
     } finally {
       setLoading(false);
     }
   };
 
-  const specialties = [
+  const specialties = lang === "en" ? [
+    { value: "", label: "Select a specialty..." },
+    { value: "meca", label: "Mechanical / Design Engineer" },
+    { value: "elec", label: "Electronics / Embedded Engineer" },
+    { value: "auto", label: "Automation / Robotics Engineer" },
+    { value: "qualite", label: "Quality / Regulatory Engineer" },
+    { value: "direction", label: "Technical Director / R&D" },
+    { value: "medtech", label: "MedTech / Medical Devices" },
+    { value: "horlogerie", label: "Watchmaking / Microtechnology" },
+    { value: "other", label: "Other engineering profile" },
+  ] : [
     { value: "", label: "Sélectionnez une spécialité..." },
     { value: "meca", label: "Ingénieur Mécanique / Conception" },
     { value: "elec", label: "Ingénieur Électronique / Embedded" },
@@ -277,7 +287,12 @@ export default function TalentFluxEngineering() {
     { value: "other", label: "Autre profil ingénierie" },
   ];
 
-  const urgencies = [
+  const urgencies = lang === "en" ? [
+    { value: "", label: "Desired timeline..." },
+    { value: "immediate", label: "⚡ Immediate (ASAP)" },
+    { value: "3months", label: "📅 Within 3 months" },
+    { value: "strategic", label: "🔭 Strategic watch" },
+  ] : [
     { value: "", label: "Délai souhaité..." },
     { value: "immediate", label: "⚡ Immédiate (ASAP)" },
     { value: "3months", label: "📅 Moins de 3 mois" },
@@ -360,15 +375,17 @@ export default function TalentFluxEngineering() {
             fontSize: ".58rem", fontWeight: 700, letterSpacing: ".14em",
             color: E.blueLight, background: "rgba(59,130,246,.1)",
             border: `1px solid ${E.borderGlow}`, borderRadius: 4, padding: "2px 8px",
-          }}>INGÉNIERIE</span>
+          }}>{lang === "en" ? "ENGINEERING" : "INGÉNIERIE"}</span>
         </div>
-        
-                <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
-          {["Méthode","Matching"].map(item => (
-            <span key={item} className="nav-link" onClick={() => scrollTo(item.toLowerCase())}>{item}</span>
+
+        <div style={{ display: isMobile ? "none" : "flex", gap: "1.6rem", alignItems: "center" }}>
+          {[
+            { label: lang === "en" ? "Method" : "Méthode", id: "méthode" },
+            { label: "Matching", id: "matching" },
+          ].map(({ label, id }) => (
+            <span key={label} className="nav-link" onClick={() => scrollTo(id)}>{label}</span>
           ))}
-                  
-          
+
           <a href="tel:+41765928806" style={{
             display: "flex", alignItems: "center", gap: 6,
             padding: "7px 14px", borderRadius: 10,
@@ -406,8 +423,8 @@ export default function TalentFluxEngineering() {
                 <Shield size={14} style={{ color: E.blueLight }} strokeWidth={1.5} />
               </div>
               <div>
-                <div style={{ color: E.subtle, fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Spécialité</div>
-                <div style={{ color: E.steelLight, fontSize: ".78rem", fontWeight: 600 }}>MedTech & Horlogerie</div>
+                <div style={{ color: E.subtle, fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>{lang === "en" ? "Specialty" : "Spécialité"}</div>
+                <div style={{ color: E.steelLight, fontSize: ".78rem", fontWeight: 600 }}>MedTech & {lang === "en" ? "Watchmaking" : "Horlogerie"}</div>
               </div>
             </div>
           </TechCard>
@@ -422,7 +439,7 @@ export default function TalentFluxEngineering() {
               </div>
               <div>
                 <div style={{ color: E.subtle, fontSize: ".6rem", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".06em" }}>Matching</div>
-                <div style={{ color: E.steelLight, fontSize: ".78rem", fontWeight: 600 }}>65 points de contrôle</div>
+                <div style={{ color: E.steelLight, fontSize: ".78rem", fontWeight: 600 }}>{lang === "en" ? "65 control points" : "65 points de contrôle"}</div>
               </div>
             </div>
           </TechCard>
@@ -439,7 +456,9 @@ export default function TalentFluxEngineering() {
           }}>
             <CircuitBoard size={13} style={{ color: E.blueLight }} />
             <span style={{ color: E.muted, fontSize: ".78rem", fontWeight: 500, fontFamily: "'DM Mono', monospace" }}>
-              Placement Ingénierie · Arc Jurassien & Bassin Lémanique
+              {lang === "en"
+                ? "Engineering Placement · Arc Jurassien & Lake Geneva Region"
+                : "Placement Ingénierie · Arc Jurassien & Bassin Lémanique"}
             </span>
           </div>
 
@@ -451,8 +470,8 @@ export default function TalentFluxEngineering() {
             color: E.text, marginBottom: 24,
             animation: "fadeUp .7s ease .1s both",
           }}>
-            Recrutement Ingénierie en Suisse romande :<br />
-            <ElectricText>vos specs méritent mieux qu'un CV générique.</ElectricText>
+            {lang === "en" ? "Engineering Recruitment in French-speaking Switzerland:" : "Recrutement Ingénierie en Suisse romande :"}<br />
+            <ElectricText>{lang === "en" ? "your specs deserve more than a generic CV." : "vos specs méritent mieux qu'un CV générique."}</ElectricText>
           </h1>
 
           <p style={{
@@ -460,13 +479,15 @@ export default function TalentFluxEngineering() {
             maxWidth: 580, margin: "0 auto 44px",
             animation: "fadeUp .7s ease .2s both",
           }}>
-            Ne laissez plus le hasard décider de vos innovations.<br />
-            Talent Flux identifie vos futurs ingénieurs via un <strong style={{ color: E.steelLight }}>audit algorithmique sur 65 points de contrôle.</strong>
+            {lang === "en"
+              ? <>Stop letting chance decide your innovations.<br />TalentFlux identifies your future engineers via an <strong style={{ color: E.steelLight }}>algorithmic audit on 65 control points.</strong></>
+              : <>Ne laissez plus le hasard décider de vos innovations.<br />Talent Flux identifie vos futurs ingénieurs via un <strong style={{ color: E.steelLight }}>audit algorithmique sur 65 points de contrôle.</strong></>
+            }
           </p>
 
           {/* CTAs */}
           <div style={{ display: isMobile ? "grid" : "flex", gridTemplateColumns: "1fr 1fr", gap: 14, justifyContent: "center", flexWrap: "wrap", marginBottom: 52, animation: "fadeUp .7s ease .3s both" }}>
-                        <button onClick={() => scrollTo("méthode")} style={{
+            <button onClick={() => scrollTo("méthode")} style={{
               background: "rgba(59,130,246,.06)", border: `1.5px solid ${E.borderGlow}`,
               color: E.blueLight, padding: "15px 26px", borderRadius: 12,
               fontFamily: "'DM Sans', sans-serif", fontWeight: 700, fontSize: ".95rem",
@@ -475,7 +496,7 @@ export default function TalentFluxEngineering() {
               onMouseEnter={e => { e.currentTarget.style.background = "rgba(59,130,246,.1)"; e.currentTarget.style.transform = "translateY(-2px)"; }}
               onMouseLeave={e => { e.currentTarget.style.background = "rgba(59,130,246,.06)"; e.currentTarget.style.transform = "translateY(0)"; }}
             >
-              Notre méthode <ChevronRight size={16} />
+              {lang === "en" ? "Our method" : "Notre méthode"} <ChevronRight size={16} />
             </button>
           </div>
 
@@ -486,10 +507,10 @@ export default function TalentFluxEngineering() {
             animation: "fadeUp .7s ease .4s both",
           }}>
             {[
-              { val: "65", unit: "critères", lbl: "Points de contrôle" },
-              { val: "72h", unit: "", lbl: "Délai shortlist" },
-              { val: "95%", unit: "", lbl: "Taux de satisfaction" },
-              { val: "100%", unit: "", lbl: "Au succès" },
+              { val: "65", unit: lang === "en" ? " criteria" : " critères", lbl: lang === "en" ? "Control points" : "Points de contrôle" },
+              { val: "72h", unit: "", lbl: lang === "en" ? "Shortlist delay" : "Délai shortlist" },
+              { val: "95%", unit: "", lbl: lang === "en" ? "Satisfaction rate" : "Taux de satisfaction" },
+              { val: "100%", unit: "", lbl: lang === "en" ? "Success fee" : "Au succès" },
             ].map(({ val, unit, lbl }, i) => (
               <div key={i} style={{ textAlign: "center" }}>
                 <div style={{ fontFamily: "'Sora', sans-serif", fontSize: "1.9rem", fontWeight: 900, marginBottom: 3, background: "linear-gradient(135deg, #3B82F6, #38BDF8)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
@@ -509,7 +530,7 @@ export default function TalentFluxEngineering() {
               onMouseEnter={e => e.currentTarget.style.color="#94A3B8"}
               onMouseLeave={e => e.currentTarget.style.color="#475569"}
             >
-              Vous êtes ingénieur ? → Déposez votre candidature
+              {lang === "en" ? "Are you an engineer? → Submit your application" : "Vous êtes ingénieur ? → Déposez votre candidature"}
             </Link>
           </div>
         </div>
@@ -519,36 +540,53 @@ export default function TalentFluxEngineering() {
       <section id="méthode" className="line-grid" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", borderTop: `1px solid ${E.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 52 }}>
-            <div style={{ color: E.blueLight, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>// Pourquoi TalentFlux Ingénierie</div>
+            <div style={{ color: E.blueLight, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>
+              {lang === "en" ? "// Why TalentFlux Engineering" : "// Pourquoi TalentFlux Ingénierie"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.3vw, 2.6rem)", fontWeight: 800, lineHeight: 1.2, color: E.text }}>
-              La rigueur de l'ingénieur<br /><SteelText>appliquée au recrutement.</SteelText>
+              {lang === "en"
+                ? <>Engineering rigor<br /><SteelText>applied to recruitment.</SteelText></>
+                : <>La rigueur de l'ingénieur<br /><SteelText>appliquée au recrutement.</SteelText></>
+              }
             </h2>
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)", gap: 20 }}>
             <MethodCard
-              icon={Settings2} label="01 — Audit Technique"
-              title="Validation des certifications & Hard Skills"
-              desc="Vérification rigoureuse des diplômes HES/EPFL/HEIG-VD, maîtrise CAO (SolidWorks, CATIA), ERP industriels, et certifications métiers (ISO, CE, MDR)."
+              icon={Settings2}
+              label={lang === "en" ? "01 — Technical Audit" : "01 — Audit Technique"}
+              title={lang === "en" ? "Certification & Hard Skills Validation" : "Validation des certifications & Hard Skills"}
+              desc={lang === "en"
+                ? "Rigorous verification of HES/EPFL/HEIG-VD degrees, CAD mastery (SolidWorks, CATIA), industrial ERPs, and professional certifications (ISO, CE, MDR)."
+                : "Vérification rigoureuse des diplômes HES/EPFL/HEIG-VD, maîtrise CAO (SolidWorks, CATIA), ERP industriels, et certifications métiers (ISO, CE, MDR)."}
               accent={E.blue} delay={0}
             />
             <MethodCard
-              icon={Target} label="02 — Culture de l'Excellence"
-              title="Analyse du Savoir-être Industriel"
-              desc="Évaluation comportementale en environnement de production, R&D ou qualité : gestion des délais, rigueur documentaire, leadership technique et adaptabilité culturelle."
+              icon={Target}
+              label={lang === "en" ? "02 — Culture of Excellence" : "02 — Culture de l'Excellence"}
+              title={lang === "en" ? "Industrial Soft Skills Analysis" : "Analyse du Savoir-être Industriel"}
+              desc={lang === "en"
+                ? "Behavioral evaluation in production, R&D or quality environments: deadline management, documentation rigor, technical leadership and cultural adaptability."
+                : "Évaluation comportementale en environnement de production, R&D ou qualité : gestion des délais, rigueur documentaire, leadership technique et adaptabilité culturelle."}
               accent={E.electric} delay={120}
             />
             <MethodCard
-              icon={Zap} label="03 — Time-to-Hire Optimisé"
-              title="Vivier d'ingénieurs qualifiés en Suisse"
-              desc="Accès immédiat à notre réseau d'ingénieurs en Suisse Romande. Arc Jurassien, bassin lémanique, Valais industriel. 72h pour une shortlist qualifiée."
+              icon={Zap}
+              label={lang === "en" ? "03 — Optimized Time-to-Hire" : "03 — Time-to-Hire Optimisé"}
+              title={lang === "en" ? "Pool of qualified engineers in Switzerland" : "Vivier d'ingénieurs qualifiés en Suisse"}
+              desc={lang === "en"
+                ? "Immediate access to our network of engineers in French-speaking Switzerland. Arc Jurassien, Lake Geneva area, industrial Valais. 72h for a qualified shortlist."
+                : "Accès immédiat à notre réseau d'ingénieurs en Suisse Romande. Arc Jurassien, bassin lémanique, Valais industriel. 72h pour une shortlist qualifiée."}
               accent={E.orange} delay={240}
             />
           </div>
 
           {/* Sector badges */}
           <div style={{ marginTop: 40, display: "flex", flexWrap: "wrap", gap: 10, justifyContent: "center" }}>
-            {["MedTech & Dispositifs médicaux", "Horlogerie & Microtechnique", "Automation & Robotique", "Électronique embarquée", "Industrie 4.0", "Qualité / MDR / ISO 13485"].map((tag, i) => (
+            {(lang === "en"
+              ? ["MedTech & Medical Devices", "Watchmaking & Microtechnology", "Automation & Robotics", "Embedded Electronics", "Industry 4.0", "Quality / MDR / ISO 13485"]
+              : ["MedTech & Dispositifs médicaux", "Horlogerie & Microtechnique", "Automation & Robotique", "Électronique embarquée", "Industrie 4.0", "Qualité / MDR / ISO 13485"]
+            ).map((tag, i) => (
               <span key={i} style={{
                 padding: "6px 14px", borderRadius: 100, fontSize: ".75rem", fontWeight: 600,
                 background: "rgba(59,130,246,.07)", border: `1px solid ${E.border}`,
@@ -567,9 +605,11 @@ export default function TalentFluxEngineering() {
       <section id="matching" style={{ padding: isMobile ? "56px 1.2rem" : "90px 2rem", background: `${E.bgDeep}`, borderTop: `1px solid ${E.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", width: "100%" }}>
           <div style={{ textAlign: "center", marginBottom: 56 }}>
-            <div style={{ color: E.electric, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>// Algorithme de matching</div>
+            <div style={{ color: E.electric, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>
+              {lang === "en" ? "// Matching algorithm" : "// Algorithme de matching"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.3vw, 2.6rem)", fontWeight: 800, lineHeight: 1.2, color: E.text }}>
-              65 points de contrôle.<br /><ElectricText>Un match à 94%.</ElectricText>
+              {lang === "en" ? <>65 control points.<br /><ElectricText>A 94% match.</ElectricText></> : <>65 points de contrôle.<br /><ElectricText>Un match à 94%.</ElectricText></>}
             </h2>
           </div>
 
@@ -580,36 +620,48 @@ export default function TalentFluxEngineering() {
                 <div style={{ display: "flex", alignItems: "center", gap: 28, marginBottom: 32 }}>
                   <MatchScore score={94} />
                   <div>
-                    <div style={{ color: E.subtle, fontSize: ".65rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>Candidat analysé</div>
-                    <div style={{ color: E.text, fontWeight: 700, fontSize: "1rem", marginBottom: 3 }}>Marc A. · Ingénieur R&D</div>
+                    <div style={{ color: E.subtle, fontSize: ".65rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", fontFamily: "'DM Mono', monospace", marginBottom: 8 }}>
+                      {lang === "en" ? "Analyzed candidate" : "Candidat analysé"}
+                    </div>
+                    <div style={{ color: E.text, fontWeight: 700, fontSize: "1rem", marginBottom: 3 }}>Marc A. · {lang === "en" ? "R&D Engineer" : "Ingénieur R&D"}</div>
                     <div style={{ color: E.subtle, fontSize: ".78rem" }}>Microtechnique · EPFL · Lausanne</div>
                     <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 6, padding: "4px 12px", borderRadius: 100, background: "rgba(59,130,246,.1)", border: `1px solid ${E.borderGlow}` }}>
                       <div style={{ width: 6, height: 6, borderRadius: "50%", background: E.electric, boxShadow: `0 0 6px ${E.electric}` }} />
-                      <span style={{ color: E.blueLight, fontSize: ".7rem", fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>MATCH VALIDÉ</span>
+                      <span style={{ color: E.blueLight, fontSize: ".7rem", fontWeight: 700, fontFamily: "'DM Mono', monospace" }}>
+                        {lang === "en" ? "MATCH VALIDATED" : "MATCH VALIDÉ"}
+                      </span>
                     </div>
                   </div>
                 </div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-                  <ScoreBar label="Maîtrise CAO (SolidWorks/CATIA)" value="97%" pct={97} color={E.blue} delay={0} />
+                  <ScoreBar label={lang === "en" ? "CAD mastery (SolidWorks/CATIA)" : "Maîtrise CAO (SolidWorks/CATIA)"} value="97%" pct={97} color={E.blue} delay={0} />
                   <ScoreBar label="Certifications ISO / MDR" value="91%" pct={91} color={E.electric} delay={100} />
                   <ScoreBar label="Soft Skills / Leadership" value="88%" pct={88} color={E.blueLight} delay={200} />
-                  <ScoreBar label="Fit culture entreprise" value="94%" pct={94} color={E.orange} delay={300} />
-                  <ScoreBar label="Disponibilité & mobilité" value="100%" pct={100} color={E.electric} delay={400} />
+                  <ScoreBar label={lang === "en" ? "Company culture fit" : "Fit culture entreprise"} value="94%" pct={94} color={E.orange} delay={300} />
+                  <ScoreBar label={lang === "en" ? "Availability & mobility" : "Disponibilité & mobilité"} value="100%" pct={100} color={E.electric} delay={400} />
                 </div>
               </TechCard>
             </div>
 
             {/* 65 criteria list */}
             <div>
-              <div style={{ color: E.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 24, fontFamily: "'DM Mono', monospace" }}>Les 65 critères couvrent :</div>
+              <div style={{ color: E.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 24, fontFamily: "'DM Mono', monospace" }}>
+                {lang === "en" ? "The 65 criteria cover:" : "Les 65 critères couvrent :"}
+              </div>
               <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                {[
+                {(lang === "en" ? [
+                  [Cpu, "Technical Hard Skills", "CAD, industrial ERP, professional certifications, industrial programming languages", E.blue],
+                  [BarChart3, "Logistics & Organization", "Project management, agility, deadlines, budget, technical documentation", E.electric],
+                  [Target, "Soft Skills & Leadership", "Autonomy, decision-making, cross-functional communication, team management", E.blueLight],
+                  [Factory, "Industrial Context", "Industry type, company size, quality culture, ISO/MDR certification", E.orange],
+                  [Settings2, "Budget & Conditions", "Salary expectations, remote policy, availability, geographic mobility", E.steel],
+                ] : [
                   [Cpu, "Hard Skills Techniques", "CAO, ERP industriel, certifications métiers, langages de programmation industrielle", E.blue],
                   [BarChart3, "Logistique & Organisation", "Gestion de projet, agilité, délais, budget, documentation technique", E.electric],
                   [Target, "Soft Skills & Leadership", "Autonomie, prise de décision, communication transversale, gestion d'équipe", E.blueLight],
                   [Factory, "Contexte Industriel", "Type d'industrie, taille d'entreprise, culture qualité, certification ISO/MDR", E.orange],
                   [Settings2, "Budget & Conditions", "Prétentions salariales, remote policy, disponibilité, mobilité géographique", E.steel],
-                ].map(([Icon, title, desc, color], i) => {
+                ]).map(([Icon, title, desc, color], i) => {
                   const [ref, inView] = useInView();
                   return (
                     <div key={i} ref={ref} style={{
@@ -636,11 +688,15 @@ export default function TalentFluxEngineering() {
       {/* TESTIMONIALS */}
       <section style={{ padding: isMobile ? "48px 1.2rem" : "64px 2rem", borderTop: `1px solid ${E.border}` }}>
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "grid", gridTemplateColumns: isMobile ? "1fr" : isTablet ? "1fr 1fr" : "repeat(3, 1fr)", gap: 18 }}>
-          {[
+          {(lang === "en" ? [
+            { q: "TalentFlux found our R&D director in 5 days. A very specific MedTech profile we had been searching for internally for 4 months.", a: "CEO, MedTech Startup, Neuchâtel" },
+            { q: "The technical validation before presentation is a huge time saver. All presented profiles truly mastered SolidWorks and our ISO processes.", a: "HR Director, Watch Group, Le Locle" },
+            { q: "Their network in the Arc Jurassien is impressive. Discreet profiles, never active on LinkedIn, exactly what we were looking for.", a: "CTO, Automation SME, Yverdon" },
+          ] : [
             { q: "TalentFlux a trouvé notre directeur R&D en 5 jours. Un profil MedTech très spécifique que nous cherchions depuis 4 mois en interne.", a: "CEO, Startup MedTech, Neuchâtel" },
             { q: "La validation technique avant présentation est un gain de temps énorme. Tous les profils présentés maîtrisaient réellement SolidWorks et nos processus ISO.", a: "DRH, Groupe horloger, Le Locle" },
             { q: "Leur réseau dans l'arc jurassien est impressionnant. Profils discrets, jamais actifs sur LinkedIn, exactement ce qu'on cherchait.", a: "CTO, PME Automation, Yverdon" },
-          ].map(({ q, a }, i) => (
+          ]).map(({ q, a }, i) => (
             <TechCard key={i} style={{ padding: 24 }}>
               <div style={{ display: "flex", gap: 3, marginBottom: 14 }}>
                 {Array(5).fill(0).map((_, j) => <Star key={j} size={11} fill={E.blue} color={E.blue} />)}
@@ -657,12 +713,20 @@ export default function TalentFluxEngineering() {
         <div style={{ position: "absolute", inset: 0, background: "radial-gradient(ellipse at center, rgba(29,78,216,.07), transparent 65%)", pointerEvents: "none" }} />
         <div style={{ maxWidth: 680, margin: "0 auto", position: "relative", zIndex: 1 }}>
           <div style={{ textAlign: "center", marginBottom: 44 }}>
-            <div style={{ color: E.blueLight, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>// Initialiser une recherche</div>
+            <div style={{ color: E.blueLight, fontSize: ".72rem", fontWeight: 700, letterSpacing: ".2em", textTransform: "uppercase", marginBottom: 14, fontFamily: "'DM Mono', monospace" }}>
+              {lang === "en" ? "// Initialize a search" : "// Initialiser une recherche"}
+            </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontSize: "clamp(1.7rem, 3.3vw, 2.5rem)", fontWeight: 800, lineHeight: 1.2, color: E.text, marginBottom: 12 }}>
-              Prêt à recruter votre<br /><ElectricText>prochain ingénieur ?</ElectricText>
+              {lang === "en"
+                ? <>Ready to hire your<br /><ElectricText>next engineer?</ElectricText></>
+                : <>Prêt à recruter votre<br /><ElectricText>prochain ingénieur ?</ElectricText></>
+              }
             </h2>
             <p style={{ color: E.muted, fontSize: ".9rem", lineHeight: 1.7 }}>
-              Décrivez votre besoin en 60 secondes.<br />Un consultant expert vous rappelle sous 24h.
+              {lang === "en"
+                ? <>Describe your need in 60 seconds.<br />An expert consultant will call you back within 24h.</>
+                : <>Décrivez votre besoin en 60 secondes.<br />Un consultant expert vous rappelle sous 24h.</>
+              }
             </p>
           </div>
 
@@ -670,32 +734,38 @@ export default function TalentFluxEngineering() {
             {/* Form header */}
             <div style={{ padding: "16px 26px", background: "rgba(59,130,246,.05)", borderBottom: `1px solid ${E.border}`, display: "flex", alignItems: "center", gap: 8 }}>
               <CircuitBoard size={13} style={{ color: E.blueLight }} />
-              <span style={{ color: E.subtle, fontSize: ".75rem", fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>MICRO-BRIEF CONFIDENTIEL · CHIFFRÉ · RGPD CONFORME</span>
+              <span style={{ color: E.subtle, fontSize: ".75rem", fontWeight: 600, fontFamily: "'DM Mono', monospace" }}>
+                {lang === "en" ? "CONFIDENTIAL MICRO-BRIEF · ENCRYPTED · GDPR COMPLIANT" : "MICRO-BRIEF CONFIDENTIEL · CHIFFRÉ · RGPD CONFORME"}
+              </span>
             </div>
 
             {!submitted ? (
               <div style={{ padding: 28 }}>
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
-                  <InputField label="Prénom" placeholder="Laurent" value={form.firstName} onChange={set("firstName")} required />
-                  <InputField label="Nom" placeholder="Favre" value={form.lastName} onChange={set("lastName")} required />
-                  <InputField label="Email professionnel" type="email" placeholder="l.favre@entreprise.ch" value={form.email} onChange={set("email")} required />
-                  <InputField label="Téléphone" type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")} />
+                  <InputField label={lang === "en" ? "First name" : "Prénom"} placeholder="Laurent" value={form.firstName} onChange={set("firstName")} required />
+                  <InputField label={lang === "en" ? "Last name" : "Nom"} placeholder="Favre" value={form.lastName} onChange={set("lastName")} required />
+                  <InputField label={lang === "en" ? "Professional email" : "Email professionnel"} type="email" placeholder="l.favre@company.ch" value={form.email} onChange={set("email")} required />
+                  <InputField label={lang === "en" ? "Phone" : "Téléphone"} type="tel" placeholder="+41 79 000 00 00" value={form.phone} onChange={set("phone")} />
                 </div>
 
                 <div style={{ marginBottom: 14 }}>
-                  <InputField label="Entreprise / Site de production" placeholder="Nom de votre société" value={form.company} onChange={set("company")} />
+                  <InputField label={lang === "en" ? "Company / Production site" : "Entreprise / Site de production"} placeholder={lang === "en" ? "Your company name" : "Nom de votre société"} value={form.company} onChange={set("company")} />
                 </div>
 
                 <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
-                  <SelectField label="Spécialité recherchée" value={form.specialty} onChange={set("specialty")} options={specialties} required />
-                  <SelectField label="Urgence" value={form.urgency} onChange={set("urgency")} options={urgencies} />
+                  <SelectField label={lang === "en" ? "Specialty sought" : "Spécialité recherchée"} value={form.specialty} onChange={set("specialty")} options={specialties} required />
+                  <SelectField label={lang === "en" ? "Urgency" : "Urgence"} value={form.urgency} onChange={set("urgency")} options={urgencies} />
                 </div>
 
                 <div style={{ marginBottom: 14 }}>
                   <label style={{ display: "block", color: E.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 7, fontFamily: "'DM Mono', monospace" }}>
-                    Contexte technique <span style={{ color: E.subtle, fontWeight: 400, textTransform: "none" }}>— Optionnel</span>
+                    {lang === "en" ? "Technical context" : "Contexte technique"} <span style={{ color: E.subtle, fontWeight: 400, textTransform: "none" }}>— {lang === "en" ? "Optional" : "Optionnel"}</span>
                   </label>
-                  <textarea placeholder="Technologies clés, certifications requises, environnement de travail, contexte projet..." value={form.message} onChange={set("message")} rows={3}
+                  <textarea
+                    placeholder={lang === "en"
+                      ? "Key technologies, required certifications, work environment, project context..."
+                      : "Technologies clés, certifications requises, environnement de travail, contexte projet..."}
+                    value={form.message} onChange={set("message")} rows={3}
                     style={{ width: "100%", padding: "12px 15px", borderRadius: 10, background: "rgba(8,13,26,.8)", border: `1px solid ${E.border}`, color: E.text, fontSize: ".86rem", outline: "none", resize: "vertical", transition: "all .3s", fontFamily: "'DM Sans', sans-serif", lineHeight: 1.6 }}
                     onFocus={e => { e.target.style.borderColor = E.borderGlow; e.target.style.boxShadow = `0 0 0 3px rgba(59,130,246,.1)`; }}
                     onBlur={e => { e.target.style.borderColor = E.border; e.target.style.boxShadow = "none"; }}
@@ -705,7 +775,7 @@ export default function TalentFluxEngineering() {
                 {/* PDF Upload */}
                 <div style={{ marginBottom: 22 }}>
                   <label style={{ display: "block", color: E.subtle, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", marginBottom: 7, fontFamily: "'DM Mono', monospace" }}>
-                    Cahier des charges / Annonce <span style={{ color: E.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB · Optionnel</span>
+                    {lang === "en" ? "Specifications / Job posting" : "Cahier des charges / Annonce"} <span style={{ color: E.subtle, fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB · {lang === "en" ? "Optional" : "Optionnel"}</span>
                   </label>
                   {!form.file ? (
                     <div onClick={() => fileRef.current?.click()}
@@ -723,9 +793,9 @@ export default function TalentFluxEngineering() {
                     >
                       <Upload size={20} style={{ color: E.subtle, margin: "0 auto 8px" }} />
                       <p style={{ color: E.muted, fontSize: ".83rem" }}>
-                        <span style={{ color: E.blueLight, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF
+                        <span style={{ color: E.blueLight, fontWeight: 600 }}>{lang === "en" ? "Click" : "Cliquez"}</span> {lang === "en" ? "or drag your PDF" : "ou glissez votre PDF"}
                       </p>
-                      <p style={{ color: E.subtle, fontSize: ".73rem", marginTop: 3 }}>Cahier des charges, fiche de poste, job description...</p>
+                      <p style={{ color: E.subtle, fontSize: ".73rem", marginTop: 3 }}>{lang === "en" ? "Specifications, job description, requirements..." : "Cahier des charges, fiche de poste, job description..."}</p>
                       <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
                     </div>
                   ) : (
@@ -760,12 +830,12 @@ export default function TalentFluxEngineering() {
                     transition: "all .3s", fontFamily: "'DM Sans', sans-serif",
                   }}>
                   {loading
-                    ? <><div style={{ width: 17, height: 17, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Analyse en cours...</>
-                    : <><Send size={17} />Recevoir un plan de recrutement</>
+                    ? <><div style={{ width: 17, height: 17, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />{lang === "en" ? "Analyzing..." : "Analyse en cours..."}</>
+                    : <><Send size={17} />{lang === "en" ? "Receive a recruitment plan" : "Recevoir un plan de recrutement"}</>
                   }
                 </button>
                 <p style={{ color: E.subtle, fontSize: ".68rem", textAlign: "center", marginTop: 10, fontFamily: "'DM Mono', monospace" }}>
-                  // DONNÉES CHIFFRÉES · SUPABASE · RGPD & LPD
+                  {lang === "en" ? "// ENCRYPTED DATA · SUPABASE · GDPR & LPD" : "// DONNÉES CHIFFRÉES · SUPABASE · RGPD & LPD"}
                 </p>
                 <div style={{ textAlign: "center", marginTop: 14, paddingTop: 14, borderTop: `1px solid ${E.border}` }}>
                   <Link href="/candidature/ingenierie" style={{
@@ -777,7 +847,7 @@ export default function TalentFluxEngineering() {
                     onMouseEnter={e => e.currentTarget.style.color = E.blueLight}
                     onMouseLeave={e => e.currentTarget.style.color = E.subtle}
                   >
-                    Vous êtes ingénieur ? → Déposez votre candidature
+                    {lang === "en" ? "Are you an engineer? → Submit your application" : "Vous êtes ingénieur ? → Déposez votre candidature"}
                   </Link>
                 </div>
               </div>
@@ -787,15 +857,20 @@ export default function TalentFluxEngineering() {
                   <CheckCircle size={28} style={{ color: E.blueLight }} />
                 </div>
                 <h3 style={{ color: E.text, fontWeight: 700, fontSize: "1.2rem", marginBottom: 10, fontFamily: "'Sora', sans-serif" }}>
-                  Brief reçu · <ElectricText>Analyse initialisée ✓</ElectricText>
+                  {lang === "en"
+                    ? <>Brief received · <ElectricText>Analysis initialized ✓</ElectricText></>
+                    : <>Brief reçu · <ElectricText>Analyse initialisée ✓</ElectricText></>
+                  }
                 </h3>
                 <p style={{ color: E.muted, marginBottom: 20, lineHeight: 1.7, fontSize: ".88rem" }}>
-                  Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />
-                  Un consultant TalentFlux Ingénierie vous contacte sous <strong style={{ color: E.blueLight }}>24h</strong>.
+                  {lang === "en"
+                    ? <>{`Thank you `}<strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />A TalentFlux Engineering consultant will contact you within <strong style={{ color: E.blueLight }}>24h</strong>.</>
+                    : <>Merci <strong style={{ color: "#CBD5E1" }}>{form.firstName}</strong>.<br />Un consultant TalentFlux Ingénierie vous contacte sous <strong style={{ color: E.blueLight }}>24h</strong>.</>
+                  }
                 </p>
                 <button onClick={() => { setSubmitted(false); setForm({ firstName:"",lastName:"",email:"",phone:"",company:"",specialty:"",urgency:"",message:"",file:null }); }}
                   style={{ padding: "9px 22px", borderRadius: 9, border: `1px solid ${E.borderGlow}`, background: "rgba(59,130,246,.07)", color: E.blueLight, fontWeight: 600, cursor: "pointer", fontSize: ".84rem", fontFamily: "'DM Mono', monospace" }}>
-                  Nouveau brief
+                  {lang === "en" ? "New brief" : "Nouveau brief"}
                 </button>
               </div>
             )}
@@ -806,7 +881,7 @@ export default function TalentFluxEngineering() {
             {[
               { icon: Mail, value: "info@talentflux.ch", href: "mailto:info@talentflux.ch" },
               { icon: Phone, value: "+41 76 592 88 06", href: "tel:+41765928806" },
-              { icon: MapPin, value: "Yverdon-les-Bains, Suisse", href: null },
+              { icon: MapPin, value: lang === "en" ? "Yverdon-les-Bains, Switzerland" : "Yverdon-les-Bains, Suisse", href: null },
             ].map(({ icon: Icon, value, href }, i) => (
               <div key={i} style={{ display: "flex", alignItems: "center", gap: 6 }}>
                 <Icon size={13} style={{ color: E.subtle }} strokeWidth={1.5} />
@@ -818,7 +893,7 @@ export default function TalentFluxEngineering() {
         </div>
       </section>
 
-      
+
       {/* ══ SILO SEO — Vous recrutez aussi dans... ══ */}
       <section style={{
         padding: "48px 2rem",
@@ -829,17 +904,17 @@ export default function TalentFluxEngineering() {
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <div style={{ textAlign: "center", marginBottom: 24 }}>
             <div style={{ color: "#818CF8", fontSize: ".7rem", fontWeight: 700, letterSpacing: ".15em", textTransform: "uppercase", marginBottom: 10 }}>
-              ✦ Nos autres expertises
+              {lang === "en" ? "✦ Our other expertise" : "✦ Nos autres expertises"}
             </div>
             <h2 style={{ fontFamily: "'Sora', sans-serif", fontWeight: 800, fontSize: "clamp(1.3rem,3vw,1.9rem)", color: "#F1F5F9", marginBottom: 6 }}>
-              Vous recrutez aussi dans...
+              {lang === "en" ? "You also recruit in..." : "Vous recrutez aussi dans..."}
             </h2>
             <p style={{ color: "#64748B", fontSize: ".88rem" }}>
-              TalentFlux opère sur 6 secteurs spécialisés en Suisse.
+              {lang === "en" ? "TalentFlux operates in 6 specialized sectors in Switzerland." : "TalentFlux opère sur 6 secteurs spécialisés en Suisse."}
             </p>
           </div>
           <div style={{ display: "flex", gap: 14, flexWrap: "wrap", justifyContent: "center" }}>
-            
+
           <a href="/it" style={{
             display: "flex", alignItems: "center", gap: 10,
             padding: "14px 22px", borderRadius: 14,
@@ -853,7 +928,7 @@ export default function TalentFluxEngineering() {
             <span style={{ fontSize: "1.1rem" }}>💻</span>
             <div>
               <div style={{ color: "#38BDF8", fontWeight: 700, fontSize: ".88rem" }}>IT & Digital</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           <a href="/paysagisme" style={{
@@ -868,8 +943,8 @@ export default function TalentFluxEngineering() {
           >
             <span style={{ fontSize: "1.1rem" }}>🌿</span>
             <div>
-              <div style={{ color: "#22C55E", fontWeight: 700, fontSize: ".88rem" }}>Paysagisme</div>
-              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>Voir la verticale →</div>
+              <div style={{ color: "#22C55E", fontWeight: 700, fontSize: ".88rem" }}>{lang === "en" ? "Landscaping" : "Paysagisme"}</div>
+              <div style={{ color: "#475569", fontSize: ".74rem", marginTop: 2 }}>{lang === "en" ? "View vertical →" : "Voir la verticale →"}</div>
             </div>
           </a>
           </div>
@@ -881,11 +956,14 @@ export default function TalentFluxEngineering() {
         <div style={{ maxWidth: 1060, margin: "0 auto", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
             <img src="/logo.png" alt="TalentFlux" style={{ height: 30, width: "auto", objectFit: "contain" }} />
-            <span style={{ color: E.subtle, fontSize: ".68rem", fontFamily: "'DM Mono', monospace" }}>· INGÉNIERIE · Yverdon-les-Bains</span>
+            <span style={{ color: E.subtle, fontSize: ".68rem", fontFamily: "'DM Mono', monospace" }}>· {lang === "en" ? "ENGINEERING" : "INGÉNIERIE"} · Yverdon-les-Bains</span>
           </div>
           <p style={{ color: E.subtle, fontSize: ".7rem", fontFamily: "'DM Mono', monospace" }}>© 2025 TalentFlux</p>
           <div style={{ display: "flex", gap: 16 }}>
-            {[["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]].map(([label, to]) => (
+            {(lang === "en"
+              ? [["Privacy", "/privacy"], ["Terms", "/cgu"], ["Contact", "/contact"]]
+              : [["Confidentialité", "/privacy"], ["CGU", "/cgu"], ["Contact", "/contact"]]
+            ).map(([label, to]) => (
               <Link key={to} href={to} style={{ color: E.subtle, fontSize: ".7rem", textDecoration: "none", fontFamily: "'DM Mono', monospace", transition: "color .2s" }}
                 onMouseEnter={e => e.target.style.color = E.muted}
                 onMouseLeave={e => e.target.style.color = E.subtle}
