@@ -1,268 +1,110 @@
 "use client";
 import { useMobile } from "@/utils/responsive";
-import { useState, useRef } from "react";
-import { HardHat, Send, Upload, X, FileText, AlertCircle } from "lucide-react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { supabase } from "@/lib/supabase";
+import { ArrowLeft, HardHat, Clock, Users, CheckCircle } from "lucide-react";
+import CandidatureForm from "@/components/CandidatureForm";
 
-export default function CandidatureBTP({ embedded = false }) {
-  const { isMobile } = useMobile();
-  const [submitted, setSubmitted] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
-  const [dragOver, setDragOver] = useState(false);
-  const fileRef = useRef(null);
-  const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "", phone: "",
-    specialite: "", typeChantier: "", logiciels: "", engins: "",
-    normes: [], certifications: "", disponibilite: "", message: "", file: null
-  });
-  const set = k => e => setForm(f => ({ ...f, [k]: e.target.value }));
-  const toggleNorme = v => setForm(f => ({
-    ...f, normes: f.normes.includes(v) ? f.normes.filter(n => n !== v) : [...f.normes, v]
-  }));
+const GradientText = ({ children }) => (
+  <span style={{ background: "linear-gradient(135deg, #FB923C, #F97316, #EA580C)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
+    {children}
+  </span>
+);
 
-  const handleFile = file => {
-    if (!file) return;
-    if (file.type !== "application/pdf") { setError("Seuls les PDF sont acceptés."); return; }
-    if (file.size > 10 * 1024 * 1024) { setError("Fichier trop lourd (max 10 MB)."); return; }
-    setError(null);
-    setForm(f => ({ ...f, file }));
-  };
+const THEME = {
+  accent: "#FB923C",
+  btnGradient: "linear-gradient(135deg, #92400E, #C2410C, #F97316)",
+  btnShadow: "0 4px 24px rgba(249,115,22,0.4)",
+  btnTextColor: "#fff",
+};
 
-  const handleSubmit = async () => {
-    setError(null);
-    if (!form.firstName || !form.lastName || !form.email) {
-      setError("Veuillez remplir les champs obligatoires (*).");
-      return;
-    }
-    setLoading(true);
-    try {
-      let pdfFileName = null, pdfFileUrl = null;
-      if (form.file) {
-        const san = s => s.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-zA-Z0-9_-]/g, "_");
-        const fn = `${Date.now()}_${san(form.firstName)}_${san(form.lastName)}.pdf`;
-        const { error: ue } = await supabase.storage.from("contact-pdfs").upload(`submissions/${fn}`, form.file, { contentType: "application/pdf" });
-        if (ue) throw new Error("Erreur lors de l'envoi du CV : " + ue.message);
-        pdfFileName = fn; pdfFileUrl = `submissions/${fn}`;
-      }
-      const competences = [
-        form.typeChantier && `Type chantier: ${form.typeChantier}`,
-        form.logiciels && `Logiciels: ${form.logiciels}`,
-        form.engins && `Permis engins: ${form.engins}`,
-        form.normes.length && `Normes: ${form.normes.join(", ")}`,
-        form.certifications && `Certifications: ${form.certifications}`,
-        form.disponibilite && `Dispo: ${form.disponibilite}`,
-        form.message,
-      ].filter(Boolean).join(" | ");
+const LABELS = {
+  submitBtn: "Soumettre ma candidature BTP",
+};
 
-      const { error: ie } = await supabase.from("contact_submissions").insert([{
-        type: "candidate", first_name: form.firstName.trim(), last_name: form.lastName.trim(),
-        email: form.email.trim().toLowerCase(), phone: form.phone.trim() || null,
-        sector: "btp", role: form.specialite.trim() || null,
-        message: competences,
-        pdf_file_name: pdfFileName, pdf_file_url: pdfFileUrl, status: "new",
-      }]);
-      if (ie) throw new Error(ie.message);
-      setSubmitted(true);
-    } catch (err) {
-      setError(err.message || "Une erreur est survenue.");
-    } finally { setLoading(false); }
-  };
+export default function CandidatureBTP() {
+  const { isMobile, isTablet } = useMobile();
+  const [scrolled, setScrolled] = useState(false);
+  useEffect(() => {
+    const fn = () => setScrolled(window.scrollY > 40);
+    window.addEventListener("scroll", fn);
+    return () => window.removeEventListener("scroll", fn);
+  }, []);
 
-  const C = { bg: "#07090C", text: "#F1F5F9", muted: "#8899B4", subtle: "#1E2D42", border: "rgba(255,255,255,0.07)", orangeL: "#FB923C", gradO: "linear-gradient(135deg,#92400E,#C2410C,#F97316)" };
+  return (
+    <div style={{ background: "#0B0F1A", minHeight: "100vh", fontFamily: "'DM Sans', sans-serif", color: "#F1F5F9" }}>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Sora:wght@700;800&family=DM+Sans:wght@400;500;600&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; }
+        ::selection { background: rgba(249,115,22,0.3); color: #fff; }
+        input::placeholder, textarea::placeholder { color: #334155; }
+        .dot-grid-btp {
+          background-image: linear-gradient(rgba(146,64,14,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(146,64,14,.04) 1px, transparent 1px);
+          background-size: 52px 52px;
+        }
+      `}</style>
 
-  const inputStyle = { width: "100%", padding: "11px 14px", borderRadius: 11, background: "rgba(255,255,255,.04)", border: "1px solid rgba(255,255,255,.07)", color: C.text, fontSize: ".88rem", outline: "none", fontFamily: "'DM Sans',sans-serif" };
-  const selectStyle = { ...inputStyle, background: "rgba(7,9,12,.9)", cursor: "pointer", appearance: "none" };
-  const labelStyle = { display: "block", color: C.muted, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 6 };
-  const focusO = e => { e.target.style.borderColor = "rgba(249,115,22,.5)"; };
-  const blurO = e => { e.target.style.borderColor = "rgba(255,255,255,.07)"; };
+      {/* NAV */}
+      <nav style={{
+        position: "fixed", top: 0, left: 0, right: 0, zIndex: 100, padding: "0 2rem", height: 68,
+        background: scrolled ? "rgba(11,15,26,0.95)" : "transparent",
+        backdropFilter: scrolled ? "blur(20px)" : "none",
+        borderBottom: scrolled ? "1px solid rgba(255,255,255,0.06)" : "none",
+        transition: "all .3s", display: "flex", alignItems: "center", justifyContent: "space-between",
+      }}>
+        <Link href="/btp" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none", color: "#94A3B8", transition: "color .2s" }}
+          onMouseEnter={e => e.currentTarget.style.color = "#F1F5F9"}
+          onMouseLeave={e => e.currentTarget.style.color = "#94A3B8"}>
+          <ArrowLeft size={17} /><span style={{ fontSize: ".88rem" }}>Retour</span>
+        </Link>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <img src="/logo.png" onError={(e) => e.target.style.display="none"} alt="TalentFlux" style={{ height: 36, objectFit: "contain" }} />
+          <span style={{ fontSize: ".58rem", fontWeight: 700, letterSpacing: ".12em", color: "#FB923C", background: "rgba(249,115,22,.1)", border: "1px solid rgba(249,115,22,.3)", borderRadius: 4, padding: "2px 7px" }}>BTP</span>
+        </div>
+      </nav>
 
-  const SectionHeader = ({ children }) => (
-    <div style={{ display: "flex", alignItems: "center", gap: 10, margin: "22px 0 14px" }}>
-      <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.07)" }} />
-      <span style={{ color: C.orangeL, fontSize: ".68rem", fontWeight: 700, letterSpacing: ".12em", textTransform: "uppercase", whiteSpace: "nowrap" }}>{children}</span>
-      <div style={{ flex: 1, height: 1, background: "rgba(255,255,255,.07)" }} />
-    </div>
-  );
-
-  if (submitted) {
-    const successContent = (
-      <div style={{ textAlign: "center", padding: embedded ? "40px 26px" : undefined, maxWidth: embedded ? undefined : 480 }}>
-        <div style={{ fontSize: 48, marginBottom: 20 }}>🏗️</div>
-        <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: embedded ? "1.25rem" : "1.8rem", marginBottom: 12 }}>Candidature reçue</h1>
-        <p style={{ color: C.muted, lineHeight: 1.8, marginBottom: 24 }}>Merci <strong style={{ color: C.text }}>{form.firstName}</strong>. Un consultant TalentFlux BTP examine votre profil et vous répond sous <strong style={{ color: C.orangeL }}>2h ouvrées</strong>.</p>
-        {!embedded && <Link href="/btp" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", borderRadius: 13, background: C.gradO, color: "#fff", textDecoration: "none", fontWeight: 700, fontSize: ".9rem" }}>← Retour</Link>}
-      </div>
-    );
-    if (embedded) return successContent;
-    return (
-      <div style={{ background: C.bg, minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'DM Sans',sans-serif", padding: "2rem" }}>
-        {successContent}
-      </div>
-    );
-  }
-
-  const formContent = (
-    <div style={{ background: "rgba(12,16,22,.92)", border: "1px solid rgba(255,255,255,.07)", borderRadius: embedded ? 0 : 22, padding: isMobile ? 20 : 32 }}>
-
-          {/* — Informations personnelles — */}
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
-            {[["Prénom *", "firstName", "Jean"], ["Nom *", "lastName", "Dupont"],
-              ["Email *", "email", "j.dupont@mail.ch"], ["Téléphone", "phone", "+41 79 000 00 00"]
-            ].map(([label, key, ph]) => (
-              <div key={key}>
-                <label style={labelStyle}>{label}</label>
-                <input type={key === "email" ? "email" : key === "phone" ? "tel" : "text"}
-                  placeholder={ph} value={form[key]} onChange={set(key)}
-                  style={inputStyle} onFocus={focusO} onBlur={blurO} />
+      {/* HERO */}
+      <div className="dot-grid-btp" style={{ padding: "100px 2rem 48px", textAlign: "center", position: "relative" }}>
+        <div style={{ position: "absolute", top: "10%", left: "10%", width: 360, height: 360, borderRadius: "50%", background: "radial-gradient(circle, rgba(146,64,14,.1), transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "absolute", bottom: 0, right: "8%", width: 260, height: 260, borderRadius: "50%", background: "radial-gradient(circle, rgba(249,115,22,.07), transparent 70%)", pointerEvents: "none" }} />
+        <div style={{ position: "relative", zIndex: 1 }}>
+          <div style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(249,115,22,.08)", border: "1px solid rgba(249,115,22,.25)", borderRadius: 100, padding: "6px 18px", marginBottom: 24 }}>
+            <HardHat size={13} style={{ color: "#FB923C" }} />
+            <span style={{ color: "#94A3B8", fontSize: ".78rem", fontWeight: 500 }}>Candidature BTP & Architecture · TalentFlux Suisse</span>
+          </div>
+          <h1 style={{ fontFamily: "'Sora',sans-serif", fontSize: "clamp(1.8rem,4vw,3rem)", fontWeight: 800, lineHeight: 1.12, marginBottom: 16 }}>
+            Construisez votre prochaine étape.<br /><GradientText>Rejoignez le Flux BTP.</GradientText>
+          </h1>
+          <p style={{ color: "#94A3B8", fontSize: ".97rem", lineHeight: 1.8, maxWidth: 520, margin: "0 auto 36px" }}>
+            Remplissez ce formulaire une seule fois. Nous matchons votre profil avec les mandats BTP & Architecture de nos clients en Suisse.
+          </p>
+          <div style={{ display: "flex", gap: 20, justifyContent: "center", flexWrap: "wrap" }}>
+            {[
+              [CheckCircle, "Réponse sous 48h"],
+              [Clock, "5 min à remplir"],
+              [Users, "Réseau de 30+ clients BTP"],
+            ].map(([Icon, text], i) => (
+              <div key={i} style={{ display: "flex", alignItems: "center", gap: 7 }}>
+                <Icon size={14} style={{ color: "#FB923C" }} />
+                <span style={{ color: "#64748B", fontSize: ".82rem" }}>{text}</span>
               </div>
             ))}
           </div>
-
-          {/* — Profil & Spécialité — */}
-          <SectionHeader>Profil & spécialité</SectionHeader>
-
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
-            <div>
-              <label style={labelStyle}>Fonction / Spécialité</label>
-              <select value={form.specialite} onChange={set("specialite")} style={{ ...selectStyle, color: form.specialite ? C.text : C.muted }}>
-                <option value="">Sélectionner...</option>
-                {["Chef de chantier", "Directeur / Conducteur de travaux", "Architecte", "Ingénieur civil / structure",
-                  "Ingénieur CVSE", "Responsable HSE / MSST", "Géomètre", "BIM Manager / Coordinateur BIM",
-                  "Technicien / Dessinateur DAO", "Économiste de la construction", "Maître d'état (électricité, plomberie, etc.)", "Autre"].map(o => (
-                  <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label style={labelStyle}>Type de chantier</label>
-              <select value={form.typeChantier} onChange={set("typeChantier")} style={{ ...selectStyle, color: form.typeChantier ? C.text : C.muted }}>
-                <option value="">Sélectionner...</option>
-                {["Neuf (gros œuvre)", "Rénovation / transformation", "Mixte neuf & rénovation",
-                  "Infrastructure / génie civil", "Aménagement intérieur", "Industrie / EPI"].map(o => (
-                  <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* — Compétences techniques — */}
-          <SectionHeader>Compétences techniques</SectionHeader>
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Logiciels & outils maîtrisés</label>
-            <select value={form.logiciels} onChange={set("logiciels")} style={{ ...selectStyle, color: form.logiciels ? C.text : C.muted }}>
-              <option value="">Sélectionner le principal outil...</option>
-              {["AutoCAD", "Revit / BIM 360", "Allplan", "ArchiCAD", "Tekla Structures",
-                "MS Project / Planification", "SAP PM / ERP chantier", "Navisworks (coordination BIM)",
-                "Adobe Acrobat (plans PDF)", "Autre / sans outil principal"].map(o => (
-                <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-              ))}
-            </select>
-          </div>
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Permis d'engins & habilitations</label>
-            <input placeholder="Ex: Grue à tour, pelle hydraulique, chariot élévateur, travaux en hauteur, SUVA..." value={form.engins} onChange={set("engins")} style={inputStyle} onFocus={focusO} onBlur={blurO} />
-          </div>
-
-          {/* — Normes & réglementations — */}
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Normes & réglementations connues</label>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginTop: 4 }}>
-              {["SIA 118", "OTConst", "LCA / CCT", "SUVA / OPA", "Minergie", "SNBS", "MOP", "SIA 102 / 103", "SIA 416", "Loi sur les marchés publics"].map(v => (
-                <button key={v} type="button" onClick={() => toggleNorme(v)}
-                  style={{ padding: "6px 12px", borderRadius: 8, fontSize: ".78rem", fontWeight: 600, cursor: "pointer", transition: "all .2s", fontFamily: "'DM Sans',sans-serif", border: form.normes.includes(v) ? "1px solid rgba(249,115,22,.6)" : "1px solid rgba(255,255,255,.1)", background: form.normes.includes(v) ? "rgba(249,115,22,.15)" : "rgba(255,255,255,.03)", color: form.normes.includes(v) ? C.orangeL : C.muted }}>
-                  {v}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {/* — Certifications & disponibilité — */}
-          <SectionHeader>Certifications & disponibilité</SectionHeader>
-
-          <div style={{ display: "grid", gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr", gap: 14, marginBottom: 14 }}>
-            <div>
-              <label style={labelStyle}>Certifications & agréments</label>
-              <input placeholder="Ex: Brevet fédéral chef de chantier, CAS Construction, MSST niv.2..." value={form.certifications} onChange={set("certifications")} style={inputStyle} onFocus={focusO} onBlur={blurO} />
-            </div>
-            <div>
-              <label style={labelStyle}>Disponibilité</label>
-              <select value={form.disponibilite} onChange={set("disponibilite")} style={{ ...selectStyle, color: form.disponibilite ? C.text : C.muted }}>
-                <option value="">Délai...</option>
-                {["Immédiatement", "1 mois", "2 mois", "3 mois", "Plus de 3 mois"].map(o => (
-                  <option key={o} value={o} style={{ background: "#07090C" }}>{o}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          <div style={{ marginBottom: 14 }}>
-            <label style={labelStyle}>Chantiers de référence & expérience</label>
-            <textarea placeholder="Ex: Chef de chantier 12 ans, structure béton et bois, chantiers jusqu'à 15M CHF, bilingue FR/DE, maîtrise SIA 118, référence MO disponible..."
-              value={form.message} onChange={set("message")} rows={4}
-              style={{ ...inputStyle, resize: "vertical", lineHeight: 1.6 }}
-              onFocus={focusO} onBlur={blurO} />
-          </div>
-
-          <div style={{ marginBottom: 18 }}>
-            <label style={labelStyle}>CV <span style={{ fontWeight: 400, textTransform: "none" }}>— PDF · Max 10 MB</span></label>
-            {!form.file ? (
-              <div onClick={() => fileRef.current?.click()}
-                onDragOver={e => { e.preventDefault(); setDragOver(true); }}
-                onDragLeave={() => setDragOver(false)}
-                onDrop={e => { e.preventDefault(); setDragOver(false); handleFile(e.dataTransfer.files[0]); }}
-                style={{ border: dragOver ? "2px dashed #FB923C" : "2px dashed rgba(255,255,255,.07)", borderRadius: 11, padding: 18, textAlign: "center", cursor: "pointer", transition: "all .25s" }}>
-                <Upload size={20} style={{ color: C.muted, margin: "0 auto 8px" }} />
-                <p style={{ color: C.muted, fontSize: ".82rem" }}><span style={{ color: C.orangeL, fontWeight: 600 }}>Cliquez</span> ou glissez votre PDF</p>
-                <input ref={fileRef} type="file" accept=".pdf" style={{ display: "none" }} onChange={e => handleFile(e.target.files[0])} />
-              </div>
-            ) : (
-              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "11px 14px", borderRadius: 11, background: "rgba(249,115,22,.06)", border: "1px solid rgba(249,115,22,.2)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
-                  <FileText size={15} style={{ color: C.orangeL }} />
-                  <span style={{ color: C.text, fontSize: ".84rem", fontWeight: 600 }}>{form.file.name}</span>
-                </div>
-                <button onClick={() => setForm(f => ({ ...f, file: null }))} style={{ background: "rgba(239,68,68,.1)", border: "1px solid rgba(239,68,68,.2)", borderRadius: 7, padding: "4px 6px", cursor: "pointer", color: "#EF4444" }}><X size={13} /></button>
-              </div>
-            )}
-          </div>
-
-          {error && (
-            <div style={{ display: "flex", alignItems: "center", gap: 9, marginBottom: 14, padding: "10px 13px", borderRadius: 10, background: "rgba(239,68,68,.08)", border: "1px solid rgba(239,68,68,.2)" }}>
-              <AlertCircle size={14} style={{ color: "#EF4444", flexShrink: 0 }} />
-              <span style={{ color: "#FCA5A5", fontSize: ".83rem" }}>{error}</span>
-            </div>
-          )}
-
-          <button onClick={handleSubmit} disabled={loading}
-            style={{ width: "100%", padding: "14px", borderRadius: 13, border: "none", background: loading ? "rgba(249,115,22,.4)" : C.gradO, color: "#fff", fontWeight: 700, fontSize: ".92rem", cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 9, fontFamily: "'DM Sans',sans-serif" }}>
-            {loading
-              ? <><div style={{ width: 16, height: 16, border: "2px solid rgba(255,255,255,.3)", borderTop: "2px solid #fff", borderRadius: "50%", animation: "spin .8s linear infinite" }} />Envoi...</>
-              : <><Send size={16} />Envoyer ma candidature</>}
-          </button>
-          <p style={{ color: C.muted, fontSize: ".7rem", textAlign: "center", marginTop: 9 }}>🔒 Traitement confidentiel · LPD suisse & RGPD conformes</p>
         </div>
-  );
+      </div>
 
-  if (embedded) return formContent;
-
-  return (
-    <div style={{ background: C.bg, minHeight: "100vh", fontFamily: "'DM Sans',sans-serif", padding: isMobile ? "80px 1.4rem 40px" : "100px 2rem 60px" }}>
-      <div style={{ maxWidth: 640, margin: "0 auto" }}>
-        <Link href="/btp" style={{ display: "inline-flex", alignItems: "center", gap: 7, color: C.muted, fontSize: ".84rem", textDecoration: "none", marginBottom: 32 }}>← Retour à la verticale BTP</Link>
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28 }}>
-          <div style={{ width: 42, height: 42, borderRadius: 12, background: "rgba(249,115,22,.15)", border: "1px solid rgba(251,146,60,.2)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <HardHat size={20} style={{ color: C.orangeL }} strokeWidth={1.5} />
+      {/* FORM */}
+      <div style={{ maxWidth: 720, margin: "0 auto", padding: "0 2rem 80px" }}>
+        <div style={{ background: "rgba(15,23,42,0.9)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 24, overflow: "hidden", boxShadow: "0 0 60px rgba(146,64,14,0.07)" }}>
+          <div style={{ padding: "16px 24px", background: "rgba(249,115,22,.05)", borderBottom: "1px solid rgba(255,255,255,.07)", display: "flex", alignItems: "center", gap: 8 }}>
+            <HardHat size={14} style={{ color: "#FB923C" }} />
+            <span style={{ color: "#475569", fontSize: ".75rem", fontWeight: 600 }}>CANDIDATURE CONFIDENTIELLE · TRAITEMENT SOUS 48H</span>
           </div>
-          <div>
-            <h1 style={{ fontFamily: "'Sora',sans-serif", color: C.text, fontWeight: 800, fontSize: "1.4rem", margin: 0 }}>Déposer ma candidature BTP</h1>
-            <p style={{ color: C.muted, fontSize: ".82rem", margin: 0 }}>Confidentiel · Sans diffusion publique · LPD suisse conforme</p>
+          <div style={{ padding: 28 }}>
+            <CandidatureForm secteur="BTP" theme={THEME} labels={LABELS} />
           </div>
         </div>
-        {formContent}
       </div>
     </div>
   );
